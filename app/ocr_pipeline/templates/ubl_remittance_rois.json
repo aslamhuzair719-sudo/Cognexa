@@ -1,0 +1,202 @@
+{
+  "form_id": "ubl_application_remittance_v1",
+  "description": "UBL Application / Remittance Form. Prefer anchor+offset so fields stick to detected section headers. offset=[x, dy, w, h] where dy is below the header center. Keep boxes tight on VALUES only.",
+  "coordinate_space": "normalized",
+  "template_size": [1000, 1400],
+  "page_aspect_hint": 0.714,
+  "fields": {
+    "date": {
+      "anchor": "page_top",
+      "offset": [0.55, 0.000, 0.22, 0.018],
+      "label": "Date (may be cropped with header)",
+      "field_type": "date",
+      "ocr_mode": "mixed"
+    },
+    "branch_code": {
+      "anchor": "page_top",
+      "offset": [0.80, 0.000, 0.16, 0.018],
+      "label": "Branch",
+      "field_type": "branch_code",
+      "ocr_mode": "printed"
+    },
+    "cheque_number": {
+      "anchor": "remittance_details",
+      "offset": [0.55, 0.055, 0.40, 0.024],
+      "label": "Cheque No / Branch Code digit grid",
+      "field_type": "cheque",
+      "ocr_mode": "printed"
+    },
+    "amount_figures": {
+      "anchor": "remittance_details",
+      "offset": [0.28, 0.145, 0.55, 0.026],
+      "label": "Amount in Figures",
+      "field_type": "amount",
+      "ocr_mode": "printed"
+    },
+    "amount_words": {
+      "anchor": "remittance_details",
+      "offset": [0.32, 0.175, 0.62, 0.018],
+      "label": "Amount in Words",
+      "field_type": "amount_words",
+      "ocr_mode": "mixed"
+    },
+
+    "beneficiary_name": {
+      "anchor": "beneficiary_details",
+      "offset": [0.38, 0.022, 0.58, 0.018],
+      "label": "Favoring / Name of the Beneficiary",
+      "field_type": "name",
+      "ocr_mode": "mixed"
+    },
+    "beneficiary_account": {
+      "anchor": "beneficiary_details",
+      "offset": [0.28, 0.050, 0.68, 0.024],
+      "label": "Bank Account No / IBAN",
+      "field_type": "account",
+      "ocr_mode": "printed"
+    },
+
+    "applicant_name": {
+      "anchor": "applicant_details",
+      "offset": [0.16, 0.018, 0.80, 0.016],
+      "label": "Remitter / Applicant Name",
+      "field_type": "name",
+      "ocr_mode": "mixed"
+    },
+    "father_name": {
+      "anchor": "applicant_details",
+      "offset": [0.34, 0.042, 0.62, 0.016],
+      "label": "Father / Husband Name",
+      "field_type": "name",
+      "ocr_mode": "mixed"
+    },
+    "cnic": {
+      "anchor": "applicant_details",
+      "offset": [0.26, 0.088, 0.50, 0.022],
+      "label": "Applicant CNIC Number",
+      "field_type": "cnic",
+      "ocr_mode": "printed"
+    },
+    "address": {
+      "anchor": "applicant_details",
+      "offset": [0.18, 0.120, 0.55, 0.018],
+      "label": "Applicant Address",
+      "field_type": "address",
+      "ocr_mode": "mixed"
+    },
+    "mobile": {
+      "anchor": "applicant_details",
+      "offset": [0.28, 0.148, 0.38, 0.022],
+      "label": "Applicant Contact No",
+      "field_type": "phone",
+      "ocr_mode": "printed"
+    },
+    "occupation": {
+      "anchor": "applicant_details",
+      "offset": [0.38, 0.215, 0.26, 0.018],
+      "label": "Line of Business / Occupation",
+      "field_type": "text",
+      "ocr_mode": "mixed"
+    },
+    "purpose": {
+      "anchor": "purpose_of_remittance",
+      "offset": [0.70, 0.035, 0.25, 0.016],
+      "label": "Purpose other write-in",
+      "field_type": "text",
+      "ocr_mode": "mixed"
+    },
+
+    "non_account_holder": {
+      "anchor": "remittance_details",
+      "offset": [0.035, 0.028, 0.015, 0.011],
+      "label": "Non Account Holder",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+    "cash_transfer": {
+      "anchor": "remittance_details",
+      "offset": [0.20, 0.028, 0.015, 0.011],
+      "label": "Cash Transfer",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+    "cashiers_cheque": {
+      "anchor": "remittance_details",
+      "offset": [0.20, 0.052, 0.015, 0.011],
+      "label": "Cashier's Cheque",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+    "online_transfer": {
+      "anchor": "remittance_details",
+      "offset": [0.035, 0.085, 0.015, 0.011],
+      "label": "Online Transfer",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+      "currency_pkr": {
+      "anchor": "remittance_details",
+      "offset": [0.88, 0.055, 0.014, 0.010],
+      "label": "Currency PKR",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+    "purpose_family_maintenance": {
+      "anchor": "purpose_of_remittance",
+      "offset": [0.08, 0.020, 0.013, 0.010],
+      "label": "Purpose: Family Maintenance",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+    "purpose_education": {
+      "anchor": "purpose_of_remittance",
+      "offset": [0.08, 0.038, 0.013, 0.010],
+      "label": "Purpose: Education",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+    "purpose_medical": {
+      "anchor": "purpose_of_remittance",
+      "offset": [0.08, 0.055, 0.013, 0.010],
+      "label": "Purpose: Medical",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+    "purpose_gift": {
+      "anchor": "purpose_of_remittance",
+      "offset": [0.30, 0.020, 0.013, 0.010],
+      "label": "Purpose: Gift",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+    "purpose_investment": {
+      "anchor": "purpose_of_remittance",
+      "offset": [0.30, 0.038, 0.013, 0.010],
+      "label": "Purpose: Investment",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+    "purpose_business": {
+      "anchor": "purpose_of_remittance",
+      "offset": [0.52, 0.020, 0.013, 0.010],
+      "label": "Purpose: Business",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+    "purpose_other": {
+      "anchor": "purpose_of_remittance",
+      "offset": [0.52, 0.055, 0.013, 0.010],
+      "label": "Purpose: Other",
+      "field_type": "checkbox",
+      "ocr_mode": "checkbox"
+    },
+
+    "signature_area": {
+      "anchor": "declaration",
+      "offset": [0.08, 0.035, 0.35, 0.065],
+      "label": "Applicant Signature",
+      "field_type": "signature",
+      "ocr_mode": "skip"
+    }
+  }
+}
