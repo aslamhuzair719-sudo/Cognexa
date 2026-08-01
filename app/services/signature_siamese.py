@@ -180,12 +180,11 @@ def compare_siamese_arrays(reg_canvas: np.ndarray, probe_canvas: np.ndarray) -> 
     probe_emb = embed_signature(probe_canvas)
     sim = cosine_similarity(reg_emb, probe_emb)
     distance = float(np.linalg.norm(reg_emb - probe_emb))
-    # Map cosine → percentage; distance is auxiliary signal for UI
+    # Map cosine → percentage; distance is auxiliary visual signal for UI
     match_pct = round(sim * 100.0, 1)
     scores = {
-        "siamese_similarity": match_pct,
-        "embedding_distance": round(max(0.0, (1.0 - distance / 2.0) * 100.0), 1),
-        "cosine_raw": round(float(np.dot(reg_emb, probe_emb)) * 100.0, 1),
+        "visual_similarity": round(max(0.0, (1.0 - distance / 2.0) * 100.0), 1),
+        "similarity": match_pct,
     }
     return match_pct, scores
 

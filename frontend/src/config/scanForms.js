@@ -39,6 +39,9 @@ export const CNIC_TEXT_FIELDS = [
 ]
 
 export const PAYSLIP_TEXT_FIELDS = [
+  { key: 'validity_status', label: 'Validity Status' },
+  { key: 'validity_score', label: 'Validity Score' },
+  { key: 'validity_reason', label: 'Validity Reason', full: true },
   { key: 'company_name', label: 'Company Name', full: true },
   { key: 'company_address', label: 'Company Address', full: true },
   { key: 'company_email', label: 'Company Email' },

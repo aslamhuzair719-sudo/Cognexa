@@ -36,6 +36,9 @@ CNIC_FIELD_KEYS = (
 )
 
 PAYSLIP_FIELD_KEYS = (
+    "validity_status",
+    "validity_score",
+    "validity_reason",
     "company_name",
     "company_address",
     "company_email",

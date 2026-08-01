@@ -1,7 +1,6 @@
 """Compare two handwritten signature images (registered vs probe).
 
-Current behavior: use Gemini Vision to estimate a match percentage.
-Siamese CNN can be re-enabled later for faster offline matching.
+Prefers local Siamese CNN when available; falls back to Gemini Vision.
 """
 
 from __future__ import annotations
@@ -223,7 +222,17 @@ def _gemini_compare_two_images(
 
 
 def compare_signature_images(registered_bytes: bytes, probe_bytes: bytes) -> dict:
-    """Return comparison result dict for the frontend."""
+    """Return comparison result dict (Siamese when available, else Gemini Vision)."""
+    try:
+        from app.services.signature_siamese import compare_siamese_bytes
+
+        return compare_siamese_bytes(registered_bytes, probe_bytes)
+    except Exception as siamese_exc:
+        logger.warning(
+            "Siamese signature compare unavailable (%s); falling back to Gemini Vision",
+            siamese_exc,
+        )
+
     try:
         registered_clean = enhance_signature_image(registered_bytes)
         probe_clean = enhance_signature_image(probe_bytes)
@@ -232,10 +241,11 @@ def compare_signature_images(registered_bytes: bytes, probe_bytes: bytes) -> dic
             probe_bytes=probe_clean,
         )
         pct = out["match_percentage"]
-        scores: Dict[str, float] = {"similarity": round(pct, 1)}
+        scores: Dict[str, float] = {}
         visual = out.get("visual_similarity")
         if visual is not None:
             scores["visual_similarity"] = round(float(visual), 1)
+        scores["similarity"] = round(pct, 1)
         return {
             "match_percentage": pct,
             "method": "gemini_vision",
@@ -244,3 +254,4 @@ def compare_signature_images(registered_bytes: bytes, probe_bytes: bytes) -> dic
     except Exception as exc:
         logger.exception("Gemini signature compare failed")
         raise ValueError(f"Signature comparison failed: {exc}") from exc
+

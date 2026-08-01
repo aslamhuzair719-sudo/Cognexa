@@ -42,7 +42,7 @@ GEMINI_URL: str = os.getenv(
     "GEMINI_URL",
     "https://generativelanguage.googleapis.com",
 )
-GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
+GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 GEMINI_VISION_MODEL: str = os.getenv("GEMINI_VISION_MODEL", GEMINI_MODEL)
 GEMINI_TIMEOUT: int = int(os.getenv("GEMINI_TIMEOUT", "120"))
 GEMINI_MAX_RETRIES: int = int(os.getenv("GEMINI_MAX_RETRIES", "2"))

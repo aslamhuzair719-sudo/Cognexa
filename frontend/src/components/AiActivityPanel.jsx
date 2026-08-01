@@ -61,6 +61,7 @@ export function buildScanSteps(docType, activeIndex, { finished = false } = {}) 
   const defs = structured
     ? [
         { id: 'upload', label: 'Document received' },
+        { id: 'type', label: 'Checking document type', activeMsg: 'AI is identifying the document…' },
         { id: 'prepare', label: 'Preparing image for AI' },
         {
           id: 'llm',
@@ -72,6 +73,7 @@ export function buildScanSteps(docType, activeIndex, { finished = false } = {}) 
       ]
     : [
         { id: 'upload', label: 'Document received' },
+        { id: 'type', label: 'Checking document type', activeMsg: 'AI is identifying the document…' },
         { id: 'ocr', label: 'Parsing document text (OCR)' },
         { id: 'llm', label: 'LLM generating summary', activeMsg: 'AI is working on the summary…' },
         { id: 'done', label: 'Summary complete' },

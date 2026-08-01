@@ -102,12 +102,13 @@ function MatchMeter({ percentage, verdict }) {
 
 function formatScoreLabel(key) {
   const normalized = String(key || '').toLowerCase()
-  if (normalized === 'similarity' || normalized === 'gemini_similarity') {
-    return 'Similarity'
-  }
+  if (normalized === 'visual_similarity') return 'Visual Similarity'
+  if (normalized === 'similarity' || normalized === 'gemini_similarity') return 'Similarity'
   const label = String(key || '').replace(/_/g, ' ')
   return label ? label.charAt(0).toUpperCase() + label.slice(1) : label
 }
+
+const REPORT_SCORE_KEYS = ['visual_similarity', 'similarity']
 
 export default function BranchSignaturesPage() {
   const [view, setView] = useState('scan')
@@ -429,15 +430,18 @@ export default function BranchSignaturesPage() {
                   <section className="sig-report-section">
                     <h3>Score breakdown</h3>
                     <div className="sig-score-bars">
-                      {Object.entries(compareResult.scores).map(([key, value]) => (
-                        <div key={key} className="sig-score-row">
-                          <span>{formatScoreLabel(key)}</span>
-                          <div className="sig-score-track">
-                            <i style={{ width: `${value}%` }} />
+                      {REPORT_SCORE_KEYS.filter((key) => compareResult.scores[key] != null).map((key) => {
+                        const value = compareResult.scores[key]
+                        return (
+                          <div key={key} className="sig-score-row">
+                            <span>{formatScoreLabel(key)}</span>
+                            <div className="sig-score-track">
+                              <i style={{ width: `${value}%` }} />
+                            </div>
+                            <strong>{value}%</strong>
                           </div>
-                          <strong>{value}%</strong>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </section>
                 ) : null}

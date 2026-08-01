@@ -16,7 +16,6 @@ from app.routes.applications import router as applications_router
 from app.routes.auth import router as auth_router
 from app.routes.branch import router as branch_router
 from app.routes.health import router as health_router
-from app.routes.remittance import router as remittance_router
 from app.routes.signatures import router as signatures_router
 from app.routes.verification import router as verification_router
 
@@ -37,10 +36,10 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(
-    title="AVS — Application Verification System",
+    title="UBL — Document and Application Verification System",
     description=(
-        "Application Verification System (AVS) — customer applications, "
-        "branch document scanning, and verification."
+        "UBL stores customer applications for branch review; "
+        "branch users run AI verification and decide."
     ),
     version="2.1.0",
     lifespan=lifespan,
@@ -59,7 +58,6 @@ app.include_router(applications_router)
 app.include_router(auth_router)
 app.include_router(branch_router)
 app.include_router(signatures_router)
-app.include_router(remittance_router)
 app.include_router(verification_router)
 
 
@@ -105,8 +103,6 @@ def favicon():
 @app.get("/ubl-logo.png")
 def ubl_logo():
     path = FRONTEND_DIST / "ubl-logo.png"
-    if not path.exists():
-        path = BASE_DIR / "frontend" / "public" / "ubl-logo.png"
     if path.exists():
         return FileResponse(path, media_type="image/png")
     raise HTTPException(status_code=404, detail="logo missing")
@@ -115,8 +111,6 @@ def ubl_logo():
 @app.get("/app-bg.jpg")
 def app_background():
     path = FRONTEND_DIST / "app-bg.jpg"
-    if not path.exists():
-        path = BASE_DIR / "frontend" / "public" / "app-bg.jpg"
     if path.exists():
         return FileResponse(path, media_type="image/jpeg")
     raise HTTPException(status_code=404, detail="background missing")
@@ -142,9 +136,8 @@ def index():
 @app.get("/branch/audit")
 @app.get("/branch/scan")
 @app.get("/branch/signatures")
-@app.get("/branch/entries/{entry_id}")
 @app.get("/branch/applications/{application_id}")
-def spa_routes(application_id: str | None = None, entry_id: str | None = None):
+def spa_routes(application_id: str | None = None):
     return FileResponse(_spa_index())
 
 

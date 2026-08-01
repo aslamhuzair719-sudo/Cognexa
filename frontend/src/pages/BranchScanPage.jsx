@@ -10,7 +10,6 @@ import {
   docTypeLabel,
   getCheckboxesForMode,
   getTextFieldsForMode,
-  isStructuredDocType,
 } from '../config/scanForms.js'
 
 const CONFIDENCE_COLOR = {
@@ -21,6 +20,18 @@ const CONFIDENCE_COLOR = {
 
 function humanizeKey(key) {
   return String(key || '').replace(/_/g, ' ')
+}
+
+/** Strip provider/model names from API summary text before showing in UI. */
+function publicSummaryText(text) {
+  if (!text) return ''
+  return String(text)
+    .replace(/\s*\([^)]*(?:gemini|groq|ollama|gpt-?|claude|flash|models\/)[^)]*\)/gi, '')
+    .replace(/\bvia\s+Gemini(?:\s+vision)?\b/gi, 'via AI')
+    .replace(/\bvia\s+(?:Groq|Ollama)\b/gi, 'via AI')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+\./g, '.')
+    .trim()
 }
 
 function buildDraftItem({ file, docType, result, fields, checkboxes, formMode, transactions = [] }) {
@@ -152,15 +163,36 @@ export default function BranchScanPage() {
         body: form,
       })
       setResult(data)
+
+      if (data?.type_mismatch) {
+        setFormMode(null)
+        setEditFields({})
+        setEditChecks({})
+        setEditTransactions([])
+        originalFormRef.current = null
+        const msgs = data?.ai_activity?.messages || [
+          data?.type_check?.message || 'Wrong document type.',
+        ]
+        setCompletionMessages(msgs)
+        setScanStepIndex(99)
+        showToast(
+          'Wrong document type',
+          data?.type_check?.message
+            || `Selected ${docTypeLabel(docType)}, but the file looks different.`,
+        )
+        return
+      }
+
       const built = buildFormFromResult(data, docType)
       setFormMode(built.mode)
       setEditFields(built.fields)
       setEditChecks(built.checkboxes)
+      setEditTransactions(built.transactions || [])
       originalFormRef.current = {
         mode: built.mode,
         fields: { ...built.fields },
         checkboxes: { ...built.checkboxes },
-        transactions: [],
+        transactions: [...(built.transactions || [])],
       }
       const msgs = data?.ai_activity?.messages || [
         'Document parsing complete.',
@@ -212,16 +244,11 @@ export default function BranchScanPage() {
   useEffect(() => {
     if (!loading) return undefined
     setScanStepIndex(0)
-    const structured = isStructuredDocType(docType)
-    const timers = structured
-      ? [
-          setTimeout(() => setScanStepIndex(1), 700),
-          setTimeout(() => setScanStepIndex(2), 1800),
-        ]
-      : [
-          setTimeout(() => setScanStepIndex(1), 600),
-          setTimeout(() => setScanStepIndex(2), 2200),
-        ]
+    const timers = [
+      setTimeout(() => setScanStepIndex(1), 600),
+      setTimeout(() => setScanStepIndex(2), 1600),
+      setTimeout(() => setScanStepIndex(3), 2800),
+    ]
     return () => timers.forEach(clearTimeout)
   }, [loading, docType])
 
@@ -256,7 +283,7 @@ export default function BranchScanPage() {
   }
 
   function stashCurrentIfReady() {
-    if (!result || !file) return null
+    if (!result || !file || result.type_mismatch) return null
     return buildDraftItem({
       file,
       docType,
@@ -350,7 +377,9 @@ export default function BranchScanPage() {
   const conf      = result?.summary?.confidence
   const confStyle = CONFIDENCE_COLOR[conf] || CONFIDENCE_COLOR.low
   const flags     = result?.summary?.flags || []
-  const hasEditableForm = result && (
+  const typeCheck = result?.type_check || null
+  const typeMismatch = Boolean(result?.type_mismatch)
+  const hasEditableForm = result && !typeMismatch && (
     Object.keys(editFields).length > 0 || editTransactions.length > 0
   )
   const liveSteps = buildScanSteps(docType, scanStepIndex, { finished: !loading && !!result })
@@ -359,7 +388,25 @@ export default function BranchScanPage() {
       || liveSteps.find((s) => s.state === 'active')?.label
       || 'AI is working…')
     : (completionMessages[completionMessages.length - 1] || 'AI finished this scan.')
-  const pendingSaveCount = draftDocs.length + (result && file ? 1 : 0)
+  const pendingSaveCount = draftDocs.length + (result && file && !typeMismatch ? 1 : 0)
+
+  function useDetectedDocumentType() {
+    const detected = typeCheck?.detected
+    if (!detected || detected === 'unknown') return
+    setDocType(detected)
+    setResult(null)
+    setFormMode(null)
+    setEditFields({})
+    setEditChecks({})
+    setEditTransactions([])
+    setCompletionMessages([])
+    setError(null)
+    originalFormRef.current = null
+    showToast(
+      'Document type updated',
+      `Switched to ${typeCheck.detected_label}. Click Scan Document to extract.`,
+    )
+  }
 
   return (
     <div className="scan-page">
@@ -575,6 +622,76 @@ export default function BranchScanPage() {
               />
             </div>
 
+            {typeCheck && (
+              <div
+                className={`panel scan-result-card scan-type-check${
+                  typeMismatch ? ' is-mismatch' : ' is-match'
+                }`}
+              >
+                <div className="panel-head" style={{ flexWrap: 'wrap', gap: '0.6rem' }}>
+                  <div>
+                    <p className="eyebrow" style={{ marginBottom: '0.2rem' }}>
+                      Document Type Check
+                    </p>
+                    <h2 style={{ marginBottom: 0 }}>
+                      {!typeMismatch
+                        ? 'Type Confirmed'
+                        : typeCheck.detected === 'unknown'
+                          ? 'Unrecognised Document'
+                          : 'Wrong Document Type'}
+                    </h2>
+                  </div>
+                  <span
+                    className={`scan-type-badge${typeMismatch ? ' bad' : ' good'}`}
+                  >
+                    {!typeMismatch
+                      ? 'MATCH'
+                      : typeCheck.detected === 'unknown'
+                        ? 'NOT A DOCUMENT'
+                        : 'MISMATCH'}
+                  </span>
+                </div>
+
+                <div className="scan-type-compare">
+                  <div className="scan-type-col">
+                    <span className="scan-type-label">Selected by you</span>
+                    <strong>{typeCheck.selected_label || docTypeLabel(docType)}</strong>
+                  </div>
+                  <div className="scan-type-col">
+                    <span className="scan-type-label">Detected by AI</span>
+                    <strong>{typeCheck.detected_label || 'Unknown'}</strong>
+                  </div>
+                </div>
+
+                <p className="scan-summary-text" style={{ marginBottom: typeMismatch ? '0.85rem' : 0 }}>
+                  {typeCheck.message}
+                  {typeCheck.reason ? ` ${typeCheck.reason}` : ''}
+                </p>
+
+                {typeMismatch && (
+                  <div className="actions scan-edit-actions" style={{ marginTop: 0 }}>
+                    {typeCheck.detected && typeCheck.detected !== 'unknown' ? (
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        onClick={useDetectedDocumentType}
+                      >
+                        Use as {typeCheck.detected_label}
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="btn-ghost"
+                      onClick={() => resetCurrentScan({ keepDraft: true })}
+                    >
+                      Upload different file
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!typeMismatch && (
             <div className="panel panel-accent scan-result-card">
               <div className="panel-head" style={{ flexWrap: 'wrap', gap: '0.6rem' }}>
                 <div>
@@ -596,7 +713,8 @@ export default function BranchScanPage() {
               </div>
 
               <p className="scan-summary-text">
-                {result.summary?.summary || 'Review the extracted values below and correct any mistakes.'}
+                {publicSummaryText(result.summary?.summary)
+                  || 'Review the extracted values below and correct any mistakes.'}
               </p>
 
               {flags.length > 0 && (
@@ -608,6 +726,7 @@ export default function BranchScanPage() {
                 </div>
               )}
             </div>
+            )}
 
             {/* Editable review form */}
             {hasEditableForm && (

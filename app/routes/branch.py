@@ -506,6 +506,76 @@ async def scan_document(
             detail=f"File too large ({len(data) // 1024} KB). Maximum is 15 MB.",
         )
 
+    # One LLM vision request: detect actual document type vs user selection.
+    type_check: dict = {
+        "selected": document_type,
+        "selected_label": doc_label,
+        "detected": document_type,
+        "detected_label": doc_label,
+        "matched": True,
+        "confidence": None,
+        "reason": None,
+        "message": "Document type check unavailable.",
+        "skipped": True,
+    }
+    try:
+        from app.ocr_pipeline.document_type import classify_document_type
+
+        type_check = classify_document_type(
+            data, selected_type=document_type, branch=True
+        )
+    except Exception as exc:
+        logger.warning("Document type check failed; continuing extraction: %s", exc)
+
+    type_step_message = (
+        "Document type check skipped."
+        if type_check.get("skipped")
+        else type_check.get("message") or "Document type check complete."
+    )
+
+    def _with_type_check(payload: dict) -> dict:
+        payload["type_check"] = type_check
+        payload["type_mismatch"] = not bool(type_check.get("matched", True))
+        return payload
+
+    # Hard stop on mismatch or unrecognised file — do not run field extraction.
+    if not type_check.get("matched", True) and not type_check.get("skipped"):
+        return _with_type_check(
+            {
+                "document_type": type_check.get("detected_label") or "Unknown",
+                "filename": file.filename,
+                "pipeline": "document_type_check",
+                "fields": {},
+                "checkboxes": {},
+                "transactions": [],
+                "extracted_text": "",
+                "summary": {
+                    "document_type": type_check.get("detected_label"),
+                    "summary": type_check.get("message"),
+                    "key_fields": {},
+                    "confidence": type_check.get("confidence") or "high",
+                    "flags": [
+                        type_check.get("message"),
+                        *(
+                            [type_check["reason"]]
+                            if type_check.get("reason")
+                            else []
+                        ),
+                    ],
+                },
+                "meta": type_check.get("meta") or {},
+                "ai_activity": {
+                    "pipeline": "document_type_check",
+                    "ai_working": False,
+                    "messages": [
+                        "Document type check complete.",
+                        type_check.get("message")
+                        or "Selected document type does not match the uploaded file.",
+                    ],
+                },
+            }
+        )
+
     # Branch officer scans: remittance slips → LLM vision only.
     # Customer-submitted forms use the Python ROI/PaddleOCR service
     # at POST /api/v1/ocr/remittance — never mix the two paths.
@@ -537,7 +607,7 @@ async def scan_document(
             confidence_label = (
                 "high" if filled >= 8 else "medium" if filled >= 4 else "low"
             )
-            return {
+            return _with_type_check({
                 "document_type": doc_label,
                 "filename": file.filename,
                 "pipeline": "remittance_llm_vision",
@@ -548,9 +618,8 @@ async def scan_document(
                 "summary": {
                     "document_type": doc_label,
                     "summary": (
-                        "Structured fields extracted via LLM "
-                        f"({meta.get('model') or meta.get('engine') or 'groq'}); "
-                        "checkboxes classified as true/false."
+                        "Structured fields extracted. "
+                        "Checkboxes classified as true/false."
                     ),
                     "key_fields": {
                         "amount": fields.get("amount_figures") or None,
@@ -571,18 +640,18 @@ async def scan_document(
                 },
                 "meta": {
                     "engine": meta.get("engine"),
-                    "model": meta.get("model"),
                     "raw_preview": meta.get("raw_preview"),
                 },
                 "ai_activity": {
                     "pipeline": "remittance_llm_vision",
                     "ai_working": False,
                     "messages": [
+                        type_step_message,
                         "Document parsing complete.",
                         "LLM extraction complete — form fields are ready to review.",
                     ],
                 },
-            }
+            })
         except ImportError as exc:
             logger.warning(
                 "LLM remittance extract unavailable (%s); falling back to Tesseract",
@@ -620,7 +689,7 @@ async def scan_document(
             confidence_label = (
                 "high" if filled >= 8 else "medium" if filled >= 4 else "low"
             )
-            return {
+            return _with_type_check({
                 "document_type": doc_label,
                 "filename": file.filename,
                 "pipeline": "document_llm_vision",
@@ -629,27 +698,24 @@ async def scan_document(
                 "extracted_text": extracted_text,
                 "summary": {
                     "document_type": doc_label,
-                    "summary": (
-                        f"{doc_label} fields extracted via Gemini vision "
-                        f"({meta.get('model') or meta.get('engine') or 'gemini'})."
-                    ),
+                    "summary": f"{doc_label} fields extracted successfully.",
                     "key_fields": fields,
                     "confidence": confidence_label,
                     "flags": [],
                 },
                 "meta": {
                     "engine": meta.get("engine"),
-                    "model": meta.get("model"),
                 },
                 "ai_activity": {
                     "pipeline": "document_llm_vision",
                     "ai_working": False,
                     "messages": [
+                        type_step_message,
                         "Document parsing complete.",
                         f"LLM {doc_label.lower()} extraction complete — fields are ready to review.",
                     ],
                 },
-            }
+            })
         except ImportError as exc:
             logger.warning(
                 "LLM document extract unavailable (%s); falling back to Tesseract",
@@ -682,7 +748,7 @@ async def scan_document(
                 or fields.get("bank_code")
                 or None
             )
-            return {
+            return _with_type_check({
                 "document_type": doc_label,
                 "filename": file.filename,
                 "pipeline": "cheque_llm",
@@ -690,10 +756,7 @@ async def scan_document(
                 "extracted_text": "\n".join(text_lines),
                 "summary": {
                     "document_type": doc_label,
-                    "summary": (
-                        "Cheque fields extracted via LLM "
-                        f"({meta.get('model') or meta.get('engine') or 'llm'})."
-                    ),
+                    "summary": "Cheque fields extracted successfully.",
                     "key_fields": {
                         "amount": fields.get("amount_figures") or None,
                         "date": fields.get("date") or None,
@@ -711,17 +774,17 @@ async def scan_document(
                 },
                 "meta": {
                     "engine": meta.get("engine"),
-                    "model": meta.get("model"),
                 },
                 "ai_activity": {
                     "pipeline": "cheque_llm",
                     "ai_working": False,
                     "messages": [
+                        type_step_message,
                         "Document parsing complete.",
                         "LLM cheque extraction complete — fields are ready to review.",
                     ],
                 },
-            }
+            })
         except ImportError as exc:
             logger.warning(
                 "LLM cheque extract unavailable (%s); falling back to Tesseract",
@@ -768,7 +831,7 @@ async def scan_document(
             "flags": [f"LLM error: {str(exc)[:120]}"],
         }
 
-    return {
+    return _with_type_check({
         "document_type": doc_label,
         "filename": file.filename,
         "extracted_text": extracted_text,
@@ -777,11 +840,12 @@ async def scan_document(
             "pipeline": "ocr_llm_summary",
             "ai_working": False,
             "messages": [
+                type_step_message,
                 "Document parsing complete — OCR text extracted.",
                 "LLM summary complete — key fields are ready to review.",
             ],
         },
-    }
+    })
 
 
 # ──────────────────────────────────────────────────────────────────────────────
