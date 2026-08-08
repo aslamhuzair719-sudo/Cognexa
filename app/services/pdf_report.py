@@ -83,7 +83,7 @@ def build_verification_pdf(
     )
 
     story: List[Any] = []
-    story.append(Paragraph("AVS — Application Verification System", title_style))
+    story.append(Paragraph("Cognexa — Verification System", title_style))
     if applicant_name or application_id:
         story.append(
             Paragraph(

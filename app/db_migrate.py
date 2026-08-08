@@ -23,6 +23,25 @@ APPLICATION_COLUMNS = {
     "country_to_stay": "VARCHAR(128) NOT NULL DEFAULT ''",
     "gender": "VARCHAR(32) NOT NULL DEFAULT ''",
     "designation": "VARCHAR(128) NOT NULL DEFAULT ''",
+    "verification_email_document": "VARCHAR(32)",
+    "verification_email_target": "VARCHAR(255)",
+    "verification_email_id": "VARCHAR(64)",
+    "verification_email_status": "VARCHAR(32) NOT NULL DEFAULT 'none'",
+    "verification_email_last_error": "TEXT",
+    "verification_email_sent_at": "TIMESTAMP",
+    "verification_email_confirmed_at": "TIMESTAMP",
+    "verification_email_note": "TEXT",
+}
+
+BRANCH_ENTRY_COLUMNS = {
+    "verification_email_document": "VARCHAR(32)",
+    "verification_email_target": "VARCHAR(255)",
+    "verification_email_id": "VARCHAR(64)",
+    "verification_email_status": "VARCHAR(32) NOT NULL DEFAULT 'none'",
+    "verification_email_last_error": "TEXT",
+    "verification_email_sent_at": "TIMESTAMP",
+    "verification_email_confirmed_at": "TIMESTAMP",
+    "verification_email_note": "TEXT",
 }
 
 
@@ -173,6 +192,11 @@ def migrate_branch_entries(engine) -> None:
                 """
             )
         )
+        for name, ddl in BRANCH_ENTRY_COLUMNS.items():
+            if _column_exists(conn, "branch_entries", name):
+                continue
+            conn.execute(text(f"ALTER TABLE branch_entries ADD COLUMN {name} {ddl}"))
+            logger.info("Added branch_entries.%s", name)
         conn.execute(
             text(
                 """
@@ -200,6 +224,130 @@ def migrate_branch_entries(engine) -> None:
             )
         )
         logger.info("Ensured branch_entries schema")
+
+
+def migrate_verifications(engine) -> None:
+    """Create verification tables and indexes for asynchronous email status tracking."""
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS verifications (
+                    id UUID PRIMARY KEY,
+                    verification_id VARCHAR(64) NOT NULL UNIQUE,
+                    application_id UUID REFERENCES applications(id),
+                    branch_entry_id UUID REFERENCES branch_entries(id),
+                    branch_id INTEGER NOT NULL REFERENCES branches(id),
+                    created_by INTEGER REFERENCES users(id),
+                    document_type VARCHAR(32) NOT NULL,
+                    company_email VARCHAR(255) NOT NULL,
+                    status VARCHAR(32) NOT NULL DEFAULT 'pending_verification',
+                    failure_reason TEXT,
+                    bounce_reason TEXT,
+                    retry_count INTEGER NOT NULL DEFAULT 0,
+                    sent_at TIMESTAMP,
+                    verified_at TIMESTAMP,
+                    rejected_at TIMESTAMP,
+                    canceled_at TIMESTAMP,
+                    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                    note TEXT,
+                    document_path VARCHAR(512)
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE INDEX IF NOT EXISTS ix_verifications_application_id
+                ON verifications (application_id)
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE INDEX IF NOT EXISTS ix_verifications_branch_entry_id
+                ON verifications (branch_entry_id)
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE INDEX IF NOT EXISTS ix_verifications_branch_id
+                ON verifications (branch_id)
+                """
+            )
+        )
+        if not _column_exists(conn, "verifications", "created_by"):
+            conn.execute(
+                text(
+                    "ALTER TABLE verifications ADD COLUMN created_by INTEGER REFERENCES users(id)"
+                )
+            )
+            logger.info("Added verifications.created_by")
+        conn.execute(
+            text(
+                """
+                CREATE INDEX IF NOT EXISTS ix_verifications_status
+                ON verifications (status)
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS verification_history (
+                    id SERIAL PRIMARY KEY,
+                    verification_id UUID NOT NULL REFERENCES verifications(id),
+                    old_status VARCHAR(32) NOT NULL,
+                    new_status VARCHAR(32) NOT NULL,
+                    remarks TEXT,
+                    changed_by VARCHAR(128),
+                    changed_at TIMESTAMP NOT NULL DEFAULT NOW()
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE INDEX IF NOT EXISTS ix_verification_history_verification_id
+                ON verification_history (verification_id)
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE INDEX IF NOT EXISTS ix_verification_history_changed_at
+                ON verification_history (changed_at)
+                """
+            )
+        )
+        logger.info("Ensured verifications schema")
+        # Add reply tracking columns if missing
+        reply_columns = {
+            "response_email": "VARCHAR(255)",
+            "response_message": "TEXT",
+            "responded_at": "TIMESTAMP",
+            "processed_at": "TIMESTAMP",
+            "reply_subject": "VARCHAR(512)",
+            "reply_message_id": "VARCHAR(255)",
+        }
+        for name, ddl in reply_columns.items():
+            if _column_exists(conn, "verifications", name):
+                continue
+            conn.execute(text(f"ALTER TABLE verifications ADD COLUMN {name} {ddl}"))
+            logger.info("Added verifications.%s", name)
+        # Indexes for quick lookup
+        try:
+            conn.execute(text("CREATE INDEX IF NOT EXISTS ix_verifications_response_email ON verifications (response_email)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS ix_verifications_reply_message_id ON verifications (reply_message_id)"))
+        except Exception:
+            pass
 
 
 def migrate_signature_records(engine) -> None:

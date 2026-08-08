@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import { api } from '../api'
+import DashboardCharts from '../components/dashboard/DashboardCharts.jsx'
 import StatusPill from '../components/StatusPill.jsx'
+import AlertBanner from '../components/ui/AlertBanner.jsx'
+import PageHeader from '../components/ui/PageHeader.jsx'
+import Button from '../components/ui/Button.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
 import { DashboardSkeleton } from '../components/ui/Skeleton.jsx'
 
@@ -36,6 +40,52 @@ function AnimatedValue({ value }) {
   return <>{display}</>
 }
 
+const METRIC_ICONS = {
+  total: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+  pending: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
+      <path d="M12 8v4l2.5 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+  analyzing: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  ),
+  completed: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  ),
+  accepted: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  rejected: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  ),
+}
+
+const METRICS = [
+  { key: 'total', label: 'All applications', accent: '#0055a4', iconBg: '#e8f2fb' },
+  { key: 'pending', label: 'Pending Cognexa AI', accent: '#d97706', iconBg: '#fff8eb' },
+  { key: 'analyzing', label: 'Analyzing now', accent: '#0891b2', iconBg: '#ecfeff' },
+  { key: 'completed', label: 'Ready to decide', accent: '#2563eb', iconBg: '#eff6ff' },
+  { key: 'accepted', label: 'Accepted', accent: '#059669', iconBg: '#ecfdf5' },
+  { key: 'rejected', label: 'Rejected', accent: '#dc2626', iconBg: '#fef2f2' },
+]
+
 export default function BranchDashboardPage() {
   const navigate = useNavigate()
   const { user } = useOutletContext()
@@ -65,50 +115,60 @@ export default function BranchDashboardPage() {
   }
 
   const counts = data?.counts || {}
-  const cards = [
-    { key: 'total', label: 'All applications', tone: 'tone-ink' },
-    { key: 'pending', label: 'Pending AI', tone: 'tone-amber' },
-    { key: 'analyzing', label: 'Analyzing now', tone: 'tone-cyan' },
-    { key: 'completed', label: 'Ready to decide', tone: 'tone-blue' },
-    { key: 'accepted', label: 'Accepted', tone: 'tone-green' },
-    { key: 'rejected', label: 'Rejected', tone: 'tone-rose' },
-  ]
 
   return (
     <>
-      <section className="hero hero-branch">
-        <span className="ai-badge">Live branch pulse</span>
-        <h1>{user.branch.name}</h1>
-        <p>
-          Full operational view for this branch — queue health, decisions, applicant activity,
-          and the latest audit trail. Refreshes automatically.
-        </p>
-        <div className="hero-row">
-          <span className="hero-pill">Queue size · {data?.queue_size ?? 0}</span>
-          <span className="hero-pill">Acceptance · {data?.acceptance_rate ?? 0}%</span>
-          <span className="hero-pill">Code · {user.branch.code}</span>
+      <PageHeader
+        eyebrow="Branch operations"
+        title={user.branch.name}
+        badge="Live dashboard"
+        description="Operational view of queue health, decisions, applicant activity, and audit trail. Refreshes every 5 seconds."
+        actions={
+          <>
+            <Button variant="secondary" onClick={() => refresh()}>Refresh</Button>
+            <Link to="/branch/queue" className="btn">Open queue</Link>
+          </>
+        }
+      >
+        <div className="page-header-pills">
+          <span className="page-pill">Queue · <strong>{data?.queue_size ?? 0}</strong></span>
+          <span className="page-pill">Acceptance · <strong>{data?.acceptance_rate ?? 0}%</strong></span>
+          <span className="page-pill">Branch · <strong>{user.branch.code}</strong></span>
         </div>
-      </section>
+      </PageHeader>
 
-      {error ? <p className="status-line error shake">{error}</p> : null}
+      {error ? (
+        <AlertBanner type="error" title="Could not load dashboard" message={error} />
+      ) : null}
 
-      <section className="dash-grid">
-        {cards.map((card) => (
-          <article key={card.key} className={`dash-card ${card.tone}`}>
-            <span className="dash-card-label">{card.label}</span>
-            <strong className="dash-card-value">
-              <AnimatedValue value={counts[card.key] ?? 0} />
+      <section className="dash-grid-v2">
+        {METRICS.map((metric, index) => (
+          <article
+            key={metric.key}
+            className="dash-metric-card"
+            style={{
+              '--metric-accent': metric.accent,
+              '--metric-icon-bg': metric.iconBg,
+              animationDelay: `${index * 0.05}s`,
+            }}
+          >
+            <div className="dash-metric-icon">{METRIC_ICONS[metric.key]}</div>
+            <span className="dash-metric-label">{metric.label}</span>
+            <strong className="dash-metric-value">
+              <AnimatedValue value={counts[metric.key] ?? 0} />
             </strong>
           </article>
         ))}
       </section>
+
+      <DashboardCharts counts={counts} acceptanceRate={data?.acceptance_rate ?? 0} />
 
       <div className="split-panels">
         <section className="panel panel-accent">
           <div className="panel-head">
             <div>
               <h2>Recent applications</h2>
-              <p className="hint">Newest submissions with full contact & employment signals.</p>
+              <p className="hint">Newest submissions with contact and employment signals.</p>
             </div>
             <Link className="btn btn-secondary" to="/branch/queue">Open queue</Link>
           </div>
@@ -161,7 +221,7 @@ export default function BranchDashboardPage() {
           <div className="panel-head">
             <div>
               <h2>Latest audit activity</h2>
-              <p className="hint">Logins, AI runs, accepts, rejects, and queue events.</p>
+              <p className="hint">Logins, Cognexa AI runs, accepts, rejects, and queue events.</p>
             </div>
             <Link className="btn btn-secondary" to="/branch/audit">All logs</Link>
           </div>

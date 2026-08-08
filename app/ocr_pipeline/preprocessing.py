@@ -110,17 +110,21 @@ def perspective_correct(image: np.ndarray, quad: np.ndarray) -> np.ndarray:
 
     # Portrait forms photographed landscape-ish still warp correctly via quad.
     # Prefer portrait orientation when height/width ratio is inverted vs A4.
-    if max_w > max_h * 1.15:
-        # Likely sideways capture of a portrait page — rotate destination 90° CW
-        # by swapping expected output dimensions after warp if aspect looks landscape.
-        pass
+    rotate_output = max_w > max_h * 1.15
+    if rotate_output:
+        logger.debug(
+            "Perspective warp output appears landscape; rotating to portrait orientation"
+        )
 
     dst = np.array(
         [[0, 0], [max_w - 1, 0], [max_w - 1, max_h - 1], [0, max_h - 1]],
         dtype="float32",
     )
     matrix = cv2.getPerspectiveTransform(quad, dst)
-    return cv2.warpPerspective(image, matrix, (max_w, max_h))
+    warped = cv2.warpPerspective(image, matrix, (max_w, max_h))
+    if rotate_output:
+        warped = cv2.rotate(warped, cv2.ROTATE_90_CLOCKWISE)
+    return warped
 
 
 def resize_to_template(

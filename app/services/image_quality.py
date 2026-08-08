@@ -50,6 +50,7 @@ class ImageQualityService:
             self._check_brightness(image),
             self._check_crop(image),
             self._check_ocr_readability(ocr_text),
+            self._check_software_tampering(document_path, image),
         ]
 
         fails = [c for c in checks if c.result == CheckResult.FAIL]
@@ -202,3 +203,75 @@ class ImageQualityService:
             detail=f"OCR extracted {chars} characters",
             value=float(chars),
         )
+
+    def _check_software_tampering(
+        self, document_path: str, image: Image.Image
+    ) -> ImageQualityCheck:
+        """Inspect file metadata and headers for editing software tags (Canva, Photoshop, GIMP, etc.)."""
+        editors = [
+            "canva",
+            "photoshop",
+            "gimp",
+            "paint.net",
+            "pixlr",
+            "adobe",
+            "illustrator",
+            "inkscape",
+            "coreldraw",
+            "figma",
+        ]
+        found_software: Optional[str] = None
+
+        # 1. PIL image info
+        info = image.info or {}
+        for key in ("software", "comment", "Software", "Comment"):
+            val = str(info.get(key) or "").strip()
+            for ed in editors:
+                if ed in val.lower():
+                    found_software = val
+                    break
+            if found_software:
+                break
+
+        # 2. EXIF data
+        if not found_software:
+            try:
+                exif = image.getexif()
+                if exif:
+                    for tag_id, val in exif.items():
+                        val_str = str(val).lower()
+                        for ed in editors:
+                            if ed in val_str:
+                                found_software = str(val)
+                                break
+                        if found_software:
+                            break
+            except Exception:
+                pass
+
+        # 3. Direct raw file header/metadata scan (catches Canva / Photoshop comments embedded in PNG/JPEG/PDF chunks)
+        if not found_software:
+            try:
+                path = Path(document_path)
+                if path.exists() and path.is_file():
+                    content = path.read_bytes()[:262144].lower()
+                    for ed in ["canva", "photoshop", "gimp", "adobe photoshop", "paint.net", "figma"]:
+                        if ed.encode("utf-8") in content:
+                            found_software = ed.title()
+                            break
+            except Exception:
+                pass
+
+        if found_software:
+            return ImageQualityCheck(
+                check="metadata_integrity",
+                result=CheckResult.FAIL,
+                detail=f"Digital editing / forgery detected: image edited or created with software ({found_software})",
+            )
+
+        return ImageQualityCheck(
+            check="metadata_integrity",
+            result=CheckResult.PASS,
+            detail="No editing software metadata detected",
+        )
+

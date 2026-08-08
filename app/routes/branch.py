@@ -34,7 +34,15 @@ from app.services.branch_entry_storage import (
     resolve_branch_entry_path,
     save_branch_entry_document,
 )
+from app.services.email_queue import email_queue
 from app.services.pdf_report import build_verification_pdf
+from app.services.workflow_service import WorkflowService
+from app.services.branch_entry_storage import save_branch_entry_document, resolve_branch_entry_path
+from app.services.extraction_service import ExtractionPipeline
+from app.services.llm_factory import get_llm_service
+from app.services.ocr_service import TesseractOCRService
+from app.services.classifier import KeywordClassifier
+import threading
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/api/v1/branch", tags=["branch"])
@@ -122,6 +130,13 @@ def _detail(app: Application) -> dict:
             "employee_id": app.employee_id,
             "designation": app.designation,
             "monthly_income": app.monthly_income,
+            "verification_email_document": app.verification_email_document,
+            "verification_email_target": app.verification_email_target,
+            "verification_email_status": app.verification_email_status,
+            "verification_email_last_error": app.verification_email_last_error,
+            "verification_email_sent_at": app.verification_email_sent_at.isoformat() if app.verification_email_sent_at else None,
+            "verification_email_confirmed_at": app.verification_email_confirmed_at.isoformat() if app.verification_email_confirmed_at else None,
+            "verification_email_note": app.verification_email_note,
             "documents": docs,
             "decision_note": app.decision_note,
             "ai_progress": ai_progress.snapshot_for_app(str(app.id), app.status),
@@ -291,7 +306,7 @@ def analyze_application(
     write_audit(
         db,
         action="analysis_queued",
-        message=f"AI analysis re-queued for {app.full_name}",
+        message=f"Cognexa AI analysis re-queued for {app.full_name}",
         branch_id=user.branch_id,
         user_id=user.id,
         username=user.username,
@@ -303,7 +318,7 @@ def analyze_application(
     return {
         "application_id": str(app.id),
         "status": app.status,
-        "message": "Application queued for AI analysis",
+        "message": "Application queued for Cognexa AI analysis",
     }
 
 
@@ -315,7 +330,7 @@ def get_report(
 ):
     app = _get_branch_application(db, user, application_id)
     if not app.report_json:
-        raise HTTPException(status_code=404, detail="Report not available yet. Wait for AI analysis.")
+        raise HTTPException(status_code=404, detail="Report not available yet. Wait for Cognexa AI analysis.")
     return app.report_json
 
 
@@ -327,7 +342,7 @@ def download_report_json(
 ):
     app = _get_branch_application(db, user, application_id)
     if not app.report_json:
-        raise HTTPException(status_code=404, detail="Report not available yet. Wait for AI analysis.")
+        raise HTTPException(status_code=404, detail="Report not available yet. Wait for Cognexa AI analysis.")
     filename = f"verification_report_{application_id}.json"
     body = json.dumps(app.report_json, indent=2, ensure_ascii=False)
     return Response(
@@ -345,7 +360,7 @@ def download_report_pdf(
 ):
     app = _get_branch_application(db, user, application_id)
     if not app.report_json:
-        raise HTTPException(status_code=404, detail="Report not available yet. Wait for AI analysis.")
+        raise HTTPException(status_code=404, detail="Report not available yet. Wait for Cognexa AI analysis.")
     pdf_bytes = build_verification_pdf(
         app.report_json,
         applicant_name=app.full_name,
@@ -357,6 +372,152 @@ def download_report_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+class VerificationEmailRequest(BaseModel):
+    document_type: str = Field(..., description="payslip or bank_statement")
+    target_email: str = Field(..., description="Company or bank verification email")
+    note: Optional[str] = Field(None, description="Optional note to include with the request")
+
+
+class VerificationEmailConfirmRequest(BaseModel):
+    note: Optional[str] = Field(None, description="Optional confirmation note")
+
+
+@router.post("/applications/{application_id}/verification-email")
+def send_verification_email(
+    application_id: UUID,
+    payload: VerificationEmailRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    from app.services.verification_service import (
+        VerificationEmailError,
+        create_application_verification,
+        validate_company_email,
+    )
+    from app.services.email_service import is_smtp_configured
+
+    app = _get_branch_application(db, user, application_id)
+    document_type = payload.document_type.strip().lower()
+    if document_type not in {"payslip", "bank_statement"}:
+        raise HTTPException(
+            status_code=400,
+            detail="document_type must be 'payslip' or 'bank_statement'",
+        )
+
+    if document_type == "payslip" and not app.payslip_path:
+        raise HTTPException(status_code=400, detail="Payslip document is missing")
+    if document_type == "bank_statement" and not app.bank_statement_path:
+        raise HTTPException(status_code=400, detail="Bank statement document is missing")
+
+    if not is_smtp_configured():
+        raise HTTPException(
+            status_code=500,
+            detail="SMTP is not configured. Cannot send verification emails.",
+        )
+
+    try:
+        target_email = validate_company_email(payload.target_email)
+        verification = create_application_verification(
+            db,
+            app,
+            document_type=document_type,
+            target_email=target_email,
+            note=payload.note,
+            user_id=user.id,
+            username=user.username,
+        )
+        db.commit()
+        email_queue.enqueue(verification.verification_id)
+        return {
+            "application_id": str(app.id),
+            "verification_id": verification.verification_id,
+            "verification_email_status": app.verification_email_status,
+            "verification_email_target": app.verification_email_target,
+            "verification_email_sent_at": None,
+        }
+    except VerificationEmailError as exc:
+        db.rollback()
+        write_audit(
+            db,
+            action="verification_email_failed",
+            message=(
+                f"Verification email creation failed for {app.full_name}: {exc}"
+            ),
+            branch_id=user.branch_id,
+            user_id=user.id,
+            username=user.username,
+            application_id=app.id,
+            details={
+                "document_type": document_type,
+                "target_email": payload.target_email,
+                "status": "failed",
+                "error": str(exc),
+            },
+        )
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        db.rollback()
+        write_audit(
+            db,
+            action="verification_email_failed",
+            message=(
+                f"Verification email creation failed for {app.full_name}: {exc}"
+            ),
+            branch_id=user.branch_id,
+            user_id=user.id,
+            username=user.username,
+            application_id=app.id,
+            details={
+                "document_type": document_type,
+                "target_email": payload.target_email,
+                "status": "failed",
+                "error": str(exc),
+            },
+        )
+        raise HTTPException(status_code=500, detail="Failed to create verification request") from exc
+
+
+@router.post("/applications/{application_id}/verification-email/confirm")
+def confirm_verification_email(
+    application_id: UUID,
+    payload: VerificationEmailConfirmRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    app = _get_branch_application(db, user, application_id)
+    if app.verification_email_status != "sent":
+        raise HTTPException(
+            status_code=400,
+            detail="No sent verification email to confirm.",
+        )
+    app.verification_email_status = "confirmed"
+    app.verification_email_confirmed_at = datetime.utcnow()
+    if payload.note:
+        app.verification_email_note = (app.verification_email_note or "") + "\n" + payload.note.strip()
+    write_audit(
+        db,
+        action="verification_email_confirmed",
+        message=(
+            f"Verification email confirmed for {app.full_name}"
+        ),
+        branch_id=user.branch_id,
+        user_id=user.id,
+        username=user.username,
+        application_id=app.id,
+        details={
+            "status": "confirmed",
+            "note": payload.note,
+        },
+    )
+    db.commit()
+    db.refresh(app)
+    return {
+        "application_id": str(app.id),
+        "verification_email_status": app.verification_email_status,
+        "verification_email_confirmed_at": app.verification_email_confirmed_at.isoformat(),
+    }
 
 
 @router.post("/applications/{application_id}/decide")
@@ -435,39 +596,81 @@ SCAN_ALLOWED_EXTENSIONS = {
 MAX_SCAN_FILE_SIZE = 15 * 1024 * 1024  # 15 MB
 
 
-def _build_scan_prompt(doc_type_label: str, extracted_text: str) -> str:
-    """Build an Ollama prompt that produces a JSON summary of the scanned document."""
-    return f"""You are a banking document analyst.
-A branch officer has scanned a **{doc_type_label}** document using OCR.
-Below is the raw extracted text from that document.
+def _inspect_image_flags(data: bytes, filename: str) -> list[str]:
+    """Extract metadata and image quality flags for branch scan review."""
+    flags: list[str] = []
+    editors = ["photoshop", "gimp", "canva", "paint.net", "pixlr", "adobe", "illustrator", "inkscape", "coreldraw", "figma"]
+    found_software = None
+    try:
+        import io
+        from PIL import Image
+        img = Image.open(io.BytesIO(data))
+        info = img.info or {}
+        for key in ("software", "comment", "Software", "Comment"):
+            val = str(info.get(key) or "").strip()
+            for ed in editors:
+                if ed in val.lower():
+                    found_software = val
+                    break
+            if found_software:
+                break
 
-=== EXTRACTED TEXT START ===
-{extracted_text[:6000]}
-=== EXTRACTED TEXT END ===
+        if not found_software:
+            exif = img.getexif()
+            if exif:
+                for tag_id, val in exif.items():
+                    val_str = str(val).lower()
+                    for ed in editors:
+                        if ed in val_str:
+                            found_software = str(val)
+                            break
+                    if found_software:
+                        break
+    except Exception:
+        pass
 
-Analyze the extracted text and return a JSON object with exactly these fields:
-{{
-  "document_type": "{doc_type_label}",
-  "summary": "A clear 3-5 sentence summary of what this document is about",
-  "key_fields": {{
-    "amount": "Monetary amount if found, else null",
-    "date": "Document date if found, else null",
-    "parties": "Payer / payee / beneficiary names if found, else null",
-    "reference_number": "Reference / order / cheque number if found, else null",
-    "bank": "Bank name if found, else null",
-    "purpose": "Purpose or description of the transaction if found, else null"
-  }},
-  "confidence": "high | medium | low — your confidence in the extraction quality",
-  "flags": ["list any anomalies, missing fields, or concerns as short strings"]
-}}
+    if not found_software and data:
+        header = data[:262144].lower()
+        for ed in ["canva", "photoshop", "gimp", "adobe photoshop", "paint.net", "figma"]:
+            if ed.encode("utf-8") in header:
+                found_software = ed.title()
+                break
 
-Return ONLY the JSON object. No markdown fences, no extra commentary.
-"""
+    if found_software:
+        flags.append(f"🛡️ Metadata Alert: Digital editing software traces detected ({found_software}).")
+
+    return flags
+
+
+@router.post("/detect-document")
+async def detect_document_gate(
+    file: UploadFile = File(...),
+    selected_type: Optional[str] = Form(None),
+    user: User = Depends(get_current_user),
+):
+    """
+    Stage 1 + Stage 2 Document Gate evaluation.
+    Determines whether the file is a document and if it is a supported banking document.
+    """
+    from app.document_detection import evaluate_document_gate
+
+    data = await file.read()
+    if len(data) > MAX_SCAN_FILE_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large ({len(data) // 1024} KB). Maximum is 15 MB.",
+        )
+    gate_result = evaluate_document_gate(data, selected_type=selected_type, branch=True)
+    scan_flags = _inspect_image_flags(data, file.filename or "file")
+    res_dict = gate_result.to_api_gate()
+    res_dict["flags"] = scan_flags
+    res_dict["editing_detected"] = bool(scan_flags)
+    return res_dict
 
 
 @router.post("/scan-document")
 async def scan_document(
-    document_type: str = File(...),
+    document_type: str = Form(...),
     file: UploadFile = File(...),
     user: User = Depends(get_current_user),
 ):
@@ -479,6 +682,7 @@ async def scan_document(
     from app import config as app_config
     from app.services.ocr_service import TesseractOCRService
     from app.services.llm_factory import get_llm_service
+    from app.document_detection import evaluate_document_gate
 
     # Validate document type
     doc_label = DOCUMENT_TYPES.get(document_type)
@@ -506,43 +710,29 @@ async def scan_document(
             detail=f"File too large ({len(data) // 1024} KB). Maximum is 15 MB.",
         )
 
-    # One LLM vision request: detect actual document type vs user selection.
-    type_check: dict = {
-        "selected": document_type,
-        "selected_label": doc_label,
-        "detected": document_type,
-        "detected_label": doc_label,
-        "matched": True,
-        "confidence": None,
-        "reason": None,
-        "message": "Document type check unavailable.",
-        "skipped": True,
-    }
-    try:
-        from app.ocr_pipeline.document_type import classify_document_type
-
-        type_check = classify_document_type(
-            data, selected_type=document_type, branch=True
-        )
-    except Exception as exc:
-        logger.warning("Document type check failed; continuing extraction: %s", exc)
+    # Two-stage document gate: Stage 1 (Document presence) + Stage 2 (Supported document check)
+    gate_result = evaluate_document_gate(data, selected_type=document_type, branch=True)
+    type_check = gate_result.to_type_check()
+    api_gate = gate_result.to_api_gate()
+    scan_flags = _inspect_image_flags(data, file.filename or "file")
 
     type_step_message = (
         "Document type check skipped."
-        if type_check.get("skipped")
-        else type_check.get("message") or "Document type check complete."
+        if gate_result.skipped
+        else gate_result.message or "Document type check complete."
     )
 
     def _with_type_check(payload: dict) -> dict:
+        payload["gate"] = api_gate
         payload["type_check"] = type_check
-        payload["type_mismatch"] = not bool(type_check.get("matched", True))
+        payload["type_mismatch"] = gate_result.type_mismatch
         return payload
 
-    # Hard stop on mismatch or unrecognised file — do not run field extraction.
-    if not type_check.get("matched", True) and not type_check.get("skipped"):
+    # Hard stop on Stage 1 (NOT_A_DOCUMENT) or Stage 2 (UNSUPPORTED_DOCUMENT) or type mismatch
+    if gate_result.gate_rejected and not gate_result.skipped:
         return _with_type_check(
             {
-                "document_type": type_check.get("detected_label") or "Unknown",
+                "document_type": gate_result.detected_type_label or "Unknown",
                 "filename": file.filename,
                 "pipeline": "document_type_check",
                 "fields": {},
@@ -550,27 +740,27 @@ async def scan_document(
                 "transactions": [],
                 "extracted_text": "",
                 "summary": {
-                    "document_type": type_check.get("detected_label"),
-                    "summary": type_check.get("message"),
+                    "document_type": gate_result.detected_type_label,
+                    "summary": gate_result.message,
                     "key_fields": {},
-                    "confidence": type_check.get("confidence") or "high",
+                    "confidence": "high" if gate_result.document_confidence >= 85 else "medium",
                     "flags": [
-                        type_check.get("message"),
+                        gate_result.message,
                         *(
-                            [type_check["reason"]]
-                            if type_check.get("reason")
+                            [gate_result.reason]
+                            if gate_result.reason
                             else []
                         ),
+                        *scan_flags,
                     ],
                 },
-                "meta": type_check.get("meta") or {},
+                "meta": gate_result.meta or {},
                 "ai_activity": {
                     "pipeline": "document_type_check",
                     "ai_working": False,
                     "messages": [
-                        "Document type check complete.",
-                        type_check.get("message")
-                        or "Selected document type does not match the uploaded file.",
+                        "Stage 1 & Stage 2 Document Gate evaluation complete.",
+                        gate_result.message,
                     ],
                 },
             }
@@ -636,7 +826,7 @@ async def scan_document(
                         ),
                     },
                     "confidence": confidence_label,
-                    "flags": [],
+                    "flags": scan_flags,
                 },
                 "meta": {
                     "engine": meta.get("engine"),
@@ -701,7 +891,7 @@ async def scan_document(
                     "summary": f"{doc_label} fields extracted successfully.",
                     "key_fields": fields,
                     "confidence": confidence_label,
-                    "flags": [],
+                    "flags": scan_flags,
                 },
                 "meta": {
                     "engine": meta.get("engine"),
@@ -770,7 +960,7 @@ async def scan_document(
                         "product": fields.get("product_name") or None,
                     },
                     "confidence": confidence_label,
-                    "flags": [],
+                    "flags": scan_flags,
                 },
                 "meta": {
                     "engine": meta.get("engine"),
@@ -819,6 +1009,9 @@ async def scan_document(
         raw_json = llm.generate(prompt)
         import json as _json
         summary_data = _json.loads(raw_json)
+        if isinstance(summary_data, dict):
+            existing_flags = summary_data.get("flags") or []
+            summary_data["flags"] = list(set(existing_flags + scan_flags))
     except Exception as exc:
         logger.warning("LLM summarization failed for scan-document: %s", exc)
         # Gracefully degrade — return OCR text without summary
@@ -828,7 +1021,7 @@ async def scan_document(
                        "Please review the extracted text manually.",
             "key_fields": {},
             "confidence": "low",
-            "flags": [f"LLM error: {str(exc)[:120]}"],
+            "flags": [f"LLM error: {str(exc)[:120]}", *scan_flags],
         }
 
     return _with_type_check({
@@ -846,6 +1039,175 @@ async def scan_document(
             ],
         },
     })
+
+
+WORKFLOW_TYPES = {
+    "account_opening": "Account Opening Workflow",
+}
+
+
+@router.post("/process-workflow")
+async def process_workflow(
+    workflow_type: str = Form(...),
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+):
+    """Process a workflow PDF containing multiple customer documents."""
+    suffix = Path(file.filename or "").suffix.lower()
+    if suffix != ".pdf":
+        raise HTTPException(
+            status_code=400,
+            detail="Workflow upload must be a PDF file.",
+        )
+
+    data = await file.read()
+    if len(data) > MAX_SCAN_FILE_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large ({len(data) // 1024} KB). Maximum is 15 MB.",
+        )
+
+    if workflow_type not in WORKFLOW_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported workflow_type '{workflow_type}'. "
+                   f"Valid values: {', '.join(WORKFLOW_TYPES.keys())}",
+        )
+
+    try:
+        service = WorkflowService()
+        result = service.process_workflow(workflow_type, data)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Workflow processing failed: %s", exc)
+        raise HTTPException(status_code=500, detail="Workflow processing failed.") from exc
+
+    return result
+
+
+@router.post("/process-workflow/commit-group")
+async def commit_workflow_group(
+    workflow_type: str = Form(...),
+    group_index: int = Form(...),
+    file: UploadFile = File(...),
+    customer_name: Optional[str] = Form(None),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Save a detected workflow group as a Branch Entry and start extraction in background.
+
+    Expects `group_index` (0-based) selecting which detected group to commit from the uploaded PDF.
+    """
+    suffix = Path(file.filename or "").suffix.lower()
+    if suffix != ".pdf":
+        raise HTTPException(status_code=400, detail="Workflow commit requires a PDF file.")
+
+    data = await file.read()
+    if len(data) > MAX_SCAN_FILE_SIZE:
+        raise HTTPException(status_code=413, detail="File too large.")
+
+    service = WorkflowService()
+    # run segmentation + lightweight OCR-only classification (no LLM)
+    workflow_result = service.process_workflow(workflow_type, data)
+    groups = workflow_result.get("customer_groups") or []
+    if group_index < 0 or group_index >= len(groups):
+        raise HTTPException(status_code=400, detail="Invalid group_index")
+
+    group = groups[group_index]
+
+    # Render pages so we can save bytes for selected pages
+    rendered_pages = service._render_pdf_pages(data)
+
+    # Build document list for this group
+    # `group['pages']` can be a list of page numbers or a list of page dicts (with 'page').
+    raw_pages = group.get("pages") or []
+    pages = [p["page"] if isinstance(p, dict) and "page" in p else p for p in raw_pages]
+    if not pages:
+        raise HTTPException(status_code=400, detail="Selected group has no pages")
+
+    entry = BranchEntry(branch_id=user.branch_id, created_by=user.id, customer_name=(customer_name or group.get("customer_id") or "Customer"))
+    db.add(entry)
+    db.flush()
+
+    saved_docs = []
+    docs_by_page = service._classify_pages(rendered_pages)
+
+    for page_no in pages:
+        page_doc = docs_by_page.get(page_no)
+        if not page_doc:
+            # create a minimal doc entry using OCR
+            # find rendered page bytes
+            page_data = next((p for p in rendered_pages if p["page"] == page_no), None)
+            img_bytes = page_data["image_bytes"] if page_data else b""
+            doc_type = "unknown"
+            summary = {"summary": "OCR text extracted.", "key_fields": {}, "confidence": "low", "flags": []}
+        else:
+            img_bytes = next((p["image_bytes"] for p in rendered_pages if p["page"] == page_no), b"")
+            doc_type = page_doc.get("document_type") or "unknown"
+            summary = page_doc.get("summary") or {"summary": "OCR text extracted.", "key_fields": {}, "confidence": "low", "flags": []}
+
+        doc_id = uuid4()
+        filename = f"page-{page_no}.png"
+        relative = save_branch_entry_document(entry.id, doc_id, filename, img_bytes)
+
+        extracted_text = page_doc.get("extracted_text") if page_doc else ""
+        fields = page_doc.get("fields") if page_doc else {}
+
+        doc = BranchEntryDocument(
+            id=doc_id,
+            branch_entry_id=entry.id,
+            document_type=doc_type,
+            original_filename=filename,
+            file_path=relative,
+            extracted_text=extracted_text or "",
+            fields_json=fields or {},
+            checkboxes_json={},
+            summary_json=summary,
+        )
+        db.add(doc)
+        saved_docs.append(doc)
+
+    write_audit(
+        db,
+        action="branch_entry_created_via_workflow",
+        message=f"Branch Entry saved from workflow group {group.get('customer_id')}",
+        branch_id=user.branch_id,
+        user_id=user.id,
+        username=user.username,
+        details={"branch_entry_id": str(entry.id), "pages": pages},
+    )
+    db.commit()
+
+    # Start background extraction processing for saved docs
+    def _background_extract(entry_id: uuid.UUID, docs_list: list[BranchEntryDocument]):
+        # Create extraction pipeline
+        ocr = TesseractOCRService()
+        classifier = KeywordClassifier()
+        llm = get_llm_service()
+        pipeline = ExtractionPipeline(ocr, classifier, llm)
+        db_session = SessionLocal()
+        try:
+            for d in docs_list:
+                try:
+                    path = resolve_branch_entry_path(d.file_path)
+                    res = pipeline.process(str(path), doc_label=d.original_filename)
+                    # persist results
+                    row = db_session.query(BranchEntryDocument).filter(BranchEntryDocument.id == d.id).first()
+                    if row:
+                        row.extracted_text = res.get("extracted_text") or row.extracted_text
+                        row.fields_json = res.get("fields") or row.fields_json
+                        row.summary_json = {"summary": res.get("error") or "Extraction complete", "key_fields": row.fields_json}
+                        db_session.commit()
+                except Exception:
+                    db_session.rollback()
+        finally:
+            db_session.close()
+
+    thread = threading.Thread(target=_background_extract, args=(entry.id, saved_docs), daemon=True)
+    thread.start()
+
+    return {"entry_id": str(entry.id), "message": "Branch Entry created and extraction started."}
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -1107,10 +1469,173 @@ def get_branch_entry(
         {
             "customer_name": entry.customer_name,
             "created_by": entry.creator.username if entry.creator else None,
+            "verification_email_document": entry.verification_email_document,
+            "verification_email_target": entry.verification_email_target,
+            "verification_email_status": entry.verification_email_status,
+            "verification_email_last_error": entry.verification_email_last_error,
+            "verification_email_sent_at": entry.verification_email_sent_at.isoformat() if entry.verification_email_sent_at else None,
+            "verification_email_confirmed_at": entry.verification_email_confirmed_at.isoformat() if entry.verification_email_confirmed_at else None,
+            "verification_email_note": entry.verification_email_note,
             "documents": [_branch_entry_doc_meta(entry.id, d) for d in (entry.documents or [])],
         }
     )
     return item
+
+
+def _branch_entry_email_application(entry: BranchEntry) -> dict:
+    return {
+        "full_name": entry.customer_name,
+        "cnic_number": _field_from_docs(entry.documents or [], "cnic", "cnic_number"),
+        "company_name": _field_from_docs(entry.documents or [], "company_name"),
+        "employee_id": _field_from_docs(entry.documents or [], "employee_id"),
+    }
+
+
+class BranchEntryVerificationEmailRequest(BaseModel):
+    document_type: str = Field(..., description="payslip or bank_statement")
+    target_email: str = Field(..., description="Company or bank verification email")
+    note: Optional[str] = Field(None, description="Optional note")
+
+
+class BranchEntryVerificationEmailConfirmRequest(BaseModel):
+    note: Optional[str] = Field(None, description="Optional note")
+
+
+@router.post("/branch-entries/{entry_id}/verification-email")
+def send_branch_entry_verification_email(
+    entry_id: UUID,
+    payload: BranchEntryVerificationEmailRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    from app.services.verification_service import (
+        VerificationEmailError,
+        create_branch_entry_verification,
+        validate_company_email,
+    )
+    from app.services.email_service import is_smtp_configured
+
+    entry = _get_branch_entry(db, user, entry_id)
+    document_type = payload.document_type.strip().lower()
+    if document_type not in {"payslip", "bank_statement"}:
+        raise HTTPException(
+            status_code=400,
+            detail="document_type must be 'payslip' or 'bank_statement'",
+        )
+
+    if not any(d.document_type == document_type for d in (entry.documents or [])):
+        raise HTTPException(
+            status_code=400,
+            detail=f"{document_type.replace('_', ' ').title()} document is missing",
+        )
+
+    if not is_smtp_configured():
+        raise HTTPException(
+            status_code=500,
+            detail="SMTP is not configured. Cannot send verification emails.",
+        )
+
+    try:
+        target_email = validate_company_email(payload.target_email)
+        verification = create_branch_entry_verification(
+            db,
+            entry,
+            document_type=document_type,
+            target_email=target_email,
+            note=payload.note,
+            user_id=user.id,
+            username=user.username,
+        )
+        db.commit()
+        email_queue.enqueue(verification.verification_id)
+        return {
+            "entry_id": str(entry.id),
+            "verification_id": verification.verification_id,
+            "verification_email_status": entry.verification_email_status,
+            "verification_email_target": entry.verification_email_target,
+            "verification_email_sent_at": None,
+        }
+    except VerificationEmailError as exc:
+        db.rollback()
+        write_audit(
+            db,
+            action="verification_email_failed",
+            message=(
+                f"Verification email creation failed for {entry.customer_name}: {exc}"
+            ),
+            branch_id=user.branch_id,
+            user_id=user.id,
+            username=user.username,
+            application_id=None,
+            details={
+                "document_type": document_type,
+                "target_email": payload.target_email,
+                "status": "failed",
+                "error": str(exc),
+            },
+        )
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        db.rollback()
+        write_audit(
+            db,
+            action="verification_email_failed",
+            message=(
+                f"Verification email creation failed for {entry.customer_name}: {exc}"
+            ),
+            branch_id=user.branch_id,
+            user_id=user.id,
+            username=user.username,
+            application_id=None,
+            details={
+                "document_type": document_type,
+                "target_email": payload.target_email,
+                "status": "failed",
+                "error": str(exc),
+            },
+        )
+        raise HTTPException(status_code=500, detail="Failed to create verification request") from exc
+
+
+@router.post("/branch-entries/{entry_id}/verification-email/confirm")
+def confirm_branch_entry_verification_email(
+    entry_id: UUID,
+    payload: BranchEntryVerificationEmailConfirmRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    entry = _get_branch_entry(db, user, entry_id)
+    if entry.verification_email_status != "sent":
+        raise HTTPException(
+            status_code=400,
+            detail="No sent verification email to confirm.",
+        )
+    entry.verification_email_status = "confirmed"
+    entry.verification_email_confirmed_at = datetime.utcnow()
+    if payload.note:
+        entry.verification_email_note = (entry.verification_email_note or "") + "\n" + payload.note.strip()
+    write_audit(
+        db,
+        action="verification_email_confirmed",
+        message=(
+            f"Verification email confirmed for {entry.customer_name}"
+        ),
+        branch_id=user.branch_id,
+        user_id=user.id,
+        username=user.username,
+        application_id=None,
+        details={
+            "status": "confirmed",
+            "note": payload.note,
+        },
+    )
+    db.commit()
+    db.refresh(entry)
+    return {
+        "entry_id": str(entry.id),
+        "verification_email_status": entry.verification_email_status,
+        "verification_email_confirmed_at": entry.verification_email_confirmed_at.isoformat(),
+    }
 
 
 @router.get("/branch-entries/{entry_id}/documents/{doc_id}")

@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
 import StatusPill, { SourcePill } from '../components/StatusPill.jsx'
+import AlertBanner from '../components/ui/AlertBanner.jsx'
+import Button from '../components/ui/Button.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
+import FormField from '../components/ui/FormField.jsx'
+import PageHeader from '../components/ui/PageHeader.jsx'
 import SearchBar from '../components/ui/SearchBar.jsx'
 import { TableSkeleton } from '../components/ui/Skeleton.jsx'
 
@@ -10,7 +14,7 @@ export default function BranchQueuePage() {
   const navigate = useNavigate()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
-  const [listStatus, setListStatus] = useState('')
+  const [listError, setListError] = useState('')
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('active')
   const [sourceFilter, setSourceFilter] = useState('all')
@@ -20,10 +24,10 @@ export default function BranchQueuePage() {
     try {
       const data = await api('/api/v1/branch/records')
       setRows(data)
-      setListStatus('')
+      setListError('')
       return data
     } catch (err) {
-      setListStatus(err.message)
+      setListError(err.message)
       throw err
     } finally {
       setLoading(false)
@@ -88,16 +92,33 @@ export default function BranchQueuePage() {
     navigate(`/branch/applications/${row.id}`)
   }
 
+  const autoRefresh = rows.some((a) => a.status === 'pending' || a.status === 'analyzing')
+
   return (
     <>
-      <section className="hero hero-branch">
-        <span className="ai-badge">Work queue</span>
-        <h1>Applications in motion</h1>
-        <p>
-          Customer Portal submissions and Branch Entry scans in one grid.
-          Filter by source or status, then open a row for the full record.
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Work queue"
+        title="Applications in motion"
+        badge={`${filtered.length} records`}
+        description="Customer Portal submissions and Branch Entry scans in one grid. Filter by source or status, then open a row for the full record."
+        actions={
+          <Button variant="secondary" onClick={() => refreshList()} loading={loading}>
+            Refresh
+          </Button>
+        }
+      />
+
+      {listError ? (
+        <AlertBanner type="error" title="Could not load queue" message={listError} />
+      ) : null}
+
+      {autoRefresh ? (
+        <AlertBanner
+          type="info"
+          title="Cognexa AI analysis in progress"
+          message="The queue refreshes automatically every 4 seconds while applications are pending or analyzing."
+        />
+      ) : null}
 
       <section className="panel panel-accent">
         <div className="search-toolbar">
@@ -106,14 +127,14 @@ export default function BranchQueuePage() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search name, CNIC, email, company, ID…"
           />
-          <label className="field">Source
+          <FormField label="Source">
             <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}>
               <option value="all">All sources</option>
               <option value="customer_portal">Customer Portal</option>
               <option value="branch_entry">Branch Entry</option>
             </select>
-          </label>
-          <label className="field">Status
+          </FormField>
+          <FormField label="Status">
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
               <option value="active">Active (pending / analyzing / completed / saved)</option>
               <option value="all">All statuses</option>
@@ -124,25 +145,19 @@ export default function BranchQueuePage() {
               <option value="accepted">Accepted</option>
               <option value="rejected">Rejected</option>
             </select>
-          </label>
-          <label className="field">Sort
+          </FormField>
+          <FormField label="Sort">
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
               <option value="newest">Newest first</option>
               <option value="name">Name A–Z</option>
               <option value="status">Status</option>
               <option value="source">Source</option>
             </select>
-          </label>
-          <button type="button" className="btn btn-secondary" onClick={() => refreshList()}>
-            Refresh
-          </button>
+          </FormField>
         </div>
 
         <p className="hint" style={{ marginTop: '0.85rem' }}>
-          {listStatus || `${filtered.length} record(s)`}
-          {rows.some((a) => a.status === 'pending' || a.status === 'analyzing')
-            ? ' · Auto-refresh every 4s while AI is running'
-            : ''}
+          Showing {filtered.length} of {rows.length} record(s)
         </p>
 
         <div className="table-wrap" style={{ marginTop: '0.85rem' }}>

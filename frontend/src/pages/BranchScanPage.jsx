@@ -27,8 +27,8 @@ function publicSummaryText(text) {
   if (!text) return ''
   return String(text)
     .replace(/\s*\([^)]*(?:gemini|groq|ollama|gpt-?|claude|flash|models\/)[^)]*\)/gi, '')
-    .replace(/\bvia\s+Gemini(?:\s+vision)?\b/gi, 'via AI')
-    .replace(/\bvia\s+(?:Groq|Ollama)\b/gi, 'via AI')
+    .replace(/\bvia\s+Gemini(?:\s+vision)?\b/gi, 'via Cognexa AI')
+    .replace(/\bvia\s+(?:Groq|Ollama)\b/gi, 'via Cognexa AI')
     .replace(/\s{2,}/g, ' ')
     .replace(/\s+\./g, '.')
     .trim()
@@ -83,9 +83,17 @@ export default function BranchScanPage() {
   const [preview, setPreview]   = useState(null)
   const [dragging, setDragging] = useState(false)
   const [loading, setLoading]   = useState(false)
+  const [workflowLoading, setWorkflowLoading] = useState(false)
   const [saving, setSaving]     = useState(false)
   const [result, setResult]     = useState(null)
+  const [workflowResult, setWorkflowResult] = useState(null)
+  const [workflowError, setWorkflowError] = useState(null)
   const [error, setError]       = useState(null)
+  const [processingMode, setProcessingMode] = useState('single')
+  const [workflowType, setWorkflowType] = useState('account_opening')
+  const [reviewingGroupIndex, setReviewingGroupIndex] = useState(null)
+  const [groupAnalyzeLoading, setGroupAnalyzeLoading] = useState(false)
+  const [workflowAnalyzeAllLoading, setWorkflowAnalyzeAllLoading] = useState(false)
   const [formMode, setFormMode] = useState(null)
   const [editFields, setEditFields] = useState({})
   const [editChecks, setEditChecks] = useState({})
@@ -98,6 +106,7 @@ export default function BranchScanPage() {
   const [saveOpen, setSaveOpen] = useState(false)
   const [customerName, setCustomerName] = useState('')
   const [saveError, setSaveError] = useState(null)
+  const [editingWarning, setEditingWarning] = useState(null)
   const inputRef                = useRef(null)
   const originalFormRef         = useRef(null)
   const toastTimerRef           = useRef(null)
@@ -113,6 +122,9 @@ export default function BranchScanPage() {
     setFile(f)
     setResult(null)
     setError(null)
+    setWorkflowResult(null)
+    setWorkflowError(null)
+    setEditingWarning(null)
     setFormMode(null)
     setEditFields({})
     setEditChecks({})
@@ -135,15 +147,48 @@ export default function BranchScanPage() {
     pickFile(e.dataTransfer.files?.[0])
   }
 
+  function resetWorkflow() {
+    setWorkflowResult(null)
+    setWorkflowError(null)
+    setFile(null)
+    setPreview(null)
+    setWorkflowLoading(false)
+  }
+
+  function resetCurrentScan({ keepDraft = true } = {}) {
+    setFile(null)
+    setPreview(null)
+    setResult(null)
+    setError(null)
+    setEditingWarning(null)
+    setFormMode(null)
+    setEditFields({})
+    setEditChecks({})
+    setEditTransactions([])
+    setSavedNote(null)
+    setScanStepIndex(0)
+    setCompletionMessages([])
+    originalFormRef.current = null
+    resetWorkflow()
+    if (inputRef.current) inputRef.current.value = ''
+    if (!keepDraft) setDraftDocs([])
+  }
+
   function onDragOver(e) { e.preventDefault(); setDragging(true) }
   function onDragLeave()  { setDragging(false) }
 
-  async function handleScan(e) {
-    e.preventDefault()
+  async function handleScan(e, forceExtract = false) {
+    if (processingMode !== 'single') {
+      return
+    }
+    if (e && e.preventDefault) e.preventDefault()
     if (!file) { setError('Please select a document file first.'); return }
     setLoading(true)
     setError(null)
-    setResult(null)
+    if (!forceExtract) {
+      setEditingWarning(null)
+      setResult(null)
+    }
     setFormMode(null)
     setEditFields({})
     setEditChecks({})
@@ -153,6 +198,31 @@ export default function BranchScanPage() {
     setCompletionMessages([])
     originalFormRef.current = null
 
+    // Check for software editing metadata first if not forced
+    if (!forceExtract) {
+      const detectForm = new FormData()
+      detectForm.append('selected_type', docType)
+      detectForm.append('file', file)
+      try {
+        const detectData = await api('/api/v1/branch/detect-document', {
+          method: 'POST',
+          body: detectForm,
+        })
+        if (detectData?.editing_detected || (detectData?.flags && detectData.flags.length > 0)) {
+          setEditingWarning(detectData)
+          setLoading(false)
+          showToast(
+            'Software Editing Detected',
+            'Image metadata indicates software editing. Click "Extract anyway" to proceed.',
+          )
+          return
+        }
+      } catch (err) {
+        // Continue to scan if detect check fails
+      }
+    }
+
+    setEditingWarning(null)
     const form = new FormData()
     form.append('document_type', docType)
     form.append('file', file)
@@ -205,7 +275,7 @@ export default function BranchScanPage() {
         'Extraction complete',
         fieldCount > 0
           ? `${fieldCount} field${fieldCount === 1 ? '' : 's'} ready to review in the form below.`
-          : (msgs[msgs.length - 1] || 'AI finished this scan.'),
+          : (msgs[msgs.length - 1] || 'Cognexa AI finished this scan.'),
       )
     } catch (err) {
       setError(err.message || 'Scan failed. Please try again.')
@@ -215,21 +285,40 @@ export default function BranchScanPage() {
     }
   }
 
-  function resetCurrentScan({ keepDraft = true } = {}) {
-    setFile(null)
-    setPreview(null)
-    setResult(null)
-    setError(null)
-    setFormMode(null)
-    setEditFields({})
-    setEditChecks({})
-    setEditTransactions([])
-    setSavedNote(null)
-    setScanStepIndex(0)
-    setCompletionMessages([])
-    originalFormRef.current = null
-    if (inputRef.current) inputRef.current.value = ''
-    if (!keepDraft) setDraftDocs([])
+  async function handleWorkflowProcess(e) {
+    if (e && e.preventDefault) e.preventDefault()
+    if (processingMode !== 'workflow') {
+      return
+    }
+    if (!file) {
+      setWorkflowError('Please select a PDF file first.')
+      return
+    }
+    const suffix = file.name.split('.').pop()?.toLowerCase()
+    if (suffix !== 'pdf') {
+      setWorkflowError('Workflow uploads must be a PDF file.')
+      return
+    }
+
+    setWorkflowLoading(true)
+    setWorkflowError(null)
+    setWorkflowResult(null)
+    try {
+      const form = new FormData()
+      form.append('workflow_type', workflowType)
+      form.append('file', file)
+      const data = await api('/api/v1/branch/process-workflow', {
+        method: 'POST',
+        body: form,
+      })
+      setWorkflowResult(data)
+      setError(null)
+      setResult(null)
+    } catch (err) {
+      setWorkflowError(err.message || 'Workflow processing failed. Please try again.')
+    } finally {
+      setWorkflowLoading(false)
+    }
   }
 
   function reset() {
@@ -386,8 +475,8 @@ export default function BranchScanPage() {
   const liveMessage = loading
     ? (liveSteps.find((s) => s.state === 'active')?.activeMsg
       || liveSteps.find((s) => s.state === 'active')?.label
-      || 'AI is working…')
-    : (completionMessages[completionMessages.length - 1] || 'AI finished this scan.')
+      || 'Cognexa AI is working…')
+    : (completionMessages[completionMessages.length - 1] || 'Cognexa AI finished this scan.')
   const pendingSaveCount = draftDocs.length + (result && file && !typeMismatch ? 1 : 0)
 
   function useDetectedDocumentType() {
@@ -453,6 +542,43 @@ export default function BranchScanPage() {
               <p className="hint" style={{ margin: 0 }}>PNG · JPG · WEBP · PDF · max 15 MB</p>
             </div>
           </div>
+          <div style={{ marginBottom: '1rem' }}>
+            <label className="field" style={{ marginBottom: '1rem' }}>
+              Processing Mode
+              <select
+                value={processingMode}
+                onChange={(e) => {
+                  const nextMode = e.target.value
+                  setProcessingMode(nextMode)
+                  setError(null)
+                  setWorkflowError(null)
+                  setResult(null)
+                  setWorkflowResult(null)
+                  setEditingWarning(null)
+                  setScanStepIndex(0)
+                  setCompletionMessages([])
+                  originalFormRef.current = null
+                }}
+                disabled={loading || workflowLoading}
+              >
+                <option value="single">Single Document</option>
+                <option value="workflow">Workflow</option>
+              </select>
+            </label>
+
+            {processingMode === 'workflow' && (
+              <label className="field" style={{ marginBottom: '1rem' }}>
+                Workflow
+                <select
+                  value={workflowType}
+                  onChange={(e) => setWorkflowType(e.target.value)}
+                  disabled={loading || workflowLoading}
+                >
+                  <option value="account_opening">Account Opening Workflow</option>
+                </select>
+              </label>
+            )}
+          </div>
 
           {draftDocs.length > 0 && (
             <div className="scan-draft-list">
@@ -480,33 +606,35 @@ export default function BranchScanPage() {
           )}
 
           <form onSubmit={handleScan} id="scan-form">
-            <label className="field" style={{ marginBottom: '1.1rem' }}>
-              Document Type
-              <select
-                id="scan-doc-type"
-                value={docType}
-                onChange={(e) => {
-                  const next = e.target.value
-                  setDocType(next)
-                  // Changing type invalidates the previous extraction form
-                  if (result) {
-                    setResult(null)
-                    setFormMode(null)
-                    setEditFields({})
-                    setEditChecks({})
-                    setEditTransactions([])
-                    setSavedNote(null)
-                    setCompletionMessages([])
-                    originalFormRef.current = null
-                  }
-                }}
-                disabled={loading}
-              >
-                {DOCUMENT_TYPES.map(t => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
-                ))}
-              </select>
-            </label>
+            {processingMode === 'single' && (
+              <label className="field" style={{ marginBottom: '1.1rem' }}>
+                Document Type
+                <select
+                  id="scan-doc-type"
+                  value={docType}
+                  onChange={(e) => {
+                    const next = e.target.value
+                    setDocType(next)
+                    // Changing type invalidates the previous extraction form
+                    if (result) {
+                      setResult(null)
+                      setFormMode(null)
+                      setEditFields({})
+                      setEditChecks({})
+                      setEditTransactions([])
+                      setSavedNote(null)
+                      setCompletionMessages([])
+                      originalFormRef.current = null
+                    }
+                  }}
+                  disabled={loading}
+                >
+                  {DOCUMENT_TYPES.map(t => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
+                  ))}
+                </select>
+              </label>
+            )}
 
             <div
               id="scan-dropzone"
@@ -573,34 +701,52 @@ export default function BranchScanPage() {
               )}
             </div>
 
-            {error && (
-              <p className="status-line error" style={{ marginTop: '0.75rem' }}>{error}</p>
+            {(error || workflowError) && (
+              <p className="status-line error" style={{ marginTop: '0.75rem' }}>
+                {processingMode === 'workflow' ? workflowError || error : error}
+              </p>
             )}
 
             <div className="actions" style={{ marginTop: '1.1rem' }}>
-              <button
-                id="scan-submit-btn"
-                type="submit"
-                className="btn"
-                disabled={loading || saving || !file}
-              >
-                {loading
-                  ? <><span className="scan-spinner" aria-hidden="true" /> Scanning…</>
-                  : <>Scan Document</>
-                }
-              </button>
-              {pendingSaveCount > 0 && !loading && (
+              {processingMode === 'workflow' ? (
                 <button
                   type="button"
                   className="btn"
-                  disabled={saving}
-                  onClick={openSaveModal}
+                  onClick={handleWorkflowProcess}
+                  disabled={workflowLoading || loading || !file}
                 >
-                  Save ({pendingSaveCount})
+                  {workflowLoading
+                    ? <><span className="scan-spinner" aria-hidden="true" /> Processing…</>
+                    : <>Process Workflow</>
+                  }
                 </button>
+              ) : (
+                <>
+                  <button
+                    id="scan-submit-btn"
+                    type="submit"
+                    className="btn"
+                    disabled={loading || saving || !file}
+                  >
+                    {loading
+                      ? <><span className="scan-spinner" aria-hidden="true" /> Scanning…</>
+                      : <>Scan Document</>
+                    }
+                  </button>
+                  {pendingSaveCount > 0 && !loading && (
+                    <button
+                      type="button"
+                      className="btn"
+                      disabled={saving}
+                      onClick={openSaveModal}
+                    >
+                      Save ({pendingSaveCount})
+                    </button>
+                  )}
+                </>
               )}
-              {(result || file || draftDocs.length > 0) && !loading && (
-                <button type="button" className="btn btn-secondary" onClick={reset} disabled={saving}>
+              {(workflowResult || result || file || draftDocs.length > 0) && !loading && (
+                <button type="button" className="btn btn-secondary" onClick={reset} disabled={saving || workflowLoading || workflowAnalyzeAllLoading}>
                   Clear
                 </button>
               )}
@@ -608,13 +754,243 @@ export default function BranchScanPage() {
           </form>
         </div>
 
+        {/* ── Editing Warning Gating Card ── */}
+        {editingWarning && (
+          <div className="scan-results" id="scan-editing-warning">
+            <div className="panel scan-result-card scan-editing-warning-card">
+              <div className="panel-head" style={{ flexWrap: 'wrap', gap: '0.6rem' }}>
+                <div>
+                  <p className="eyebrow amber-tag" style={{ marginBottom: '0.2rem' }}>
+                    Metadata &amp; Forgery Security Alert
+                  </p>
+                  <h2 style={{ marginBottom: 0 }}>Digital Editing Software Detected</h2>
+                </div>
+                <span className="scan-type-badge bad">EDITING DETECTED</span>
+              </div>
+              <p className="scan-summary-text" style={{ marginTop: '0.75rem', marginBottom: '0.75rem' }}>
+                Image metadata indicates that this document was created or modified using digital editing software (e.g. Canva / Photoshop). Extraction is paused to prevent unverified processing.
+              </p>
+              {editingWarning.flags && editingWarning.flags.length > 0 && (
+                <ul className="scan-flags-list" style={{ margin: '0.5rem 0 1rem 0', paddingLeft: '1.2rem' }}>
+                  {editingWarning.flags.map((flag, idx) => (
+                    <li key={idx} className="scan-flag-item error" style={{ color: '#eab308', fontWeight: 600, fontSize: '0.9rem' }}>
+                      {flag}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="actions" style={{ marginTop: '1.25rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="btn btn-warning-extract"
+                  onClick={(e) => handleScan(e, true)}
+                >
+                  ⚡ Extract anyway
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={reset}
+                >
+                  Cancel / Clear
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── Results ── */}
+        {workflowResult && (
+          <div className="scan-results" id="workflow-results">
+            <div className="panel panel-accent scan-result-card">
+              <div className="panel-head" style={{ flexWrap: 'wrap', gap: '0.6rem' }}>
+                <div>
+                  <p className="eyebrow" style={{ marginBottom: '0.2rem' }}>Workflow Summary</p>
+                  <h2 style={{ marginBottom: 0 }}>{workflowResult.workflow_label}</h2>
+                </div>
+                <span className={`scan-type-badge${workflowResult.status === 'COMPLETE' ? ' good' : ' bad'}`}>
+                  {workflowResult.status}
+                </span>
+              </div>
+              <div className="scan-type-compare">
+                <div className="scan-type-col">
+                  <span className="scan-type-label">Workflow ID</span>
+                  <strong>{workflowResult.workflow_id}</strong>
+                </div>
+                <div className="scan-type-col">
+                  <span className="scan-type-label">Pages</span>
+                  <strong>{workflowResult.total_pages}</strong>
+                </div>
+              </div>
+              {workflowResult.separator_pages?.length > 0 && (
+                <p className="scan-summary-text" style={{ marginTop: '0.75rem' }}>
+                  Separator pages detected: {workflowResult.separator_pages.join(', ')}.
+                </p>
+              )}
+            </div>
+
+            <div className="panel scan-result-card">
+              <div className="panel-head" style={{ flexWrap: 'wrap', gap: '0.6rem' }}>
+                <div>
+                  <p className="eyebrow" style={{ marginBottom: '0.2rem' }}>Customer Groups</p>
+                  <h2 style={{ marginBottom: 0 }}>Detected document clusters</h2>
+                </div>
+              </div>
+              <div style={{ margin: '1rem 0', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <span className="eyebrow" style={{ margin: 0 }}>Workflow upload complete — grouped and classified.</span>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={async () => {
+                    if (!workflowResult?.customer_groups?.length) return
+                    setWorkflowAnalyzeAllLoading(true)
+                    try {
+                      let remaining = workflowResult.customer_groups.length
+                      while (remaining > 0) {
+                        const form = new FormData()
+                        form.append('workflow_type', workflowResult.workflow_type)
+                        form.append('group_index', 0)
+                        form.append('file', file)
+                        const res = await api('/api/v1/branch/process-workflow/commit-group', {
+                          method: 'POST',
+                          body: form,
+                        })
+                        showToast('Queued for Analysis', res.message || 'Started extraction for a workflow group.')
+                        setWorkflowResult((prev) => ({
+                          ...prev,
+                          customer_groups: (prev.customer_groups || []).slice(1),
+                        }))
+                        remaining -= 1
+                      }
+                    } catch (err) {
+                      showToast('Analyze all failed', err.message || 'Failed while queuing workflow groups.')
+                    } finally {
+                      setWorkflowAnalyzeAllLoading(false)
+                    }
+                  }}
+                  disabled={!file || workflowAnalyzeAllLoading || groupAnalyzeLoading || !workflowResult?.customer_groups?.length}
+                >
+                  {workflowAnalyzeAllLoading ? 'Queuing all…' : 'Analyze All'}
+                </button>
+              </div>
+              {workflowResult.customer_groups.map((group, gidx) => (
+                <div key={group.customer_id} className="scan-group-card" style={{ marginTop: '1rem', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                  <p className="eyebrow" style={{ marginBottom: '0.5rem' }}>Group {group.customer_id}</p>
+                  <p style={{ margin: 0 }}><strong>Pages:</strong> {group.pages.map((doc) => doc.page).join(', ')}</p>
+                  <p style={{ margin: '0.5rem 0' }}><strong>Validation:</strong> {group.validation.status}</p>
+                  {group.validation.messages?.map((msg, idx) => (
+                    <p key={idx} className="scan-summary-text" style={{ margin: '0.25rem 0' }}>{msg}</p>
+                  ))}
+                  {group.cross_document_checks?.length > 0 && (
+                    <div style={{ marginTop: '0.75rem' }}>
+                      <p className="eyebrow" style={{ marginBottom: '0.35rem' }}>Cross-document checks</p>
+                      <ul className="scan-flag-list">
+                        {group.cross_document_checks.map((check, idx) => (
+                          <li key={idx}>
+                            <strong>{check.field}</strong>: {check.match ? 'Match' : 'Mismatch'}
+                            {check.values ? ` — ${check.values.join(', ')}` : ''}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                    <button type="button" className="btn" onClick={() => setReviewingGroupIndex(gidx)}>
+                      Review
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={async () => {
+                        setGroupAnalyzeLoading(true)
+                        try {
+                          const form = new FormData()
+                          form.append('workflow_type', workflowResult.workflow_type)
+                          form.append('group_index', gidx)
+                          form.append('file', file)
+                          const res = await api('/api/v1/branch/process-workflow/commit-group', {
+                            method: 'POST',
+                            body: form,
+                          })
+                          showToast('Queued for Analysis', res.message || 'Started extraction for selected group.')
+                          setWorkflowResult((prev) => ({
+                            ...prev,
+                            customer_groups: (prev.customer_groups || []).filter((_, i) => i !== gidx),
+                          }))
+                        } catch (err) {
+                          showToast('Analyze failed', err.message || 'Failed to start analysis')
+                        } finally {
+                          setGroupAnalyzeLoading(false)
+                        }
+                      }}
+                      disabled={!file || groupAnalyzeLoading || workflowAnalyzeAllLoading}
+                    >
+                      {groupAnalyzeLoading ? 'Analyzing…' : 'Analyze'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Review modal for selected group */}
+        {workflowResult && reviewingGroupIndex != null && (
+          <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="panel" style={{ width: '720px', maxHeight: '80vh', overflow: 'auto' }}>
+              <div className="panel-head">
+                <h3>Review Group {workflowResult.customer_groups[reviewingGroupIndex].customer_id}</h3>
+                <button type="button" className="scan-toast-close" onClick={() => setReviewingGroupIndex(null)}>×</button>
+              </div>
+              <div style={{ padding: '1rem' }}>
+                <p><strong>Pages:</strong> {workflowResult.customer_groups[reviewingGroupIndex].pages.map(p => p.page).join(', ')}</p>
+                <p><strong>Validation:</strong> {workflowResult.customer_groups[reviewingGroupIndex].validation.status}</p>
+                <div style={{ marginTop: '0.75rem' }}>
+                  {workflowResult.customer_groups[reviewingGroupIndex].pages.map((doc) => (
+                    <div key={doc.page} style={{ padding: '0.5rem 0', borderBottom: '1px dashed #e6eef6' }}>
+                      <strong>Page {doc.page}</strong>
+                      <p style={{ margin: 0 }}>{doc.document_type_label} — Confidence: {Math.round((doc.confidence || 0) * 100)}</p>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+                  <button type="button" className="btn" onClick={() => setReviewingGroupIndex(null)}>Close</button>
+                  <button type="button" className="btn btn-ghost" onClick={async () => {
+                    // reuse analyze action from group card: commit and start extraction
+                    setGroupAnalyzeLoading(true)
+                    try {
+                      const form = new FormData()
+                      form.append('workflow_type', workflowResult.workflow_type)
+                      form.append('group_index', reviewingGroupIndex)
+                      form.append('file', file)
+                      const res = await api('/api/v1/branch/process-workflow/commit-group', {
+                        method: 'POST',
+                        body: form,
+                      })
+                      showToast('Queued for Analysis', res.message || 'Started extraction for selected group.')
+                      setWorkflowResult((prev) => ({
+                        ...prev,
+                        customer_groups: (prev.customer_groups || []).filter((_, i) => i !== reviewingGroupIndex),
+                      }))
+                      setReviewingGroupIndex(null)
+                    } catch (err) {
+                      showToast('Analyze failed', err.message || 'Failed to start analysis')
+                    } finally {
+                      setGroupAnalyzeLoading(false)
+                    }
+                  }} disabled={!file || groupAnalyzeLoading}>{groupAnalyzeLoading ? 'Analyzing…' : 'Analyze Group'}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {result && (
           <div className="scan-results" id="scan-results">
 
             <div className="panel panel-accent scan-result-card">
               <AiActivityPanel
-                title="AI Activity"
+                title="Cognexa AI Activity"
                 message={liveMessage}
                 steps={liveSteps}
                 messages={completionMessages}
@@ -631,34 +1007,38 @@ export default function BranchScanPage() {
                 <div className="panel-head" style={{ flexWrap: 'wrap', gap: '0.6rem' }}>
                   <div>
                     <p className="eyebrow" style={{ marginBottom: '0.2rem' }}>
-                      Document Type Check
+                      Stage 1 &amp; Stage 2 Document Gate
                     </p>
                     <h2 style={{ marginBottom: 0 }}>
                       {!typeMismatch
-                        ? 'Type Confirmed'
-                        : typeCheck.detected === 'unknown'
-                          ? 'Unrecognised Document'
-                          : 'Wrong Document Type'}
+                        ? 'Supported Document Confirmed'
+                        : result?.gate?.status === 'not_a_document'
+                          ? 'Invalid Upload — Not a Document'
+                          : result?.gate?.status === 'unsupported_document'
+                            ? 'Unsupported Document'
+                            : 'Wrong Document Type'}
                     </h2>
                   </div>
                   <span
                     className={`scan-type-badge${typeMismatch ? ' bad' : ' good'}`}
                   >
                     {!typeMismatch
-                      ? 'MATCH'
-                      : typeCheck.detected === 'unknown'
-                        ? 'NOT A DOCUMENT'
-                        : 'MISMATCH'}
+                      ? 'SUPPORTED'
+                      : result?.gate?.status === 'not_a_document'
+                        ? 'INVALID UPLOAD'
+                        : result?.gate?.status === 'unsupported_document'
+                          ? 'UNSUPPORTED'
+                          : 'MISMATCH'}
                   </span>
                 </div>
 
                 <div className="scan-type-compare">
                   <div className="scan-type-col">
-                    <span className="scan-type-label">Selected by you</span>
+                    <span className="scan-type-label">Selected Document Type</span>
                     <strong>{typeCheck.selected_label || docTypeLabel(docType)}</strong>
                   </div>
                   <div className="scan-type-col">
-                    <span className="scan-type-label">Detected by AI</span>
+                    <span className="scan-type-label">Detected by Cognexa AI</span>
                     <strong>{typeCheck.detected_label || 'Unknown'}</strong>
                   </div>
                 </div>
@@ -669,8 +1049,21 @@ export default function BranchScanPage() {
                 </p>
 
                 {typeMismatch && (
-                  <div className="actions scan-edit-actions" style={{ marginTop: 0 }}>
-                    {typeCheck.detected && typeCheck.detected !== 'unknown' ? (
+                  <div className="scan-supported-banner" style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                    <p className="eyebrow" style={{ marginBottom: '0.3rem', fontSize: '0.75rem', color: '#64748b' }}>
+                      Supported Banking Documents (Demo Scope)
+                    </p>
+                    <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.85rem', color: '#334155' }}>
+                      <li><strong>CNIC</strong> (Pakistani National Identity Card)</li>
+                      <li><strong>Payslip</strong> (Salary / Pay Slip)</li>
+                      <li><strong>Remittance</strong> (UBL Remittance / Transfer Slip)</li>
+                    </ul>
+                  </div>
+                )}
+
+                {typeMismatch && (
+                  <div className="actions scan-edit-actions" style={{ marginTop: '1rem' }}>
+                    {typeCheck.detected && !['unknown', 'not_a_document', 'other'].includes(typeCheck.detected) && ['cnic', 'payslip', 'remittance_slip'].includes(typeCheck.detected) ? (
                       <button
                         type="button"
                         className="btn-primary"
@@ -695,7 +1088,7 @@ export default function BranchScanPage() {
             <div className="panel panel-accent scan-result-card">
               <div className="panel-head" style={{ flexWrap: 'wrap', gap: '0.6rem' }}>
                 <div>
-                  <p className="eyebrow" style={{ marginBottom: '0.2rem' }}>AI Extraction</p>
+                  <p className="eyebrow" style={{ marginBottom: '0.2rem' }}>Cognexa AI Extraction</p>
                   <h2 style={{ marginBottom: 0 }}>{result.document_type}</h2>
                 </div>
                 {conf && (
@@ -870,7 +1263,7 @@ export default function BranchScanPage() {
           <div className="scan-loading-state scan-loading-activity">
             <div className="scan-loading-orb" aria-hidden="true" />
             <p style={{ color: 'var(--ink)', fontWeight: 700, fontSize: '1rem', margin: '1.1rem 0 0.35rem' }}>
-              AI is working on your document…
+              Cognexa AI is working on your document…
             </p>
             <div className="scan-loading-panel">
               <AiActivityPanel

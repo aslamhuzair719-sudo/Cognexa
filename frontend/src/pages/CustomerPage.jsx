@@ -221,7 +221,7 @@ export default function CustomerPage() {
       for (const [key, label] of FILE_FIELDS) {
         if (!files[key]) return `Please upload ${label}`
       }
-      if (cnicChecking) return 'Please wait — verifying CNIC against your upload…'
+      if (cnicChecking) return 'Please wait — Cognexa AI is verifying CNIC against your upload…'
       if (cnicVerified !== true) {
         return cnicCheckMsg
           || 'Please upload a clear CNIC front so we can verify it matches your entered CNIC.'
@@ -242,7 +242,7 @@ export default function CustomerPage() {
     }
 
     setCnicChecking(true)
-    setCnicCheckMsg('Checking CNIC against uploaded document…')
+    setCnicCheckMsg('Cognexa AI is checking CNIC against uploaded document…')
     setError(false)
     setStatus('')
     try {
@@ -570,7 +570,7 @@ export default function CustomerPage() {
                         cnicChecking ? 'pending' : cnicVerified ? 'ok' : 'bad'
                       }`}
                     >
-                      {cnicChecking ? 'Verifying CNIC against document…' : cnicCheckMsg}
+                      {cnicChecking ? 'Cognexa AI is verifying CNIC against document…' : cnicCheckMsg}
                     </p>
                   )}
                 </>

@@ -1,0 +1,136 @@
+Document Scan Frontend Design Specification
+
+Overview:
+- Application name: Document Scan
+- Branding: Use UBL blue palette as the primary brand color, with clean white surfaces and subtle gray/neutral accents.
+- Typography: modern, legible sans serif with clear headings and body text hierarchy.
+- Layout: responsive dashboard-style app with a top navigation bar and a left-side panel on desktop, collapsing to a mobile menu on smaller screens.
+- Application name should appear in the top navigation and/or brand area on every page.
+
+Global UI Structure:
+- Top header: application logo/name, current branch/user name, global search, notifications icon, profile menu.
+- Sidebar or top nav: Dashboard, Queue, Applications, Audit, History, Scan, Signatures, Customers, Settings.
+- Page title bar: shows current page name, optional breadcrumbs, and primary action button.
+- Card/grid system: use summary cards for key KPIs and quick actions.
+- Expand/collapse sections: keep long pages compact by default with toggles for details.
+- Modal/dialog patterns: confirm actions, show form details, display document previews, and collect reasons for decisions.
+
+Pages and Functionality:
+
+1. Branch Login Page
+- Full-page login screen styled with UBL brand colors.
+- Fields: Branch code, email/username, password.
+- Remember me checkbox and forgot password link.
+- Clear call-to-action button: "Sign in".
+- Optional brand messaging explaining Document Scan capabilities.
+
+2. Branch Dashboard Page
+- Top summary cards: total applications, pending reviews, passed reports, failed reports, average score.
+- Recent activity panel: latest applications, status changes, reviewer actions.
+- Quick links: go to queue, new scan, latest report, signature verification.
+- KPI charts or small trend cards: daily application volume, pass/fail ratio, quality warnings.
+- Alerts panel: urgent items, missing documents, verification exceptions.
+
+3. Branch Queue Page
+- Table of pending applications waiting for review.
+- Columns: Application ID, customer name, branch, submitted date, status, score, action.
+- Filters: date range, status, branch, score band, document type.
+- Search field for customer name or application ID.
+- Each row action: View application, Open report, Mark reviewed.
+- Bulk actions: export, assign, set status, notify customer.
+
+4. Branch Application Page
+- Primary page for reviewing a single application.
+- Top summary panel: applicant name, application status, submission date, score, recommendation.
+- Customer details section: CNIC, phone, email, address, employer, account number.
+- Document summary section: uploaded documents, extraction status, quality status.
+- Report summary section: quick pass/fail counts, missing items, warnings.
+- Expandable full report viewer: collapsible sections for each validation type (customer info, CNIC, payslip, bank statement, cross validation).
+- Document preview gallery: thumbnails or links for CNIC front/back, payslip, bank statement.
+- Action controls: Approve application, Reject application, Request more information, Send note to audit.
+- Notes/comments section for reviewer feedback.
+
+5. Report View (inside application review)
+- A compact report summary at the top with overall recommendation and score.
+- Collapsible validation blocks:
+  - Customer information validation
+  - CNIC validation
+  - Payslip validation
+  - Bank statement validation
+  - Cross validation
+- Each block shows pass/fail/warn counts and a summary line.
+- Detailed view opens on demand with a comparison table: field, customer value, document value, result.
+- Document verification status and notes displayed clearly.
+- Recommendation block with final verdict and explanation.
+
+6. Verification Page / Branch Audit Page
+- Review task list of applications that need manual verification.
+- Show staged verification steps like document extraction, face and signature checks, customer information match.
+- Fields for manual review input: verified by, verification notes, override decision.
+- Toggles or step indicators for each verification phase.
+- Action buttons: Confirm verification, Request re-scan, Escalate.
+- Side panel with application summary and verification history.
+
+7. Email / Notification Center Page
+- List of messages and notifications related to applications and reviews.
+- Filters: unread, alerts, reports delivered, follow-ups.
+- Search by subject, application ID, or customer.
+- Preview pane for selected message content.
+- Buttons for sending new notifications, re-sending report links, or marking as read.
+- Optional templates for audit notifications and verification status updates.
+
+8. Branch History Page
+- Archive of completed applications and past reports.
+- Search and filter by date, status, customer, document type, score.
+- Table view with columns: application ID, customer, branch, completed date, score, result.
+- Detailed view open from row to inspect a past application or report.
+- Export function to download history as CSV or Excel.
+
+9. Branch Scan Page
+- Document upload interface for branch-level scanning.
+- Instructions for scanning CNIC, payslip, bank statement, signature.
+- Drag and drop upload area and camera capture buttons.
+- Preview of uploaded documents with status badges: Uploaded, Processing, Ready.
+- Field mapping preview from OCR extraction.
+- Submit button to send documents for processing.
+- Error/warning display for missing pages or poor image quality.
+
+10. Branch Signatures Page
+- Signature verification workflow.
+- List of uploaded signature samples and comparison results.
+- Display signature images side-by-side with similarity score.
+- Buttons to accept, reject, or request manual review.
+- Notes field for signature validation comments.
+- History of signature checks per application.
+
+11. Customer Page
+- Customer profile screen with personal details, account info, and document history.
+- Recent applications associated with the customer.
+- Verification status summary and audit notes.
+- Ability to view uploaded documents and reports for this customer.
+
+12. Settings / Profile Page
+- User profile settings: name, email, password, branch details.
+- Notification preferences: email alerts, app notifications.
+- Branding settings: primary color selection using UBL blue shades, logo placement, app name text.
+- Display and accessibility options: compact mode, font size, dark/light mode if desired.
+
+Design Principles:
+- Keep every page clean, consistent, and easy to scan.
+- Use cards for summaries and tables for detailed lists.
+- Favor collapsible sections to reduce scrolling.
+- Keep actions prominent and easily accessible.
+- Use the UBL blue palette for primary buttons, links, and highlights.
+- Use neutral backgrounds with white cards and subtle shadows.
+- Keep the application name visible in top navigation and header areas.
+
+Component Guidelines:
+- Summary cards: simple label, value, optional trend indicator.
+- Tables: responsive with sticky headers and row actions.
+- Toggles: used for expanding/collapsing report sections, enabling review modes, and switching summary/detail views.
+- Modals: confirm approval/rejection, show document preview, collect additional notes.
+- Badges: use green for pass, amber for warn, red for fail.
+- Buttons: primary action in UBL blue, secondary in gray/white.
+- Icons: small icons for alerts, documents, status, and navigation.
+
+This file describes a complete frontend product for Document Scan with every page and major functionality defined from scratch.

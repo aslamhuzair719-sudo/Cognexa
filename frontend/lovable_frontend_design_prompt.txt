@@ -1,0 +1,22 @@
+Hi Lovable,
+
+Please design the frontend for our Document Scan application with a clean, professional, and modern UI.
+
+Requirements:
+- Define every page clearly, including: Home/Dashboard, Branch Application Review, Report View, Verification, Email or Notification Center, and Settings/Profile if needed.
+- Use the same color palette as the UBL logo and brand identity (blue shades with clean white and neutral accents).
+- Keep layout responsive and easy to scan, with compact summaries and expandable detail sections.
+- Make sure the application name is visible in the header or top navigation and matches the UBL brand style.
+- Use consistent typography, spacing, and button styles across pages.
+
+Please write out the page structure and component layout in detail, including cards, summary panels, data tables, toggles, and modal/dialog patterns for important actions.
+
+Define each page explicitly:
+- Home / Dashboard: show overall application status, report summaries, quick links to pending reviews, recent activity, and KPI tiles.
+- Branch Application Review: show a compact application summary panel, applicant details, attached documents, status controls, and an expandable report preview.
+- Report View: render the AI verification report with a top summary, collapsible validation sections, document verification status, and a clear recommendation block.
+- Verification: provide candidate verification steps, form fields for manual review input, validation toggles, and a final submit/approve/reject action.
+- Email / Notification Center: list messages, alerts, and report delivery status; include filters, search, and detail preview panels.
+- Settings / Profile: allow branding configuration, user profile details, notification preferences, and color/theme settings.
+
+Use the same color palette as the UBL logo and brand identity (blue shades with clean white and neutral accents). Keep the application name visible in the header or top navigation and consistent across pages.

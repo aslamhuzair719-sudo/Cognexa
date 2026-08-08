@@ -17,8 +17,8 @@ export default function BrandHeader({
           className={`ubl-logo ${isBar ? 'ubl-logo-on-bar' : 'ubl-logo-on-light'}`}
         />
         <div className="brand-text">
-          <p className="brand-product">Application Verification System</p>
-          <p className="brand-product-abbr">AVS</p>
+          <p className="brand-product">Cognexa Verification System</p>
+          <p className="brand-product-abbr">Cognexa</p>
           {subtitle ? <p className="brand-sub">{subtitle}</p> : null}
         </div>
       </div>

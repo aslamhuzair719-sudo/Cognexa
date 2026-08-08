@@ -8,13 +8,13 @@ from typing import Any, Dict, List, Optional
 
 # Canonical stages for customer application analysis
 APP_STAGES = [
-    {"id": "queued", "label": "Waiting in AI queue"},
-    {"id": "starting", "label": "AI analysis starting"},
+    {"id": "queued", "label": "Waiting in Cognexa AI queue"},
+    {"id": "starting", "label": "Cognexa AI analysis starting"},
     {"id": "ocr", "label": "Parsing documents (OCR)"},
     {"id": "llm", "label": "LLM extracting fields"},
     {"id": "validating", "label": "Validating against form"},
     {"id": "report", "label": "Building verification report"},
-    {"id": "complete", "label": "AI analysis complete"},
+    {"id": "complete", "label": "Cognexa AI analysis complete"},
 ]
 
 _STAGE_INDEX = {s["id"]: i for i, s in enumerate(APP_STAGES)}
@@ -85,26 +85,26 @@ class AiProgressStore:
         raw = self.get(application_id)
         if status == "pending" and not raw:
             stage = "queued"
-            message = "Waiting in the AI queue…"
+            message = "Waiting in the Cognexa AI queue…"
             done = False
         elif status == "completed" or status in ("accepted", "rejected"):
             if raw and raw.get("done"):
                 stage = raw.get("stage") or "complete"
-                message = raw.get("message") or "AI analysis complete."
+                message = raw.get("message") or "Cognexa AI analysis complete."
             else:
                 stage = "complete"
-                message = "AI analysis complete."
+                message = "Cognexa AI analysis complete."
             done = True
         elif raw:
             stage = raw.get("stage") or "starting"
-            message = raw.get("message") or "AI is working…"
+            message = raw.get("message") or "Cognexa AI is working…"
             done = bool(raw.get("done"))
         else:
             stage = "starting" if status == "analyzing" else "queued"
             message = (
-                "AI analysis is running…"
+                "Cognexa AI analysis is running…"
                 if status == "analyzing"
-                else "Waiting in the AI queue…"
+                else "Waiting in the Cognexa AI queue…"
             )
             done = False
 
@@ -134,7 +134,7 @@ class AiProgressStore:
                 ):
                     messages.append(h["message"])
             if raw.get("done"):
-                messages.append(raw.get("message") or "AI analysis complete.")
+                messages.append(raw.get("message") or "Cognexa AI analysis complete.")
 
         # Deduplicate while preserving order
         seen = set()

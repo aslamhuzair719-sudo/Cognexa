@@ -313,7 +313,7 @@ export default function BranchSignaturesPage() {
   return (
     <div className="scan-page sig-page">
       <section className="hero hero-branch">
-        <span className="ai-badge">Signature Scan</span>
+        <span className="ai-badge">Cognexa Signature Scan</span>
         <h1>Signature verification</h1>
         <p>
           Compare signatures against registered specimens, or manage the signature

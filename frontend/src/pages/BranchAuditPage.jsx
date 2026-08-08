@@ -50,7 +50,7 @@ export default function BranchAuditPage() {
         <span className="ai-badge">Compliance trail</span>
         <h1>Audit logs</h1>
         <p>
-          Immutable branch activity — authentication, AI queue events, and accept / reject
+          Immutable branch activity — authentication, Cognexa AI queue events, and accept / reject
           decisions with operator identity.
         </p>
       </section>

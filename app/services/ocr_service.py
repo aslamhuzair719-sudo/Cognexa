@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import re
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Union
@@ -64,12 +65,39 @@ class TesseractOCRService(BaseOCRService):
         try:
             for page in doc:
                 text = page.get_text().strip()
-                if text:
+                if text and not self._is_text_garbage(text):
                     full_text += text + "\n"
                 else:
+                    logger.info(
+                        "Page %s text appears unreliable; falling back to image OCR.",
+                        page.number + 1,
+                    )
                     pix = page.get_pixmap(dpi=config.OCR_DPI)
                     img = Image.open(io.BytesIO(pix.tobytes("png")))
-                    full_text += pytesseract.image_to_string(img) + "\n"
+                    full_text += pytesseract.image_to_string(img).strip() + "\n"
         finally:
             doc.close()
         return full_text.strip()
+
+    def _is_text_garbage(self, text: str) -> bool:
+        if not text:
+            return True
+
+        clean = text.strip()
+        if len(clean) < 40:
+            return True
+
+        letters = sum(1 for c in clean if c.isalpha())
+        if letters / max(1, len(clean)) < 0.35:
+            return True
+
+        words = re.findall(r"\b[A-Za-z]{3,}\b", clean)
+        if len(words) < 5:
+            return True
+
+        common_words = {'the', 'and', 'for', 'with', 'from', 'date', 'name', 'account', 'branch', 'application', 'customer', 'company', 'employee'}
+        valid_word_count = sum(1 for word in words if word.lower() in common_words)
+        if valid_word_count / max(1, len(words)) < 0.12:
+            return True
+
+        return False

@@ -48,7 +48,7 @@ class ReportGenerator:
         image_quality: List[ImageQualityResult],
     ) -> VerificationReport:
         all_comparisons = self._flatten(sections)
-        score = self._score(all_comparisons)
+        score = self._score(all_comparisons, image_quality)
         missing = self._missing(uploaded_documents, all_comparisons)
         warnings = self._warnings(all_comparisons, image_quality)
         recommendation, detail = self._recommend(all_comparisons, missing, image_quality)
@@ -97,7 +97,19 @@ class ReportGenerator:
             rows.extend(section.comparisons)
         return rows
 
-    def _score(self, comparisons: List[FieldComparison]) -> float:
+    def _score(
+        self,
+        comparisons: List[FieldComparison],
+        image_quality: Optional[List[ImageQualityResult]] = None,
+    ) -> float:
+        if image_quality:
+            for iq in image_quality:
+                for c in iq.checks:
+                    if (
+                        c.check in {"metadata_integrity", "software_editing"}
+                        and c.result == CheckResult.FAIL
+                    ):
+                        return 0.0
         if not comparisons:
             return 0.0
         weights = {CheckResult.PASS: 1.0, CheckResult.WARNING: 0.5, CheckResult.FAIL: 0.0}
@@ -137,8 +149,10 @@ class ReportGenerator:
         for iq in image_quality:
             if iq.overall == CheckResult.WARNING:
                 warnings.append(f"Image quality warning for {iq.document_label}")
+            elif iq.overall == CheckResult.FAIL:
+                warnings.append(f"Image quality check failed for {iq.document_label}")
             for check in iq.checks:
-                if check.result == CheckResult.WARNING and check.detail:
+                if check.result in (CheckResult.WARNING, CheckResult.FAIL) and check.detail:
                     warnings.append(f"{iq.document_label}: {check.detail}")
         # de-dupe preserving order
         seen = set()
@@ -162,6 +176,13 @@ class ReportGenerator:
             and (c.is_critical or c.field.lower() in self.CRITICAL_FIELD_HINTS)
         ]
         unreadable = [iq for iq in image_quality if not iq.readable]
+        tampered_docs = [
+            iq.document_label
+            for iq in image_quality
+            for c in iq.checks
+            if c.check in {"metadata_integrity", "software_editing"}
+            and c.result == CheckResult.FAIL
+        ]
         expired = any(
             c.field.lower() == "cnic not expired" and c.result == CheckResult.FAIL
             for c in comparisons
@@ -172,8 +193,20 @@ class ReportGenerator:
         )
         missing_docs = any("Missing mandatory document" in m for m in missing)
 
-        if expired or cnic_mismatch or missing_docs or unreadable or critical_fails:
+        if (
+            expired
+            or cnic_mismatch
+            or missing_docs
+            or unreadable
+            or tampered_docs
+            or critical_fails
+        ):
             reasons = []
+            if tampered_docs:
+                reasons.append(
+                    "Digital editing / software tampering detected on: "
+                    + ", ".join(tampered_docs)
+                )
             if expired:
                 reasons.append("CNIC is expired")
             if cnic_mismatch:
@@ -244,13 +277,27 @@ class ReportGenerator:
         else:
             lines.append("CNIC validity could not be fully confirmed.")
 
+        tampered_docs = [
+            iq.document_label
+            for iq in image_quality
+            for c in iq.checks
+            if c.check in {"metadata_integrity", "software_editing"}
+            and c.result == CheckResult.FAIL
+        ]
+        if tampered_docs:
+            lines.append(
+                "SECURITY WARNING: Image editing software metadata detected on: "
+                + ", ".join(tampered_docs)
+                + "."
+            )
+
         if not warnings and recommendation == Recommendation.APPROVED:
             lines.append("No major discrepancies detected.")
         elif warnings:
             lines.append(f"{len(warnings)} warning(s) noted for staff review.")
 
         iq_fails = [iq for iq in image_quality if iq.overall == CheckResult.FAIL]
-        if iq_fails:
+        if iq_fails and not tampered_docs:
             lines.append(
                 "Image quality issues detected on: "
                 + ", ".join(iq.document_label for iq in iq_fails)

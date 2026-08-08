@@ -16,14 +16,22 @@ def setup_logging() -> None:
         root.setLevel(level)
         return
 
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(
-        logging.Formatter(
-            fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S",
-        )
+    formatter = logging.Formatter(
+        fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
-    root.addHandler(handler)
+
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setFormatter(formatter)
+    root.addHandler(stream_handler)
+
+    try:
+        file_handler = logging.FileHandler(config.SIRI_LOG_DIR / "sirilogs.log", encoding="utf-8")
+        file_handler.setFormatter(formatter)
+        root.addHandler(file_handler)
+    except Exception as exc:
+        root.error("Failed to create log file handler: %s", exc)
+
     root.setLevel(level)
 
 

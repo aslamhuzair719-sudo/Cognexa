@@ -2,7 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
 import StatusPill from '../components/StatusPill.jsx'
+import AlertBanner from '../components/ui/AlertBanner.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
+import FormField from '../components/ui/FormField.jsx'
+import PageHeader from '../components/ui/PageHeader.jsx'
 import SearchBar from '../components/ui/SearchBar.jsx'
 import { TableSkeleton } from '../components/ui/Skeleton.jsx'
 
@@ -51,12 +54,21 @@ export default function BranchHistoryPage() {
 
   return (
     <>
-      <section className="hero hero-branch">
-        <span className="ai-badge">Decision archive</span>
-        <h1>Accepted & rejected history</h1>
-        <p>
-          Closed applications for this branch, including decision timestamps and reject notes.
-        </p>
+      <PageHeader
+        eyebrow="Decision archive"
+        title="Accepted & rejected history"
+        badge={`${apps.length} closed`}
+        description="Closed applications for this branch, including decision timestamps and reject notes."
+      >
+        <div className="page-header-pills">
+          <span className="page-pill">Accepted · <strong>{accepted}</strong></span>
+          <span className="page-pill">Rejected · <strong>{rejected}</strong></span>
+        </div>
+      </PageHeader>
+
+      {error ? <AlertBanner type="error" title="Could not load history" message={error} /> : null}
+
+      <section className="panel panel-accent">
         <div className="hero-row">
           <span className="hero-pill tone-green-pill">Accepted · {accepted}</span>
           <span className="hero-pill tone-rose-pill">Rejected · {rejected}</span>

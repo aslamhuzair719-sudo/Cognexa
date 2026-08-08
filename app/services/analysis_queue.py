@@ -57,7 +57,7 @@ class AnalysisQueue:
         ai_progress.set(
             key,
             stage="queued",
-            message="Waiting in the AI queue…",
+            message="Waiting in the Cognexa AI queue…",
         )
         logger.info("Queued application %s for AI analysis", key)
 
@@ -125,7 +125,7 @@ class AnalysisQueue:
             write_audit(
                 db,
                 action="analysis_started",
-                message=f"AI analysis started for {app.full_name}",
+                message=f"Cognexa AI analysis started for {app.full_name}",
                 branch_id=app.branch_id,
                 application_id=app.id,
                 details={"status": "analyzing"},
@@ -146,7 +146,7 @@ class AnalysisQueue:
             ai_progress.set(
                 app_key,
                 stage="starting",
-                message="AI analysis starting — AI is working…",
+                message="Cognexa AI analysis starting — working…",
             )
 
             form = ApplicationForm(
@@ -185,7 +185,7 @@ class AnalysisQueue:
             write_audit(
                 db,
                 action="analysis_completed",
-                message=f"AI analysis completed for {app.full_name}",
+                message=f"Cognexa AI analysis completed for {app.full_name}",
                 branch_id=app.branch_id,
                 application_id=app.id,
                 details={
@@ -200,7 +200,7 @@ class AnalysisQueue:
             ai_progress.set(
                 app_key,
                 stage="complete",
-                message="AI analysis complete — document parsing and LLM summary done.",
+                message="Cognexa AI analysis complete — document parsing and LLM summary done.",
                 done=True,
             )
             logger.info("Completed analysis for %s", application_id)
@@ -213,7 +213,7 @@ class AnalysisQueue:
                     write_audit(
                         db,
                         action="analysis_failed",
-                        message=f"AI analysis failed for {app.full_name}",
+                        message=f"Cognexa AI analysis failed for {app.full_name}",
                         branch_id=app.branch_id,
                         application_id=app.id,
                         details={"error": str(exc)[:500], "status": "pending"},

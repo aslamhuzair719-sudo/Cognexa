@@ -37,6 +37,7 @@ def init_db() -> None:
         migrate_application_status,
         migrate_branch_entries,
         migrate_signature_records,
+        migrate_verifications,
     )
     from app.seed import seed_branches_and_users
 
@@ -46,6 +47,7 @@ def init_db() -> None:
         migrate_application_form_fields(engine)
         migrate_branch_entries(engine)
         migrate_signature_records(engine)
+        migrate_verifications(engine)
     except Exception:
         logger.exception("Schema migration failed")
         raise

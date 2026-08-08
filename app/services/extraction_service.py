@@ -93,7 +93,7 @@ class ExtractionPipeline:
 
         _progress(
             "llm",
-            f"Gemini vision is extracting fields from {doc_label} — AI is working…",
+            f"Cognexa AI is extracting fields from {doc_label}…",
         )
         try:
             if supports_vision() and isinstance(self.llm_service, GeminiService):

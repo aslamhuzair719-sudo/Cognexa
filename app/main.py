@@ -30,16 +30,18 @@ FRONTEND_ASSETS = FRONTEND_DIST / "assets"
 async def lifespan(_app: FastAPI):
     init_db()
     from app.services.analysis_queue import analysis_queue
+    from app.services.email_queue import email_queue
 
     analysis_queue.start()
+    email_queue.start()
     yield
 
 
 app = FastAPI(
-    title="UBL — Document and Application Verification System",
+    title="Cognexa — Document and Verification System",
     description=(
-        "UBL stores customer applications for branch review; "
-        "branch users run AI verification and decide."
+        "Cognexa stores customer applications for branch review; "
+        "branch users run Cognexa AI verification and decide."
     ),
     version="2.1.0",
     lifespan=lifespan,

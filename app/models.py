@@ -39,6 +39,7 @@ class Branch(Base):
     users: Mapped[list["User"]] = relationship(back_populates="branch")
     applications: Mapped[list["Application"]] = relationship(back_populates="branch")
     branch_entries: Mapped[list["BranchEntry"]] = relationship(back_populates="branch")
+    verifications: Mapped[list["Verification"]] = relationship(back_populates="branch")
 
 
 class User(Base):
@@ -92,6 +93,18 @@ class Application(Base):
     designation: Mapped[str] = mapped_column(String(128), nullable=False, default="")
     monthly_income: Mapped[str] = mapped_column(String(64), nullable=False)
 
+    # Email verification tracking
+    verification_email_document: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    verification_email_target: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    verification_email_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, unique=True)
+    verification_email_status: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="none", index=True
+    )
+    verification_email_last_error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    verification_email_sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    verification_email_confirmed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    verification_email_note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     # Document relative paths under APPLICATIONS_DIR
     cnic_front_path: Mapped[str] = mapped_column(String(512), nullable=False)
     cnic_back_path: Mapped[str] = mapped_column(String(512), nullable=False)
@@ -109,6 +122,7 @@ class Application(Base):
     decided_by: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
 
     branch: Mapped["Branch"] = relationship(back_populates="applications")
+    verifications: Mapped[list["Verification"]] = relationship(back_populates="application")
     decider: Mapped[Optional["User"]] = relationship(foreign_keys=[decided_by])
 
 
@@ -130,8 +144,17 @@ class BranchEntry(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow, index=True
     )
+    verification_email_document: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    verification_email_target: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    verification_email_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, unique=True)
+    verification_email_status: Mapped[str] = mapped_column(String(32), nullable=False, default='none')
+    verification_email_last_error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    verification_email_sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    verification_email_confirmed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    verification_email_note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     branch: Mapped["Branch"] = relationship(back_populates="branch_entries")
+    verifications: Mapped[list["Verification"]] = relationship(back_populates="branch_entry")
     creator: Mapped[Optional["User"]] = relationship(foreign_keys=[created_by])
     documents: Mapped[list["BranchEntryDocument"]] = relationship(
         back_populates="branch_entry",
@@ -163,6 +186,70 @@ class BranchEntryDocument(Base):
     )
 
     branch_entry: Mapped["BranchEntry"] = relationship(back_populates="documents")
+
+
+class Verification(Base):
+    __tablename__ = "verifications"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    verification_id: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
+    application_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("applications.id"), nullable=True, index=True
+    )
+    branch_entry_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("branch_entries.id"), nullable=True, index=True
+    )
+    branch_id: Mapped[int] = mapped_column(ForeignKey("branches.id"), nullable=False, index=True)
+    document_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    company_email: Mapped[str] = mapped_column(String(255), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending_verification", index=True)
+    failure_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    bounce_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    retry_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    rejected_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    canceled_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    # Reply tracking fields (added for IMAP reply processing)
+    response_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    response_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    responded_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    processed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    reply_subject: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    reply_message_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    document_path: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+
+    application: Mapped[Optional["Application"]] = relationship(back_populates="verifications")
+    branch_entry: Mapped[Optional["BranchEntry"]] = relationship(back_populates="verifications")
+    branch: Mapped["Branch"] = relationship(back_populates="verifications")
+    created_by: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
+    creator: Mapped[Optional["User"]] = relationship(foreign_keys=[created_by])
+    history: Mapped[list["VerificationHistory"]] = relationship(
+        back_populates="verification",
+        cascade="all, delete-orphan",
+        order_by="VerificationHistory.changed_at",
+    )
+
+
+class VerificationHistory(Base):
+    __tablename__ = "verification_history"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    verification_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("verifications.id"), nullable=False, index=True
+    )
+    old_status: Mapped[str] = mapped_column(String(32), nullable=False)
+    new_status: Mapped[str] = mapped_column(String(32), nullable=False)
+    remarks: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    changed_by: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+    changed_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+
+    verification: Mapped["Verification"] = relationship(back_populates="history")
 
 
 class SignatureRecord(Base):

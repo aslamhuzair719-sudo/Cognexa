@@ -284,7 +284,7 @@ async def submit_application(
         "branch": {"code": branch.code, "name": branch.name},
         "message": (
             "Application submitted successfully. "
-            "AI has started analysing your documents — parsing and LLM summary "
+            "Cognexa AI has started analyzing your documents — parsing and LLM summary "
             "will run at your branch next."
         ),
         "ai_status": "queued",

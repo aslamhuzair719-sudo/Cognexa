@@ -86,7 +86,7 @@ class VerificationPipeline:
                 on_progress(stage, message)
 
         logger.info("Starting verification for applicant %s", form.personal.full_name)
-        _progress("starting", "AI analysis starting — preparing customer documents…")
+        _progress("starting", "Cognexa AI analysis starting — preparing customer documents…")
 
         upload_statuses = []
         quality_results = []
@@ -182,7 +182,7 @@ class VerificationPipeline:
             report.recommendation.value,
             report.overall_score,
         )
-        _progress("complete", "AI analysis complete — parsing and LLM summary done.")
+        _progress("complete", "Cognexa AI analysis complete — parsing and LLM summary done.")
         return report
 
     def save_upload(self, filename: str, data: bytes) -> Path:

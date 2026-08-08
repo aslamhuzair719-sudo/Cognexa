@@ -1,6 +1,6 @@
 const LABELS = {
   pending: 'Pending',
-  analyzing: 'AI Reviewing',
+  analyzing: 'Cognexa AI Reviewing',
   completed: 'Ready',
   accepted: 'Approved',
   rejected: 'Rejected',
