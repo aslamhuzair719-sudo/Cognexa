@@ -8,9 +8,11 @@ import time
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy.orm import joinedload
+
 from app.db import SessionLocal
 from app.logging_config import get_logger
-from app.models import Verification
+from app.models import BranchEntry, Verification
 from app import config
 from app.services.verification_service import (
     get_verification_by_public_id,
@@ -82,6 +84,10 @@ class VerificationEmailQueue:
         try:
             verification = (
                 db.query(Verification)
+                .options(
+                    joinedload(Verification.application),
+                    joinedload(Verification.branch_entry).joinedload(BranchEntry.documents),
+                )
                 .filter(Verification.verification_id == public_id)
                 .first()
             )

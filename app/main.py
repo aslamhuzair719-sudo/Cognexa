@@ -17,6 +17,7 @@ from app.routes.auth import router as auth_router
 from app.routes.branch import router as branch_router
 from app.routes.health import router as health_router
 from app.routes.signatures import router as signatures_router
+from app.routes.verification import public_router as verification_public_router
 from app.routes.verification import router as verification_router
 
 setup_logging()
@@ -63,6 +64,7 @@ app.include_router(auth_router)
 app.include_router(branch_router)
 app.include_router(signatures_router)
 app.include_router(verification_router)
+app.include_router(verification_public_router)
 
 
 def _spa_index() -> Path:

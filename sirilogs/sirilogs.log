@@ -3638,3 +3638,110 @@ imaplib.IMAP4.error: b'[AUTHENTICATIONFAILED] Invalid credentials (Failure)'
 2026-08-13 11:49:37 | INFO     | app.services.workflow_queue | Workflow queue worker started
 2026-08-13 11:49:38 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
 2026-08-13 11:49:40 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-13 12:22:15 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-13 12:22:15 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-13 12:22:15 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-13 12:22:15 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-13 12:22:15 | INFO     | app.db | Database initialized and seeded
+2026-08-13 12:22:15 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-13 12:22:15 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-13 12:22:15 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-13 12:22:15 | INFO     | app.services.email_queue | Recovered 2 pending verification(s) into email queue
+2026-08-13 12:22:15 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-13 12:22:15 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-13 12:22:16 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-13 12:22:17 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-13 12:22:23 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
+2026-08-13 12:22:26 | INFO     | __main__ | IMAP poll found 2 unread message(s)
+2026-08-13 12:22:26 | INFO     | __main__ | Processing unread message: subject=[Application Verification: VER-c14868b7c8c54b7a] message_id=<202608130649.20095752985@smtp-relay.sendinblue.com>
+2026-08-13 12:22:26 | WARNING  | __main__ | Reply sender mismatch for VER-c14868b7c8c54b7a: expected=syedhuzair113@gmail.com got=syedhuzair113@11822841.brevosend.com
+2026-08-13 12:22:29 | INFO     | __main__ | Processing unread message: subject=[Application Verification: VER-c14868b7c8c54b7a] message_id=<202608130722.17870112223@smtp-relay.sendinblue.com>
+2026-08-13 12:22:29 | WARNING  | __main__ | Reply sender mismatch for VER-c14868b7c8c54b7a: expected=syedhuzair113@gmail.com got=syedhuzair113@11822841.brevosend.com
+2026-08-13 12:24:17 | WARNING  | app.services.email_service | Unable to conclusively verify recipient syedhuzairaslam18@gmail.com at ['gmail-smtp-in.l.google.com', 'alt1.gmail-smtp-in.l.google.com', 'alt2.gmail-smtp-in.l.google.com', 'alt3.gmail-smtp-in.l.google.com', 'alt4.gmail-smtp-in.l.google.com']: temporary or connection failure.
+2026-08-13 12:25:07 | WARNING  | app.services.email_service | Unable to conclusively verify recipient syedhuzairaslam18@gmail.com at ['gmail-smtp-in.l.google.com', 'alt1.gmail-smtp-in.l.google.com', 'alt2.gmail-smtp-in.l.google.com', 'alt3.gmail-smtp-in.l.google.com', 'alt4.gmail-smtp-in.l.google.com']: temporary or connection failure.
+2026-08-13 12:25:07 | INFO     | app.services.email_queue | Queued verification VER-921e9ad12bc54e56 for email delivery
+2026-08-13 12:25:08 | INFO     | app.services.email_queue | Verification email delivered for VER-921e9ad12bc54e56
+2026-08-13 12:26:10 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-13 12:26:10 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-13 12:26:10 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-13 12:26:10 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-13 12:26:10 | INFO     | app.db | Database initialized and seeded
+2026-08-13 12:26:10 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-13 12:26:10 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-13 12:26:10 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-13 12:26:10 | INFO     | app.services.email_queue | Recovered 2 pending verification(s) into email queue
+2026-08-13 12:26:10 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-13 12:26:10 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-13 12:26:11 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-13 12:26:13 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-13 12:26:16 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
+2026-08-13 12:27:22 | INFO     | __main__ | IMAP poll found 1 unread message(s)
+2026-08-13 12:27:22 | INFO     | __main__ | Processing unread message: subject=[Application Verification: VER-c14868b7c8c54b7a] message_id=<202608130726.85497751280@smtp-relay.sendinblue.com>
+2026-08-13 12:27:22 | WARNING  | __main__ | Reply sender mismatch for VER-c14868b7c8c54b7a: expected=syedhuzair113@gmail.com got=syedhuzair113@11822841.brevosend.com
+2026-08-13 12:29:29 | WARNING  | app.services.email_service | Unable to conclusively verify recipient syedhuzairaslam18@gmail.com at ['gmail-smtp-in.l.google.com', 'alt1.gmail-smtp-in.l.google.com', 'alt2.gmail-smtp-in.l.google.com', 'alt3.gmail-smtp-in.l.google.com', 'alt4.gmail-smtp-in.l.google.com']: temporary or connection failure.
+2026-08-13 12:30:19 | WARNING  | app.services.email_service | Unable to conclusively verify recipient syedhuzairaslam18@gmail.com at ['gmail-smtp-in.l.google.com', 'alt1.gmail-smtp-in.l.google.com', 'alt2.gmail-smtp-in.l.google.com', 'alt3.gmail-smtp-in.l.google.com', 'alt4.gmail-smtp-in.l.google.com']: temporary or connection failure.
+2026-08-13 12:30:19 | INFO     | app.services.email_queue | Queued verification VER-3912fa657e9441d5 for email delivery
+2026-08-13 12:30:21 | INFO     | app.services.email_queue | Verification email delivered for VER-3912fa657e9441d5
+2026-08-13 12:47:32 | ERROR    | app.services.imap_service | IMAP connection failed (check IMAP_HOST/PORT and network connectivity)
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\imap_service.py", line 55, in fetch_unread_messages
+    client = _connect()
+             ^^^^^^^^^^
+  File "E:\Document_Scan\app\services\imap_service.py", line 22, in _connect
+    client = imaplib.IMAP4_SSL(config.IMAP_HOST, config.IMAP_PORT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1323, in __init__
+    IMAP4.__init__(self, host, port, timeout)
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 205, in __init__
+    self._connect()
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 247, in _connect
+    self.welcome = self._get_response()
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1075, in _get_response
+    resp = self._get_line()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1185, in _get_line
+    raise self.abort('socket error: EOF')
+imaplib.IMAP4.abort: socket error: EOF
+2026-08-13 12:51:42 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-13 12:51:42 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-13 12:51:42 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-13 12:51:42 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-13 12:51:42 | INFO     | app.db | Database initialized and seeded
+2026-08-13 12:51:42 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-13 12:51:42 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-13 12:51:42 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-13 12:51:42 | INFO     | app.services.email_queue | Recovered 2 pending verification(s) into email queue
+2026-08-13 12:51:42 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-13 12:51:42 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-13 12:51:44 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-13 12:51:47 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-13 12:51:52 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
+2026-08-13 12:52:02 | INFO     | __main__ | IMAP poll found 1 unread message(s)
+2026-08-13 12:52:02 | INFO     | __main__ | Processing unread message: subject=[Application Verification: VER-c14868b7c8c54b7a] message_id=<202608130751.47639753848@smtp-relay.sendinblue.com>
+2026-08-13 12:52:02 | WARNING  | __main__ | Reply sender mismatch for VER-c14868b7c8c54b7a: expected=syedhuzair113@gmail.com got=syedhuzair113@11822841.brevosend.com
+2026-08-13 12:52:47 | WARNING  | app.services.email_service | Unable to conclusively verify recipient syedhuzairaslam18@gmail.com at ['gmail-smtp-in.l.google.com', 'alt1.gmail-smtp-in.l.google.com', 'alt2.gmail-smtp-in.l.google.com', 'alt3.gmail-smtp-in.l.google.com', 'alt4.gmail-smtp-in.l.google.com']: temporary or connection failure.
+2026-08-13 12:53:37 | WARNING  | app.services.email_service | Unable to conclusively verify recipient syedhuzairaslam18@gmail.com at ['gmail-smtp-in.l.google.com', 'alt1.gmail-smtp-in.l.google.com', 'alt2.gmail-smtp-in.l.google.com', 'alt3.gmail-smtp-in.l.google.com', 'alt4.gmail-smtp-in.l.google.com']: temporary or connection failure.
+2026-08-13 12:53:37 | INFO     | app.services.email_queue | Queued verification VER-33e0498e7c274af7 for email delivery
+2026-08-13 12:53:38 | INFO     | app.services.email_queue | Verification email delivered for VER-33e0498e7c274af7
+2026-08-13 13:35:38 | ERROR    | app.services.imap_service | IMAP connection failed (check IMAP_HOST/PORT and network connectivity)
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\imap_service.py", line 55, in fetch_unread_messages
+    client = _connect()
+             ^^^^^^^^^^
+  File "E:\Document_Scan\app\services\imap_service.py", line 22, in _connect
+    client = imaplib.IMAP4_SSL(config.IMAP_HOST, config.IMAP_PORT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1323, in __init__
+    IMAP4.__init__(self, host, port, timeout)
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 205, in __init__
+    self._connect()
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 247, in _connect
+    self.welcome = self._get_response()
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1075, in _get_response
+    resp = self._get_line()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1185, in _get_line
+    raise self.abort('socket error: EOF')
+imaplib.IMAP4.abort: socket error: EOF

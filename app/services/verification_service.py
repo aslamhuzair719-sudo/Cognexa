@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.logging_config import get_logger
 from app.models import (
     Application,
+    ApplicationStatus,
     BranchEntry,
     Verification,
     VerificationHistory,
@@ -51,11 +52,55 @@ def validate_company_email(email: str) -> str:
     return validate_verification_target(email)
 
 
+def _clean_field(value) -> str:
+    if value is None:
+        return ""
+    text = str(value).strip()
+    if not text or text.lower() in {"null", "none", "n/a", "—", "-", "missing"}:
+        return ""
+    return text
+
+
+def _comparison_document_value(section: dict, field_name: str) -> str:
+    target = field_name.strip().lower()
+    for row in (section or {}).get("comparisons") or []:
+        if not isinstance(row, dict):
+            continue
+        if str(row.get("field") or "").strip().lower() == target:
+            return _clean_field(row.get("document_value"))
+    return ""
+
+
+def _payslip_identity_from_report(report_json: Optional[dict]) -> tuple[str, str]:
+    section = (report_json or {}).get("payslip_validation") or {}
+    name = _comparison_document_value(section, "Employee Name")
+    company = _comparison_document_value(section, "Company Name")
+    return name, company
+
+
+def _field_from_entry_docs(entry: BranchEntry, *keys: str, payslip_only: bool = True) -> str:
+    documents = list(entry.documents or [])
+    if payslip_only:
+        payslip_docs = [doc for doc in documents if doc.document_type == "payslip"]
+        documents = payslip_docs or documents
+    for doc in documents:
+        fields = doc.fields_json or {}
+        for key in keys:
+            value = _clean_field(fields.get(key))
+            if value:
+                return value
+    return ""
+
+
 def _application_email_payload(application: Application) -> dict:
+    payslip_name, payslip_company = _payslip_identity_from_report(application.report_json)
+    full_name = payslip_name or _clean_field(application.full_name)
+    company_name = payslip_company or _clean_field(application.company_name)
     return {
-        "applicant_name": application.full_name,
+        "full_name": full_name,
+        "applicant_name": full_name,
         "cnic_number": application.cnic_number,
-        "company_name": application.company_name,
+        "company_name": company_name,
         "employee_id": application.employee_id,
         "branch_name": application.branch.name if application.branch else "",
         "request_date": _now().isoformat(),
@@ -63,11 +108,19 @@ def _application_email_payload(application: Application) -> dict:
 
 
 def _branch_entry_email_payload(entry: BranchEntry) -> dict:
+    full_name = (
+        _field_from_entry_docs(entry, "employee_name", "applicant_name", "name", "full_name")
+        or _clean_field(entry.customer_name)
+    )
+    company_name = _field_from_entry_docs(entry, "company_name")
     return {
-        "applicant_name": entry.customer_name,
-        "cnic_number": None,
-        "company_name": None,
-        "employee_id": None,
+        "full_name": full_name,
+        "applicant_name": full_name,
+        "cnic_number": _field_from_entry_docs(
+            entry, "cnic", "cnic_number", payslip_only=False
+        ),
+        "company_name": company_name,
+        "employee_id": _field_from_entry_docs(entry, "employee_id"),
         "branch_name": entry.branch.name if entry.branch else "",
         "request_date": _now().isoformat(),
     }
@@ -120,15 +173,10 @@ def _build_verification_message(
     verification: Verification,
     attachment_path: Optional[Path] = None,
 ) -> "EmailMessage":
-    data = verification.to_dict() if hasattr(verification, "to_dict") else {}
-    # fallback payload for backward compatibility
-    # when Verification is not fully hydrated.
-    payload = {
-        "full_name": verification.applicant_name if hasattr(verification, "applicant_name") else None,
-        "cnic_number": verification.company_email,
-        "company_name": verification.company_email,
-        "employee_id": None,
-    }
+    payload = _build_verification_context(
+        application=verification.application,
+        branch_entry=verification.branch_entry,
+    )
     return compose_verification_email(
         payload,
         document_type=verification.document_type,
@@ -382,23 +430,7 @@ def build_verification_email_message(verification: Verification) -> "EmailMessag
     attachment_path = Path(verification.document_path)
     if not attachment_path.exists() or not attachment_path.is_file():
         raise VerificationEmailError("Verification attachment is missing on disk.")
-    application_payload = {}
-    if verification.application_id:
-        application_payload = {
-            "full_name": verification.applicant_name if hasattr(verification, "applicant_name") else "",
-            "cnic_number": None,
-            "company_name": None,
-            "employee_id": None,
-        }
-    message = compose_verification_email(
-        application_payload,
-        document_type=verification.document_type,
-        target_email=verification.company_email,
-        verification_id=verification.verification_id,
-        attachment_path=str(attachment_path),
-        note=verification.note,
-    )
-    return message
+    return _build_verification_message(verification, attachment_path=attachment_path)
 
 
 def send_verification_message(verification: Verification) -> None:
@@ -497,6 +529,86 @@ def complete_verification(
         },
     )
     return updated
+
+
+def apply_email_link_decision(
+    db: Session,
+    verification: Verification,
+    action: str,
+) -> tuple[str, str]:
+    """Record an Accept/Reject click from a company verification email.
+
+    Returns (page_title, page_message) for the public confirmation page.
+    """
+    normalized = (action or "").strip().lower()
+    if normalized not in {"accept", "reject"}:
+        raise VerificationEmailError("Decision must be accept or reject.")
+
+    already_verified = verification.status == VERIFICATION_STATUS_VERIFIED
+    already_rejected = verification.status == VERIFICATION_STATUS_REJECTED
+    if already_verified or already_rejected:
+        existing = "Accepted" if already_verified else "Rejected"
+        return (
+            "Already processed",
+            f"This verification was already marked as {existing}.",
+        )
+
+    if verification.status not in {VERIFICATION_STATUS_PENDING}:
+        raise VerificationEmailError(
+            f"This verification can no longer be updated (status: {verification.status})."
+        )
+
+    result = (
+        VERIFICATION_STATUS_VERIFIED if normalized == "accept" else VERIFICATION_STATUS_REJECTED
+    )
+    complete_verification(
+        db,
+        verification,
+        result,
+        remarks=f"Company clicked {normalized} in the verification email.",
+        changed_by="email_link",
+    )
+    verification.response_email = verification.company_email
+    verification.response_message = normalized
+    verification.responded_at = _now()
+    verification.processed_at = _now()
+
+    application = verification.application
+    if application:
+        if normalized == "accept":
+            application.status = ApplicationStatus.accepted.value
+            application.decision_note = "Accepted via company verification email link"
+        else:
+            application.status = ApplicationStatus.rejected.value
+            application.decision_note = "Rejected via company verification email link"
+        application.decided_at = _now()
+        write_audit(
+            db,
+            action="application_accepted" if normalized == "accept" else "application_rejected",
+            message=(
+                f"Application for {application.full_name} was "
+                f"{'accepted' if normalized == 'accept' else 'rejected'} "
+                f"via company verification email link."
+            ),
+            branch_id=verification.branch_id,
+            application_id=application.id,
+            details={
+                "verification_id": verification.verification_id,
+                "source": "email_link",
+                "status": application.status,
+            },
+        )
+
+    label = "Accepted" if normalized == "accept" else "Rejected"
+    if application:
+        return (
+            f"Application {label}",
+            f"Thank you. The application has been marked as {label}.",
+        )
+    return (
+        f"Verification {label}",
+        f"Thank you. This verification has been marked as {label}.",
+    )
 
 
 def cancel_verification(

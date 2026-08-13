@@ -112,6 +112,10 @@ DATABASE_URL: str = os.getenv(
 # Sessions
 SESSION_SECRET: str = os.getenv("SESSION_SECRET", "document-scan-dev-secret-change-me")
 
+# Public URL used in company verification emails (Accept / Reject links).
+PUBLIC_BASE_URL: str = os.getenv("PUBLIC_BASE_URL", "http://localhost:8000").rstrip("/")
+VERIFICATION_LINK_SECRET: str = os.getenv("VERIFICATION_LINK_SECRET", SESSION_SECRET)
+
 # Logging
 LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 

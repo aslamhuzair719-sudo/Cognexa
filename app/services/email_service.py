@@ -6,6 +6,7 @@ import mimetypes
 import socket
 import smtplib
 from email.message import EmailMessage
+from html import escape as html_escape
 from pathlib import Path
 from typing import Iterable, Optional
 
@@ -168,6 +169,19 @@ def _format_from_header() -> str:
     return config.EMAIL_FROM
 
 
+def _display_applicant_name(application: dict) -> str:
+    return str(
+        application.get("full_name")
+        or application.get("applicant_name")
+        or application.get("employee_name")
+        or ""
+    ).strip()
+
+
+def _display_company_name(application: dict) -> str:
+    return str(application.get("company_name") or "").strip()
+
+
 def compose_verification_email(
     application: dict,
     document_type: str,
@@ -192,7 +206,51 @@ def compose_verification_email(
 
     document_label = "Payslip" if document_type == "payslip" else "Bank Statement"
     verification_id_text = f"Verification ID: {verification_id}" if verification_id else ""
-    note_section = f"<p><strong>Branch note:</strong> {note}</p>" if note else ""
+    applicant_name = _display_applicant_name(application)
+    company_name = _display_company_name(application)
+    applicant_html = html_escape(applicant_name)
+    company_html = html_escape(company_name)
+    target_email_html = html_escape(target_email)
+    request_date_html = html_escape(str(application.get("request_date") or ""))
+    note_section = (
+        f"<p><strong>Branch note:</strong> {html_escape(note)}</p>" if note else ""
+    )
+
+    links_html = ""
+    links_text = ""
+    if verification_id:
+        from app.services.verification_tokens import build_decision_urls
+
+        accept_url, reject_url = build_decision_urls(verification_id)
+        accept_html = html_escape(accept_url, quote=True)
+        reject_html = html_escape(reject_url, quote=True)
+        links_html = f"""
+            <p style="margin:0 0 12px;font-size:0.95rem;line-height:1.6;">Please click one of the buttons below to record your decision:</p>
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 24px;">
+              <tr>
+                <td align="center">
+                  <table cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="padding-right:12px;">
+                        <a href="{accept_html}" style="display:inline-block;background:#15803d;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:bold;font-size:0.95rem;">Accept</a>
+                      </td>
+                      <td>
+                        <a href="{reject_html}" style="display:inline-block;background:#b91c1c;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:bold;font-size:0.95rem;">Reject</a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:0 0 16px;font-size:0.82rem;color:#667085;line-height:1.5;">If the buttons do not work, copy and open one of these links:<br/>
+            Accept: {accept_html}<br/>
+            Reject: {reject_html}</p>
+        """
+        links_text = (
+            "Please click one of the following links to record your decision:\n"
+            f"Accept: {accept_url}\n"
+            f"Reject: {reject_url}\n\n"
+        )
 
     # Instruction block required at the end of every email per product spec.
     instructions_html = """
@@ -200,7 +258,9 @@ def compose_verification_email(
             <pre style="background:#f8fafc;padding:12px;border-radius:8px;font-size:0.85rem;">--------------------------------------------
 Verification Instructions
 
-Please reply using ONLY one of the following words.
+Please click Accept or Reject in this email.
+
+You may also reply using ONLY one of the following words.
 
 Approved
 
@@ -222,19 +282,20 @@ Replies from any email address other than the intended recipient will be ignored
           </td></tr>
           <tr><td style="padding:28px 32px;">
             <p style="margin:0 0 16px;font-size:0.95rem;line-height:1.6;">Dear Sir/Madam,</p>
-            <p style="margin:0 0 16px;font-size:0.95rem;line-height:1.6;">The bank is requesting confirmation of the attached document submitted by <strong>{application.get('full_name', '')}</strong>. Please verify whether this document is genuine and issued by your organisation.</p>
+            <p style="margin:0 0 16px;font-size:0.95rem;line-height:1.6;">The bank is requesting confirmation of the attached document submitted by <strong>{applicant_html or "the applicant"}</strong>. Please verify whether this document is genuine and issued by your organisation.</p>
             <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:18px 0 24px;">
               <tr><td style="background:#f0f4fb;padding:16px;border-radius:10px;">
-                <p style="margin:0 0 10px;font-size:0.9rem;"><strong>Applicant name:</strong> {application.get('full_name', '')}</p>
-                <p style="margin:0 0 10px;font-size:0.9rem;"><strong>Company name:</strong> {application.get('company_name', '')}</p>
-                <p style="margin:0 0 10px;font-size:0.9rem;"><strong>Verification email:</strong> {target_email}</p>
+                <p style="margin:0 0 10px;font-size:0.9rem;"><strong>Applicant name:</strong> {applicant_html}</p>
+                <p style="margin:0 0 10px;font-size:0.9rem;"><strong>Company name:</strong> {company_html}</p>
+                <p style="margin:0 0 10px;font-size:0.9rem;"><strong>Verification email:</strong> {target_email_html}</p>
                 <p style="margin:0 0 10px;font-size:0.9rem;"><strong>Document type:</strong> {document_label}</p>
-                <p style="margin:0;font-size:0.9rem;"><strong>Request date:</strong> {application.get('request_date', '')}</p>
-                <p style="margin:0;font-size:0.9rem;"><strong>{verification_id_text}</strong></p>
+                <p style="margin:0;font-size:0.9rem;"><strong>Request date:</strong> {request_date_html}</p>
+                <p style="margin:0;font-size:0.9rem;"><strong>{html_escape(verification_id_text)}</strong></p>
               </td></tr>
             </table>
             {note_section}
-            <p style="margin:0 0 16px;font-size:0.95rem;line-height:1.6;">Please reply to this email with your verification decision. If you are unable to confirm, let us know the appropriate contact for document validation.</p>
+            {links_html}
+            <p style="margin:0 0 16px;font-size:0.95rem;line-height:1.6;">If you are unable to confirm, let us know the appropriate contact for document validation.</p>
             <p style="margin:0;font-size:0.95rem;line-height:1.6;">Best regards,<br/>Document Verification Team</p>
           </td></tr>
                         <tr><td style="padding:0 32px 24px;">
@@ -248,13 +309,14 @@ Replies from any email address other than the intended recipient will be ignored
 
     plain_text = (
         f"Dear Sir/Madam,\n\n"
-        f"Please verify whether the attached document submitted by {application.get('full_name', '')} "
+        f"Please verify whether the attached document submitted by {applicant_name} "
         f"is genuine and issued by your organisation.\n\n"
-        f"Applicant name: {application.get('full_name', '')}\n"
-        f"Company name: {application.get('company_name', '')}\n"
+        f"Applicant name: {applicant_name}\n"
+        f"Company name: {company_name}\n"
         f"Document type: {document_label}\n"
         f"{verification_id_text}\n\n"
-        f"Please reply using ONLY one of the following words: Approved or Rejected\n"
+        # f"{links_text}"
+        f"You may also reply using ONLY one of the following words: Approved or Rejected\n"
         f"Do not include additional text. Replies from any email address other than the intended recipient will be ignored automatically.\n\n"
         f"Best regards,\n"
         f"Document Verification Team\n"

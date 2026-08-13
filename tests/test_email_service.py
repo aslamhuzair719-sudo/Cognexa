@@ -63,6 +63,43 @@ class TestEmailService(unittest.TestCase):
         body = message.get_body(preferencelist=("plain",))
         self.assertIsNotNone(body)
         self.assertIn("Jane Doe", body.get_content())
+        self.assertIn("Acme Co", body.get_content())
+        html = message.get_body(preferencelist=("html",))
+        self.assertIsNotNone(html)
+        self.assertIn("Jane Doe", html.get_content())
+        self.assertIn("Acme Co", html.get_content())
+
+    def test_compose_verification_email_uses_applicant_name_fallback(self):
+        message = compose_verification_email(
+            {
+                "applicant_name": "Payslip Employee",
+                "company_name": "Payslip Ltd",
+            },
+            document_type="payslip",
+            target_email="verify@company-example.com",
+        )
+        body = message.get_body(preferencelist=("plain",)).get_content()
+        self.assertIn("Payslip Employee", body)
+        self.assertIn("Payslip Ltd", body)
+
+    def test_compose_verification_email_includes_encrypted_decision_links(self):
+        message = compose_verification_email(
+            {
+                "full_name": "Jane Doe",
+                "company_name": "Acme Co",
+            },
+            document_type="payslip",
+            target_email="verify@company-example.com",
+            verification_id="VER-abc123",
+        )
+        self.assertEqual(message["Subject"], "[Application Verification: VER-abc123]")
+        plain = message.get_body(preferencelist=("plain",)).get_content()
+        html = message.get_body(preferencelist=("html",)).get_content()
+        self.assertIn("http://localhost:8000/verify/", plain)
+        self.assertIn("Accept:", plain)
+        self.assertIn("Reject:", plain)
+        self.assertIn("Accept</a>", html)
+        self.assertIn("Reject</a>", html)
 
     @patch("app.services.email_service.smtplib.SMTP")
     def test_send_verification_email_uses_smtp(self, mock_smtp):
