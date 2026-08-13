@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UBL UK - First Applicant Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #222; font-size: 12px; display: flex; justify-content: center; padding: 20px; }
+        .form-container { width: 750px; border: 2px solid #005691; box-sizing: border-box; }
+        .header-main { background-color: #005691; color: white; padding: 8px 15px; font-size: 18px; font-weight: bold; }
+        .header-main span { font-size: 12px; font-weight: normal; font-style: italic; margin-left: 10px; }
+        .section-bar { background-color: #0072CE; color: white; padding: 5px 15px; font-size: 13px; font-weight: bold; }
+        .form-body { padding: 12px 15px; background-color: #EBF5FF; }
+        .field-group { margin-bottom: 8px; display: flex; align-items: flex-start; }
+        .field-num { width: 25px; font-weight: bold; flex-shrink: 0; }
+        .field-label { width: 160px; flex-shrink: 0; }
+        .field-input-container { flex-grow: 1; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+        .text-box { width: 100%; height: 20px; border: 1px solid #7799BB; background: white; }
+        .segmented-boxes { display: flex; margin-right: 15px; }
+        .box { width: 16px; height: 18px; border: 1px solid #7799BB; background: white; text-align: center; font-size: 10px; line-height: 18px; color: #aaa; margin-right: 1px; }
+        .note { font-size: 10px; font-style: italic; color: #444; margin-left: 25px; margin-bottom: 6px; }
+        .radio-group { display: flex; gap: 15px; align-items: center; }
+        .checkbox { width: 14px; height: 14px; border: 1px solid #7799BB; background: white; display: inline-block; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <div class="header-main">FIRST APPLICANT <span>(Please complete all section in BLOCK Capitals)</span></div>
+    <div class="section-bar">Section 1 - Personal Information</div>
+    
+    <div class="form-body">
+        <!-- 1. Title & Surname -->
+        <div class="field-group">
+            <div class="field-num">1.</div>
+            <div class="field-label">Title and Surname</div>
+            <div class="field-input-container">
+                <span style="font-size: 11px; margin-right: 5px;">Mr/Mrs/Miss/Ms/Other</span>
+                <div class="text-box" style="flex-grow: 1;"></div>
+            </div>
+        </div>
+
+        <!-- 2. Forenames -->
+        <div class="field-group">
+            <div class="field-num">2.</div>
+            <div class="field-label">Forenames</div>
+            <div class="field-input-container"><div class="text-box"></div></div>
+        </div>
+
+        <!-- 3a. Address -->
+        <div class="field-group">
+            <div class="field-num">3a.</div>
+            <div class="field-label">Current Residential Address</div>
+            <div class="field-input-container"><div class="text-box" style="height: 35px;"></div></div>
+        </div>
+        <div class="field-group" style="margin-left: 25px;">
+            <span style="margin-right: 10px;">Post Code</span>
+            <div class="segmented-boxes">
+                <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
+                <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
+            </div>
+            <span style="margin-right: 10px;">Country</span>
+            <div class="text-box" style="flex-grow:1;"></div>
+        </div>
+
+        <!-- 3b. Date of Entry & Previous Address -->
+        <div class="field-group">
+            <div class="field-num">b.</div>
+            <div class="field-label">Date of Entry to this address <small>(eg. 01/06/2005)</small></div>
+            <div class="field-input-container">
+                <div class="segmented-boxes">
+                    <div class="box">D</div><div class="box">D</div>
+                    <div class="box">M</div><div class="box">M</div>
+                    <div class="box">Y</div><div class="box">Y</div><div class="box">Y</div><div class="box">Y</div>
+                </div>
+            </div>
+        </div>
+        <div class="note">If less than 3 years, please tell us your last address</div>
+        <div class="field-group" style="margin-left: 25px;">
+            <div class="text-box" style="height: 30px;"></div>
+        </div>
+
+        <!-- 4. Phone -->
+        <div class="field-group">
+            <div class="field-num">4.</div>
+            <div class="field-label">Home Phone number</div>
+            <div class="field-input-container"><div class="text-box"></div></div>
+        </div>
+        <div class="field-group">
+            <div class="field-num"></div>
+            <div class="field-label">Mobile number</div>
+            <div class="field-input-container"><div class="text-box"></div></div>
+        </div>
+
+        <!-- 5. Email -->
+        <div class="field-group">
+            <div class="field-num">5.</div>
+            <div class="field-label">Email Address</div>
+            <div class="field-input-container"><div class="text-box"></div></div>
+        </div>
+
+        <!-- 6 & 7. DOB / Nationality -->
+        <div class="field-group">
+            <div class="field-num">6.</div>
+            <div class="field-label">Date of Birth</div>
+            <div class="field-input-container">
+                <div class="segmented-boxes">
+                    <div class="box">D</div><div class="box">D</div>
+                    <div class="box">M</div><div class="box">M</div>
+                    <div class="box">Y</div><div class="box">Y</div><div class="box">Y</div><div class="box">Y</div>
+                </div>
+                <span>7a. Nationality</span>
+                <div class="text-box" style="flex-grow:1; margin-left: 5px;"></div>
+            </div>
+        </div>
+
+        <!-- US Residence Questions -->
+        <div class="field-group" style="margin-top: 10px;">
+            <div class="field-num">10a.</div>
+            <div class="field-label" style="width: 220px;">Do you have residence in the USA?</div>
+            <div class="radio-group">
+                <div class="checkbox"></div> Yes
+                <div class="checkbox"></div> No
+            </div>
+        </div>
+        <div class="field-group">
+            <div class="field-num">b.</div>
+            <div class="field-label" style="width: 220px;">Have you ever held a USA Green Card?</div>
+            <div class="radio-group">
+                <div class="checkbox"></div> Yes
+                <div class="checkbox"></div> No
+            </div>
+        </div>
+    </div>
+
+    <div class="section-bar">Section 2 – Country of Residence for Tax Purposes and related TIN</div>
+    <div class="form-body">
+        <p style="font-size: 11px; margin: 0 0 10px 0;">Please complete the following table indicating (i) where the Account Holder is tax resident and (ii) the Account Holder's TIN for each country indicated.</p>
+    </div>
+</div>
+
+</body>
+</html>

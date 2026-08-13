@@ -1,9 +1,9 @@
 :root {
-  --ubl-blue: #0055a4;
-  --ubl-blue-deep: #003f7a;
-  --ubl-blue-mid: #1a6bb8;
-  --ubl-blue-soft: #e8f2fb;
-  --ubl-blue-line: #b7d3ec;
+  --ubl-blue: #6366f1;
+  --ubl-blue-deep: #4f46e5;
+  --ubl-blue-mid: #818cf8;
+  --ubl-blue-soft: #eef2ff;
+  --ubl-blue-line: #c7d2fe;
   --ink: #1a2332;
   --ink-soft: #2c3a4f;
   --ink-muted: #6b7c90;
@@ -27,7 +27,7 @@
   --fail: #c93b3b;
   --pass: #178a52;
   --font: "Plus Jakarta Sans", "Manrope", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --display: "Sora", "Plus Jakarta Sans", system-ui, sans-serif;
+  --display: "Outfit", "Sora", "Plus Jakarta Sans", system-ui, sans-serif;
   --shadow: 0 16px 40px rgba(0, 63, 122, 0.08);
   --shadow-sm: 0 6px 18px rgba(0, 63, 122, 0.08);
   --radius: 14px;
@@ -837,6 +837,18 @@ table.data-grid tbody tr:hover {
   border-color: #b7e4c7;
 }
 
+.status-pill.review_required {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fcd34d;
+}
+
+.status-pill.failed {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
 .detail-header {
   display: flex;
   justify-content: space-between;
@@ -887,6 +899,87 @@ table.data-grid tbody tr:hover {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.archive-search-grid {
+  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+}
+
+.archive-result-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.archive-result-item {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(0, 85, 164, 0.12);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 0.85rem 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.archive-result-item:hover,
+.archive-result-item.active {
+  border-color: rgba(0, 114, 206, 0.45);
+  box-shadow: 0 8px 24px rgba(0, 85, 164, 0.08);
+}
+
+.archive-result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.archive-result-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  color: var(--text-muted, #5b6777);
+}
+
+.archive-result-snippet {
+  margin: 0.45rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--text, #1f2933);
+}
+
+.archive-result-snippet mark {
+  background: #fff3bf;
+  color: inherit;
+  padding: 0 0.1em;
+  border-radius: 2px;
+}
+
+.archive-result-snippet.block {
+  padding: 0.75rem 0.85rem;
+  background: rgba(235, 245, 255, 0.65);
+  border-radius: var(--radius-sm);
+}
+
+.archive-result-date {
+  margin: 0.35rem 0 0;
+}
+
+.archive-preview-panel .archive-preview-frame {
+  margin-top: 0.85rem;
+}
+
+.archive-preview-panel .doc-preview-pdf {
+  width: 100%;
+  min-height: 420px;
+  border: 1px solid rgba(0, 85, 164, 0.12);
+  border-radius: var(--radius-sm);
+}
+
+.archive-snippet-block {
+  margin-top: 1rem;
 }
 
 .tab-bar {

@@ -42,6 +42,11 @@ BRANCH_ENTRY_COLUMNS = {
     "verification_email_sent_at": "TIMESTAMP",
     "verification_email_confirmed_at": "TIMESTAMP",
     "verification_email_note": "TEXT",
+    "status": "VARCHAR(32) NOT NULL DEFAULT 'saved'",
+    "workflow_type": "VARCHAR(64)",
+    "workflow_group_id": "VARCHAR(64)",
+    "workflow_meta_json": "JSONB",
+    "analyzed_at": "TIMESTAMP",
 }
 
 
@@ -403,3 +408,46 @@ def migrate_signature_records(engine) -> None:
             )
         )
         logger.info("Ensured signature_records schema")
+
+
+def migrate_document_archives(engine) -> None:
+    """Searchable OCR / vision text archive for branch document search."""
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS document_archives (
+                    id UUID PRIMARY KEY,
+                    branch_id INTEGER NOT NULL REFERENCES branches(id),
+                    source VARCHAR(32) NOT NULL,
+                    record_id UUID NOT NULL,
+                    document_key VARCHAR(64) NOT NULL,
+                    document_type VARCHAR(64) NOT NULL,
+                    document_label VARCHAR(128) NOT NULL DEFAULT '',
+                    customer_name VARCHAR(255) NOT NULL DEFAULT '',
+                    original_filename VARCHAR(255) NOT NULL DEFAULT '',
+                    file_path VARCHAR(512),
+                    extracted_text TEXT NOT NULL DEFAULT '',
+                    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                    indexed_at TIMESTAMP NOT NULL DEFAULT NOW()
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE UNIQUE INDEX IF NOT EXISTS uq_document_archives_source_record_doc
+                ON document_archives (branch_id, source, record_id, document_key)
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE INDEX IF NOT EXISTS ix_document_archives_branch_created
+                ON document_archives (branch_id, created_at DESC)
+                """
+            )
+        )
+        logger.info("Ensured document_archives schema")

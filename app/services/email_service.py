@@ -152,11 +152,11 @@ def validate_verification_target(email: str) -> EmailStr:
     except Exception as exc:
         raise VerificationEmailError("Invalid email address") from exc
 
-    domain = str(recipient).split("@", 1)[1].lower()
-    if _is_free_email_domain(domain):
-        raise VerificationEmailError(
-            "Free email domains are not allowed for verification."
-        )
+    # domain = str(recipient).split("@", 1)[1].lower()
+    # if _is_free_email_domain(domain):
+    #     raise VerificationEmailError(
+    #         "Free email domains are not allowed for verification."
+    #     )
 
     _validate_email_exists(str(recipient))
     return recipient

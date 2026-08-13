@@ -9,8 +9,13 @@ Do NOT include secrets in this file; set them in your environment or .env before
 
 from __future__ import annotations
 
+import os
 import sys
 from email.message import EmailMessage
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 
 from app import config
 from app.logging_config import setup_logging

@@ -31,9 +31,11 @@ async def lifespan(_app: FastAPI):
     init_db()
     from app.services.analysis_queue import analysis_queue
     from app.services.email_queue import email_queue
+    from app.services.workflow_queue import workflow_queue
 
     analysis_queue.start()
     email_queue.start()
+    workflow_queue.start()
     yield
 
 

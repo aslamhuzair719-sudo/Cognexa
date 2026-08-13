@@ -3,6 +3,8 @@ import { api } from '../api'
 import Button from '../components/ui/Button.jsx'
 import ConfirmDialog from '../components/ui/ConfirmDialog.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
+import PageHeader from '../components/ui/PageHeader.jsx'
+import AlertBanner from '../components/ui/AlertBanner.jsx'
 import { useToast } from '../components/ui/ToastProvider.jsx'
 
 function formatWhen(value) {
@@ -312,14 +314,12 @@ export default function BranchSignaturesPage() {
 
   return (
     <div className="scan-page sig-page">
-      <section className="hero hero-branch">
-        <span className="ai-badge">Cognexa Signature Scan</span>
-        <h1>Signature verification</h1>
-        <p>
-          Compare signatures against registered specimens, or manage the signature
-          database for your branch.
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Signature verification"
+        title="Signature Scan"
+        badge="Compare & database"
+        description="Compare probe signatures against registered specimens, or manage the branch signature database."
+      />
 
       <div className="sig-view-toggle" role="tablist" aria-label="Signature scan views">
         <button
@@ -368,7 +368,9 @@ export default function BranchSignaturesPage() {
                 setDragging={setDragging}
               />
 
-              {error ? <p className="status-line error">{error}</p> : null}
+              {error ? (
+                <AlertBanner type="error" message={error} className="alert-banner-compact" />
+              ) : null}
 
               <div className="sig-actions">
                 <button type="submit" className="btn" disabled={loading}>
@@ -496,7 +498,7 @@ export default function BranchSignaturesPage() {
           {recordsLoading ? (
             <p className="hint">Loading signatures…</p>
           ) : recordsError ? (
-            <p className="status-line error">{recordsError}</p>
+            <AlertBanner type="error" title="Could not load records" message={recordsError} />
           ) : records.length === 0 ? (
             <EmptyState
               icon="✎"
@@ -604,8 +606,12 @@ export default function BranchSignaturesPage() {
                 setDragging={setRegDragging}
               />
 
-              {regError ? <p className="status-line error">{regError}</p> : null}
-              {regSuccess ? <p className="status-line success">{regSuccess}</p> : null}
+              {regError ? (
+                <AlertBanner type="error" message={regError} className="alert-banner-compact" />
+              ) : null}
+              {regSuccess ? (
+                <AlertBanner type="success" message={regSuccess} className="alert-banner-compact" />
+              ) : null}
 
               <div className="sig-actions">
                 <button type="submit" className="btn" disabled={regLoading}>

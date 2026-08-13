@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import { api } from '../api'
 import DashboardCharts from '../components/dashboard/DashboardCharts.jsx'
-import StatusPill from '../components/StatusPill.jsx'
+import StatusPill, { SourcePill } from '../components/StatusPill.jsx'
 import AlertBanner from '../components/ui/AlertBanner.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
 import Button from '../components/ui/Button.jsx'
@@ -78,12 +78,12 @@ const METRIC_ICONS = {
 }
 
 const METRICS = [
-  { key: 'total', label: 'All applications', accent: '#0055a4', iconBg: '#e8f2fb' },
-  { key: 'pending', label: 'Pending Cognexa AI', accent: '#d97706', iconBg: '#fff8eb' },
-  { key: 'analyzing', label: 'Analyzing now', accent: '#0891b2', iconBg: '#ecfeff' },
-  { key: 'completed', label: 'Ready to decide', accent: '#2563eb', iconBg: '#eff6ff' },
-  { key: 'accepted', label: 'Accepted', accent: '#059669', iconBg: '#ecfdf5' },
-  { key: 'rejected', label: 'Rejected', accent: '#dc2626', iconBg: '#fef2f2' },
+  { key: 'total', label: 'All applications', accent: '#6366f1', iconBg: '#eef2ff' },
+  { key: 'pending', label: 'Pending Cognexa AI', accent: '#d97706', iconBg: '#fffbeb' },
+  { key: 'analyzing', label: 'Analyzing now', accent: '#06b6d4', iconBg: '#ecfeff' },
+  { key: 'completed', label: 'Ready to decide', accent: '#6366f1', iconBg: '#eef2ff' },
+  { key: 'accepted', label: 'Accepted', accent: '#10b981', iconBg: '#ecfdf5' },
+  { key: 'rejected', label: 'Rejected', accent: '#ef4444', iconBg: '#fef2f2' },
 ]
 
 export default function BranchDashboardPage() {
@@ -168,7 +168,7 @@ export default function BranchDashboardPage() {
           <div className="panel-head">
             <div>
               <h2>Recent applications</h2>
-              <p className="hint">Newest submissions with contact and employment signals.</p>
+              <p className="hint">Newest portal submissions and branch scan entries.</p>
             </div>
             <Link className="btn btn-secondary" to="/branch/queue">Open queue</Link>
           </div>
@@ -179,27 +179,35 @@ export default function BranchDashboardPage() {
                 <thead>
                   <tr>
                     <th>Applicant</th>
+                    <th>Source</th>
                     <th>CNIC</th>
                     <th>Mobile</th>
                     <th>Company / role</th>
-                    <th>Income</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.recent_applications.map((a) => (
-                    <tr key={a.id} onClick={() => navigate(`/branch/applications/${a.id}`)} title="Open application">
+                    <tr
+                      key={`${a.source || 'app'}-${a.id}`}
+                      onClick={() => navigate(
+                        a.source === 'branch_entry'
+                          ? `/branch/entries/${a.id}`
+                          : `/branch/applications/${a.id}`,
+                      )}
+                      title="Open record"
+                    >
                       <td>
                         <strong>{a.full_name}</strong>
-                        <div className="meta">{a.email}</div>
+                        <div className="meta">{a.email || '—'}</div>
                       </td>
-                      <td>{a.cnic_number}</td>
-                      <td>{a.mobile_number}</td>
+                      <td><SourcePill source={a.source || 'customer_portal'} /></td>
+                      <td>{a.cnic_number || '—'}</td>
+                      <td>{a.mobile_number || '—'}</td>
                       <td>
-                        {a.company_name}
+                        {a.company_name || '—'}
                         <div className="meta">{a.designation || '—'}</div>
                       </td>
-                      <td>{a.monthly_income || '—'}</td>
                       <td><StatusPill status={a.status} /></td>
                     </tr>
                   ))}
@@ -209,7 +217,7 @@ export default function BranchDashboardPage() {
               <EmptyState
                 icon="📋"
                 title="No applications yet"
-                description="Customer portal submissions will appear here once received."
+                description="Portal submissions and document scans will appear here once received."
                 actionLabel="Open queue"
                 onAction={() => navigate('/branch/queue')}
               />

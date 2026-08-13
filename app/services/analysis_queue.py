@@ -14,6 +14,7 @@ from app.models import Application, ApplicationStatus
 from app.schemas.application import ApplicationForm, CnicInfo, EmploymentInfo, PersonalInfo
 from app.services.ai_progress import ai_progress
 from app.services.application_storage import document_paths_map
+from app.services.document_archive import index_application_documents
 from app.services.audit import write_audit
 from app.services.verification_pipeline import VerificationPipeline
 
@@ -174,7 +175,7 @@ class AnalysisQueue:
                 ),
             )
             documents = document_paths_map(app)
-            report = self._pipeline.verify(form, documents, on_progress=_on_progress)
+            report, extractions = self._pipeline.verify(form, documents, on_progress=_on_progress)
 
             app = db.query(Application).filter(Application.id == application_id).first()
             if not app:
@@ -182,6 +183,7 @@ class AnalysisQueue:
             app.report_json = report.model_dump(mode="json")
             app.status = ApplicationStatus.completed.value
             app.analyzed_at = datetime.utcnow()
+            index_application_documents(db, app, extractions)
             write_audit(
                 db,
                 action="analysis_completed",

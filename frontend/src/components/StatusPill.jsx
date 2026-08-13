@@ -5,6 +5,8 @@ const LABELS = {
   accepted: 'Approved',
   rejected: 'Rejected',
   saved: 'Saved',
+  review_required: 'Review Required',
+  failed: 'Failed',
   submitted: 'Pending',
   analyzed: 'Ready',
   approved: 'Approved',

@@ -116,7 +116,7 @@ async def verify_application(
                 raise HTTPException(status_code=400, detail=f"Empty file uploaded for {label}")
             saved[label] = pipeline.save_upload(upload.filename, data)
 
-        report = pipeline.verify(form, saved)
+        report, _extractions = pipeline.verify(form, saved)
         return report.model_dump()
     except HTTPException:
         raise
@@ -156,7 +156,7 @@ async def verify_application_json(
                 raise HTTPException(status_code=400, detail=f"Empty file uploaded for {label}")
             saved[label] = pipeline.save_upload(upload.filename, data)
 
-        report = pipeline.verify(form, saved)
+        report, _extractions = pipeline.verify(form, saved)
         return report.model_dump()
     except HTTPException:
         raise

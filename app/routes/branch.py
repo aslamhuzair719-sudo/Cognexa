@@ -36,13 +36,9 @@ from app.services.branch_entry_storage import (
 )
 from app.services.email_queue import email_queue
 from app.services.pdf_report import build_verification_pdf
+from app.services.document_archive import index_branch_entry, search_archives
+from app.services.workflow_queue import workflow_queue
 from app.services.workflow_service import WorkflowService
-from app.services.branch_entry_storage import save_branch_entry_document, resolve_branch_entry_path
-from app.services.extraction_service import ExtractionPipeline
-from app.services.llm_factory import get_llm_service
-from app.services.ocr_service import TesseractOCRService
-from app.services.classifier import KeywordClassifier
-import threading
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/api/v1/branch", tags=["branch"])
@@ -164,17 +160,28 @@ def list_applications(
     return [_list_item(a) for a in apps]
 
 
+def _dashboard_status_bucket(status: Optional[str]) -> Optional[str]:
+    """Map portal + branch-entry statuses onto dashboard metric keys."""
+    value = (status or "").strip().lower()
+    if value in {"pending", "saved", "submitted"}:
+        return "pending"
+    if value == "analyzing":
+        return "analyzing"
+    if value in {"completed", "review_required", "analyzed"}:
+        return "completed"
+    if value in {"accepted", "approved"}:
+        return "accepted"
+    if value == "rejected":
+        return "rejected"
+    # failed stays in total only (not a decision outcome)
+    return None
+
+
 @router.get("/dashboard")
 def branch_dashboard(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    rows = (
-        db.query(Application.status, func.count(Application.id))
-        .filter(Application.branch_id == user.branch_id)
-        .group_by(Application.status)
-        .all()
-    )
     counts = {
         "total": 0,
         "pending": 0,
@@ -183,12 +190,32 @@ def branch_dashboard(
         "accepted": 0,
         "rejected": 0,
     }
-    for status_value, count in rows:
-        counts["total"] += count
-        if status_value in counts:
-            counts[status_value] = count
 
-    recent = (
+    app_rows = (
+        db.query(Application.status, func.count(Application.id))
+        .filter(Application.branch_id == user.branch_id)
+        .group_by(Application.status)
+        .all()
+    )
+    for status_value, count in app_rows:
+        counts["total"] += count
+        bucket = _dashboard_status_bucket(status_value)
+        if bucket:
+            counts[bucket] += count
+
+    entry_rows = (
+        db.query(BranchEntry.status, func.count(BranchEntry.id))
+        .filter(BranchEntry.branch_id == user.branch_id)
+        .group_by(BranchEntry.status)
+        .all()
+    )
+    for status_value, count in entry_rows:
+        counts["total"] += count
+        bucket = _dashboard_status_bucket(status_value)
+        if bucket:
+            counts[bucket] += count
+
+    recent_apps = (
         db.query(Application)
         .options(joinedload(Application.branch))
         .filter(Application.branch_id == user.branch_id)
@@ -196,6 +223,27 @@ def branch_dashboard(
         .limit(8)
         .all()
     )
+    recent_entries = (
+        db.query(BranchEntry)
+        .options(
+            joinedload(BranchEntry.branch),
+            joinedload(BranchEntry.documents),
+        )
+        .filter(BranchEntry.branch_id == user.branch_id)
+        .order_by(BranchEntry.created_at.desc())
+        .limit(8)
+        .all()
+    )
+    recent = []
+    for app in recent_apps:
+        item = _list_item(app)
+        item["source"] = SOURCE_CUSTOMER_PORTAL
+        recent.append(item)
+    for entry in recent_entries:
+        recent.append(_branch_entry_list_item(entry))
+    recent.sort(key=lambda r: r.get("created_at") or "", reverse=True)
+    recent = recent[:8]
+
     recent_logs = (
         db.query(AuditLog)
         .filter(AuditLog.branch_id == user.branch_id)
@@ -211,7 +259,7 @@ def branch_dashboard(
         "counts": counts,
         "acceptance_rate": acceptance_rate,
         "queue_size": counts["pending"] + counts["analyzing"],
-        "recent_applications": [_list_item(a) for a in recent],
+        "recent_applications": recent,
         "recent_audit": [
             {
                 "id": log.id,
@@ -587,6 +635,7 @@ DOCUMENT_TYPES = {
     "cnic": "CNIC",
     "payslip": "Pay Slip",
     "bank_statement": "Bank Statement",
+    "account_opening_form": "Account Opening Form",
 }
 
 SCAN_ALLOWED_EXTENSIONS = {
@@ -1046,6 +1095,97 @@ WORKFLOW_TYPES = {
 }
 
 
+def _workflow_page_numbers(group: dict) -> list[int]:
+    raw_pages = group.get("pages") or []
+    page_numbers: list[int] = []
+    for item in raw_pages:
+        if isinstance(item, dict):
+            page_numbers.append(int(item["page"]))
+        else:
+            page_numbers.append(int(item))
+    return page_numbers
+
+
+def _create_workflow_branch_entry(
+    db: Session,
+    *,
+    user: User,
+    group: dict,
+    rendered_pages: list[dict],
+    docs_by_page: dict[int, dict],
+    workflow_type: str,
+    customer_name: Optional[str] = None,
+) -> BranchEntry:
+    page_numbers = _workflow_page_numbers(group)
+    if not page_numbers:
+        raise HTTPException(status_code=400, detail="Selected group has no pages")
+
+    entry = BranchEntry(
+        branch_id=user.branch_id,
+        created_by=user.id,
+        customer_name=customer_name or group.get("customer_id") or "Customer",
+        status="pending",
+        workflow_type=workflow_type,
+        workflow_group_id=group.get("customer_id"),
+        workflow_meta_json={
+            "workflow_type": workflow_type,
+            "workflow_group_id": group.get("customer_id"),
+            "validation_preview": group.get("validation"),
+            "cross_document_checks_preview": group.get("cross_document_checks"),
+            "progress": {
+                "stage": "queued",
+                "message": "Waiting in workflow queue…",
+            },
+        },
+    )
+    db.add(entry)
+    db.flush()
+
+    for page_no in page_numbers:
+        page_doc = docs_by_page.get(page_no) or {}
+        page_data = next((p for p in rendered_pages if p["page"] == page_no), None)
+        img_bytes = page_data["image_bytes"] if page_data else b""
+        doc_type = page_doc.get("document_type") or "unknown"
+        summary = page_doc.get("summary") or {
+            "summary": "Queued for OCR and extraction.",
+            "key_fields": {},
+            "confidence": "low",
+            "flags": ["queued"],
+        }
+
+        doc_id = uuid4()
+        filename = f"page-{page_no}.png"
+        relative = save_branch_entry_document(entry.id, doc_id, filename, img_bytes)
+
+        doc = BranchEntryDocument(
+            id=doc_id,
+            branch_entry_id=entry.id,
+            document_type=doc_type,
+            original_filename=filename,
+            file_path=relative,
+            extracted_text=page_doc.get("raw_text") or "",
+            fields_json=page_doc.get("fields") or {},
+            checkboxes_json={},
+            summary_json=summary,
+        )
+        db.add(doc)
+
+    return entry
+
+
+async def _read_workflow_pdf(file: UploadFile) -> bytes:
+    suffix = Path(file.filename or "").suffix.lower()
+    if suffix != ".pdf":
+        raise HTTPException(status_code=400, detail="Workflow upload must be a PDF file.")
+    data = await file.read()
+    if len(data) > MAX_SCAN_FILE_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large ({len(data) // 1024} KB). Maximum is 15 MB.",
+        )
+    return data
+
+
 @router.post("/process-workflow")
 async def process_workflow(
     workflow_type: str = Form(...),
@@ -1086,6 +1226,69 @@ async def process_workflow(
     return result
 
 
+@router.post("/process-workflow/commit-all")
+async def commit_workflow_all(
+    workflow_type: str = Form(...),
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Save every detected customer group as Branch Entries and queue serial extraction."""
+    if workflow_type not in WORKFLOW_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported workflow_type '{workflow_type}'. "
+                   f"Valid values: {', '.join(WORKFLOW_TYPES.keys())}",
+        )
+
+    data = await _read_workflow_pdf(file)
+    service = WorkflowService()
+    try:
+        workflow_result = service.process_workflow(workflow_type, data)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    groups = workflow_result.get("customer_groups") or []
+    if not groups:
+        raise HTTPException(status_code=422, detail="No customer groups detected in PDF.")
+
+    rendered_pages = service._render_pdf_pages(data)
+    docs_by_page = service._classify_pages(rendered_pages)
+    entry_ids: list[str] = []
+
+    for group in groups:
+        entry = _create_workflow_branch_entry(
+            db,
+            user=user,
+            group=group,
+            rendered_pages=rendered_pages,
+            docs_by_page=docs_by_page,
+            workflow_type=workflow_type,
+        )
+        index_branch_entry(db, entry, document_type_labels=DOCUMENT_TYPES)
+        entry_ids.append(str(entry.id))
+
+    write_audit(
+        db,
+        action="branch_entries_created_via_workflow",
+        message=f"Queued {len(entry_ids)} workflow customer group(s) for extraction",
+        branch_id=user.branch_id,
+        user_id=user.id,
+        username=user.username,
+        details={"entry_ids": entry_ids, "workflow_type": workflow_type},
+    )
+    db.commit()
+
+    for entry_id in entry_ids:
+        workflow_queue.enqueue(entry_id)
+
+    return {
+        "entry_ids": entry_ids,
+        "count": len(entry_ids),
+        "message": f"Queued {len(entry_ids)} customer(s) for OCR, extraction, and cross-check.",
+    }
+
+
 @router.post("/process-workflow/commit-group")
 async def commit_workflow_group(
     workflow_type: str = Form(...),
@@ -1095,119 +1298,52 @@ async def commit_workflow_group(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Save a detected workflow group as a Branch Entry and start extraction in background.
+    """Save one detected workflow group as a Branch Entry and queue extraction."""
+    if workflow_type not in WORKFLOW_TYPES:
+        raise HTTPException(status_code=400, detail=f"Unsupported workflow_type '{workflow_type}'.")
 
-    Expects `group_index` (0-based) selecting which detected group to commit from the uploaded PDF.
-    """
-    suffix = Path(file.filename or "").suffix.lower()
-    if suffix != ".pdf":
-        raise HTTPException(status_code=400, detail="Workflow commit requires a PDF file.")
-
-    data = await file.read()
-    if len(data) > MAX_SCAN_FILE_SIZE:
-        raise HTTPException(status_code=413, detail="File too large.")
-
+    data = await _read_workflow_pdf(file)
     service = WorkflowService()
-    # run segmentation + lightweight OCR-only classification (no LLM)
-    workflow_result = service.process_workflow(workflow_type, data)
+    try:
+        workflow_result = service.process_workflow(workflow_type, data)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
     groups = workflow_result.get("customer_groups") or []
     if group_index < 0 or group_index >= len(groups):
         raise HTTPException(status_code=400, detail="Invalid group_index")
 
     group = groups[group_index]
-
-    # Render pages so we can save bytes for selected pages
     rendered_pages = service._render_pdf_pages(data)
-
-    # Build document list for this group
-    # `group['pages']` can be a list of page numbers or a list of page dicts (with 'page').
-    raw_pages = group.get("pages") or []
-    pages = [p["page"] if isinstance(p, dict) and "page" in p else p for p in raw_pages]
-    if not pages:
-        raise HTTPException(status_code=400, detail="Selected group has no pages")
-
-    entry = BranchEntry(branch_id=user.branch_id, created_by=user.id, customer_name=(customer_name or group.get("customer_id") or "Customer"))
-    db.add(entry)
-    db.flush()
-
-    saved_docs = []
     docs_by_page = service._classify_pages(rendered_pages)
 
-    for page_no in pages:
-        page_doc = docs_by_page.get(page_no)
-        if not page_doc:
-            # create a minimal doc entry using OCR
-            # find rendered page bytes
-            page_data = next((p for p in rendered_pages if p["page"] == page_no), None)
-            img_bytes = page_data["image_bytes"] if page_data else b""
-            doc_type = "unknown"
-            summary = {"summary": "OCR text extracted.", "key_fields": {}, "confidence": "low", "flags": []}
-        else:
-            img_bytes = next((p["image_bytes"] for p in rendered_pages if p["page"] == page_no), b"")
-            doc_type = page_doc.get("document_type") or "unknown"
-            summary = page_doc.get("summary") or {"summary": "OCR text extracted.", "key_fields": {}, "confidence": "low", "flags": []}
-
-        doc_id = uuid4()
-        filename = f"page-{page_no}.png"
-        relative = save_branch_entry_document(entry.id, doc_id, filename, img_bytes)
-
-        extracted_text = page_doc.get("extracted_text") if page_doc else ""
-        fields = page_doc.get("fields") if page_doc else {}
-
-        doc = BranchEntryDocument(
-            id=doc_id,
-            branch_entry_id=entry.id,
-            document_type=doc_type,
-            original_filename=filename,
-            file_path=relative,
-            extracted_text=extracted_text or "",
-            fields_json=fields or {},
-            checkboxes_json={},
-            summary_json=summary,
-        )
-        db.add(doc)
-        saved_docs.append(doc)
+    entry = _create_workflow_branch_entry(
+        db,
+        user=user,
+        group=group,
+        rendered_pages=rendered_pages,
+        docs_by_page=docs_by_page,
+        workflow_type=workflow_type,
+        customer_name=customer_name,
+    )
+    index_branch_entry(db, entry, document_type_labels=DOCUMENT_TYPES)
 
     write_audit(
         db,
         action="branch_entry_created_via_workflow",
-        message=f"Branch Entry saved from workflow group {group.get('customer_id')}",
+        message=f"Branch Entry queued from workflow group {group.get('customer_id')}",
         branch_id=user.branch_id,
         user_id=user.id,
         username=user.username,
-        details={"branch_entry_id": str(entry.id), "pages": pages},
+        details={"branch_entry_id": str(entry.id), "group_index": group_index},
     )
     db.commit()
+    workflow_queue.enqueue(entry.id)
 
-    # Start background extraction processing for saved docs
-    def _background_extract(entry_id: uuid.UUID, docs_list: list[BranchEntryDocument]):
-        # Create extraction pipeline
-        ocr = TesseractOCRService()
-        classifier = KeywordClassifier()
-        llm = get_llm_service()
-        pipeline = ExtractionPipeline(ocr, classifier, llm)
-        db_session = SessionLocal()
-        try:
-            for d in docs_list:
-                try:
-                    path = resolve_branch_entry_path(d.file_path)
-                    res = pipeline.process(str(path), doc_label=d.original_filename)
-                    # persist results
-                    row = db_session.query(BranchEntryDocument).filter(BranchEntryDocument.id == d.id).first()
-                    if row:
-                        row.extracted_text = res.get("extracted_text") or row.extracted_text
-                        row.fields_json = res.get("fields") or row.fields_json
-                        row.summary_json = {"summary": res.get("error") or "Extraction complete", "key_fields": row.fields_json}
-                        db_session.commit()
-                except Exception:
-                    db_session.rollback()
-        finally:
-            db_session.close()
-
-    thread = threading.Thread(target=_background_extract, args=(entry.id, saved_docs), daemon=True)
-    thread.start()
-
-    return {"entry_id": str(entry.id), "message": "Branch Entry created and extraction started."}
+    return {
+        "entry_id": str(entry.id),
+        "message": "Customer queued for OCR, extraction, and cross-document check.",
+    }
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -1227,27 +1363,37 @@ def _field_from_docs(docs: list[BranchEntryDocument], *keys: str) -> str:
 
 def _branch_entry_list_item(entry: BranchEntry) -> dict:
     docs = list(entry.documents or [])
+    workflow_meta = entry.workflow_meta_json or {}
+    status = entry.status or "saved"
     return {
         "id": str(entry.id),
         "source": SOURCE_BRANCH_ENTRY,
-        "status": "saved",
+        "status": status,
         "full_name": entry.customer_name,
         "cnic_number": _field_from_docs(docs, "cnic", "cnic_number"),
         "email": _field_from_docs(docs, "email"),
         "mobile_number": _field_from_docs(docs, "mobile", "mobile_number"),
-        "company_name": "",
+        "company_name": _field_from_docs(docs, "company_name"),
         "designation": "",
         "monthly_income": "",
         "decision_note": None,
         "created_at": entry.created_at.isoformat() if entry.created_at else None,
-        "analyzed_at": None,
+        "analyzed_at": entry.analyzed_at.isoformat() if entry.analyzed_at else None,
         "decided_at": None,
         "document_count": len(docs),
+        "workflow_type": entry.workflow_type,
+        "workflow_group_id": entry.workflow_group_id,
+        "workflow_progress": workflow_meta.get("progress"),
+        "overall_score": workflow_meta.get("overall_score"),
+        "recommendation": workflow_meta.get("recommendation"),
         "branch": {
             "code": entry.branch.code if entry.branch else None,
             "name": entry.branch.name if entry.branch else None,
         },
-        "has_report": False,
+        "has_report": bool(
+            workflow_meta.get("report")
+            or (entry.analyzed_at and status in {"completed", "review_required"})
+        ),
     }
 
 
@@ -1288,6 +1434,29 @@ def _branch_entry_doc_meta(entry_id: UUID, doc: BranchEntryDocument) -> dict:
         "extracted_text": doc.extracted_text or "",
         "created_at": doc.created_at.isoformat() if doc.created_at else None,
     }
+
+
+@router.get("/archive/search")
+def archive_search(
+    q: str = "",
+    source: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Full-text search across archived OCR / vision extracted document text."""
+    query = (q or "").strip()
+    if len(query) < 2:
+        raise HTTPException(status_code=400, detail="Search query must be at least 2 characters.")
+    return search_archives(
+        db,
+        branch_id=user.branch_id,
+        query=query,
+        source=source,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.get("/records")
@@ -1370,6 +1539,7 @@ async def create_branch_entry(
         branch_id=user.branch_id,
         created_by=user.id,
         customer_name=name,
+        status="saved",
     )
     db.add(entry)
     db.flush()
@@ -1447,6 +1617,9 @@ async def create_branch_entry(
     db.commit()
 
     entry = _get_branch_entry(db, user, entry.id)
+    index_branch_entry(db, entry, document_type_labels=DOCUMENT_TYPES)
+    db.commit()
+
     return {
         "id": str(entry.id),
         "source": SOURCE_BRANCH_ENTRY,
@@ -1468,6 +1641,10 @@ def get_branch_entry(
     item.update(
         {
             "customer_name": entry.customer_name,
+            "status": entry.status or "saved",
+            "workflow_type": entry.workflow_type,
+            "workflow_group_id": entry.workflow_group_id,
+            "workflow_meta": entry.workflow_meta_json or {},
             "created_by": entry.creator.username if entry.creator else None,
             "verification_email_document": entry.verification_email_document,
             "verification_email_target": entry.verification_email_target,

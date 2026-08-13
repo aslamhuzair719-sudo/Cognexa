@@ -10,6 +10,10 @@ from app.prompts.bank_statement import (
 )
 from app.prompts.cnic import CNIC_EXTRACTION_PROMPT, CNIC_VISION_PROMPT
 from app.prompts.payslip import PAYSLIP_EXTRACTION_PROMPT, PAYSLIP_VISION_PROMPT
+from app.prompts.account_opening_form import (
+    ACCOUNT_OPENING_FORM_EXTRACTION_PROMPT,
+    ACCOUNT_OPENING_FORM_VISION_PROMPT,
+)
 
 
 class PromptManager:
@@ -24,11 +28,13 @@ class PromptManager:
             "cnic": CNIC_EXTRACTION_PROMPT,
             "payslip": PAYSLIP_EXTRACTION_PROMPT,
             "bank_statement": BANK_STATEMENT_EXTRACTION_PROMPT,
+            "account_opening_form": ACCOUNT_OPENING_FORM_EXTRACTION_PROMPT,
         }
         self._vision_prompts: Dict[str, str] = {
             "cnic": CNIC_VISION_PROMPT,
             "payslip": PAYSLIP_VISION_PROMPT,
             "bank_statement": BANK_STATEMENT_VISION_PROMPT,
+            "account_opening_form": ACCOUNT_OPENING_FORM_VISION_PROMPT,
         }
 
     def register(self, document_type: str, prompt_template: str) -> None:

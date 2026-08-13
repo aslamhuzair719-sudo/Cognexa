@@ -26,8 +26,23 @@ def _connect() -> imaplib.IMAP4:
     return client
 
 
+# Outgoing verification emails use: [Application Verification: VER-...]
+# Replies typically keep that text in the subject (often with Re:/Fwd:).
+VERIFICATION_SUBJECT_MARKER = "[Application Verification:"
+
+
+def is_verification_reply_subject(subject: str) -> bool:
+    """True when the subject looks like a verification request/reply."""
+    if not subject:
+        return False
+    return VERIFICATION_SUBJECT_MARKER.lower() in subject.lower()
+
+
 def fetch_unread_messages() -> List[dict]:
-    """Fetch unread messages from INBOX.
+    """Fetch unread verification-reply candidates from INBOX.
+
+    Only messages whose subject contains ``[Application Verification:`` are returned,
+    so normal inbox mail is left unread and untouched.
 
     Returns a list of dicts with keys: subject, from, message_id, raw, email_message
     """
@@ -45,11 +60,13 @@ def fetch_unread_messages() -> List[dict]:
     results: List[dict] = []
     try:
         client.select("INBOX")
-        typ, data = client.search(None, "UNSEEN")
+        # Prefer server-side SUBJECT filter to avoid downloading unrelated unread mail.
+        typ, data = client.search(None, "UNSEEN", "SUBJECT", '"Application Verification"')
         if typ != "OK":
             logger.warning("IMAP search returned non-OK: %s", typ)
             return []
-        for num in data[0].split():
+        ids = data[0].split() if data and data[0] else []
+        for num in ids:
             try:
                 logger.debug("Fetching message uid=%s", num)
                 typ, msg_data = client.fetch(num, "RFC822")
@@ -61,6 +78,9 @@ def fetch_unread_messages() -> List[dict]:
                 subject = msg.get("Subject", "")
                 from_hdr = msg.get("From", "")
                 message_id = msg.get("Message-ID") or msg.get("Message-Id")
+                if not is_verification_reply_subject(subject):
+                    logger.debug("Skipping non-verification subject: %s", subject)
+                    continue
                 logger.debug("Fetched message num=%s subject=%s from=%s", num, subject, from_hdr)
                 results.append({
                     "num": num,

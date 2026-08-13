@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import AlertBanner from '../components/ui/AlertBanner.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
+import FormField from '../components/ui/FormField.jsx'
+import PageHeader from '../components/ui/PageHeader.jsx'
 import SearchBar from '../components/ui/SearchBar.jsx'
 import { TableSkeleton } from '../components/ui/Skeleton.jsx'
 
@@ -46,14 +49,14 @@ export default function BranchAuditPage() {
 
   return (
     <>
-      <section className="hero hero-branch">
-        <span className="ai-badge">Compliance trail</span>
-        <h1>Audit logs</h1>
-        <p>
-          Immutable branch activity — authentication, Cognexa AI queue events, and accept / reject
-          decisions with operator identity.
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Compliance trail"
+        title="Audit logs"
+        badge={`${filtered.length} events`}
+        description="Immutable branch activity — authentication, AI queue events, and accept / reject decisions with operator identity."
+      />
+
+      {error ? <AlertBanner type="error" title="Could not load audit logs" message={error} /> : null}
 
       <section className="panel panel-ink">
         <div className="search-toolbar" style={{ gridTemplateColumns: 'minmax(220px, 1.6fr) minmax(160px, 0.9fr)' }}>
@@ -62,17 +65,15 @@ export default function BranchAuditPage() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search action, message, user, application…"
           />
-          <label className="field">Action
+          <FormField label="Action">
             <select value={actionFilter} onChange={(e) => setActionFilter(e.target.value)}>
               <option value="all">All actions</option>
               {actions.map((action) => (
                 <option key={action} value={action}>{action.replaceAll('_', ' ')}</option>
               ))}
             </select>
-          </label>
+          </FormField>
         </div>
-
-        {error ? <p className="status-line error shake">{error}</p> : null}
 
         <div className="table-wrap" style={{ marginTop: '0.85rem' }}>
           {loading ? (
@@ -118,7 +119,7 @@ export default function BranchAuditPage() {
             <EmptyState
               icon="🔒"
               title="No audit entries"
-              description="Branch activity logs will appear here as actions are performed."
+              description="Branch activity will appear here as operators use the console."
             />
           )}
         </div>

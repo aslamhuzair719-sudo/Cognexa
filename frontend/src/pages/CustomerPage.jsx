@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
+import AlertBanner from '../components/ui/AlertBanner.jsx'
 
 const EMPTY = {
   full_name: '',
@@ -597,9 +598,11 @@ export default function CustomerPage() {
               </div>
 
               {status ? (
-                <p className={`status-line ${error ? 'error' : ''}`} style={{ marginTop: '1rem' }}>
-                  {status}
-                </p>
+                <AlertBanner
+                  type={error ? 'error' : cnicVerified === true ? 'success' : 'info'}
+                  title={error ? 'Something went wrong' : cnicVerified === true ? 'CNIC verified' : 'Status'}
+                  message={status}
+                />
               ) : null}
             </form>
           </main>

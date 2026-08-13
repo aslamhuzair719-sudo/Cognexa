@@ -2,7 +2,6 @@ export const DOCUMENT_TYPES = [
   { value: 'remittance_slip', label: 'Remittance' },
   { value: 'cnic', label: 'CNIC' },
   { value: 'payslip', label: 'Pay Slip' },
-  { value: 'bank_statement', label: 'Bank Statement' },
 ]
 
 export const REMITTANCE_TEXT_FIELDS = [

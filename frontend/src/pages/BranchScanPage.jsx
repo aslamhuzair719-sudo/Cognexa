@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api'
 import { AiActivityPanel, buildScanSteps } from '../components/AiActivityPanel.jsx'
+import AlertBanner from '../components/ui/AlertBanner.jsx'
+import PageHeader from '../components/ui/PageHeader.jsx'
 import {
   DOCUMENT_TYPES,
   buildDraftKeyFields,
@@ -78,6 +80,7 @@ function StructuredFieldGrid({ fields, editFields, onChange }) {
 }
 
 export default function BranchScanPage() {
+  const navigate = useNavigate()
   const [docType, setDocType]   = useState('remittance_slip')
   const [file, setFile]         = useState(null)
   const [preview, setPreview]   = useState(null)
@@ -321,6 +324,53 @@ export default function BranchScanPage() {
     }
   }
 
+  async function commitWorkflowGroup(groupIndex) {
+    if (!file || !workflowResult) return
+    setGroupAnalyzeLoading(true)
+    try {
+      const form = new FormData()
+      form.append('workflow_type', workflowResult.workflow_type)
+      form.append('group_index', String(groupIndex))
+      form.append('file', file)
+      await api('/api/v1/branch/process-workflow/commit-group', {
+        method: 'POST',
+        body: form,
+      })
+      showToast(
+        'Queued for analysis',
+        `${workflowResult.customer_groups[groupIndex]?.customer_id || 'Customer'} queued — OCR, extraction, and cross-check will run shortly.`,
+      )
+      navigate('/branch/queue')
+    } catch (err) {
+      showToast('Analyze failed', err.message || 'Failed to queue workflow group.')
+    } finally {
+      setGroupAnalyzeLoading(false)
+    }
+  }
+
+  async function commitAllWorkflowGroups() {
+    if (!file || !workflowResult?.customer_groups?.length) return
+    setWorkflowAnalyzeAllLoading(true)
+    try {
+      const form = new FormData()
+      form.append('workflow_type', workflowResult.workflow_type)
+      form.append('file', file)
+      const res = await api('/api/v1/branch/process-workflow/commit-all', {
+        method: 'POST',
+        body: form,
+      })
+      showToast(
+        'All customers queued',
+        res.message || `Queued ${res.count} customer(s) for sequential analysis.`,
+      )
+      navigate('/branch/queue')
+    } catch (err) {
+      showToast('Analyze all failed', err.message || 'Failed to queue workflow groups.')
+    } finally {
+      setWorkflowAnalyzeAllLoading(false)
+    }
+  }
+
   function reset() {
     resetCurrentScan({ keepDraft: false })
     setToast(null)
@@ -521,17 +571,12 @@ export default function BranchScanPage() {
         </div>
       )}
 
-      {/* ── Header ── */}
-      <div className="hero hero-branch" style={{ marginBottom: '1.25rem' }}>
-        <p className="eyebrow">Branch Tools</p>
-        <h1 style={{ fontSize: 'clamp(1.6rem,3.5vw,2.4rem)', maxWidth: '26ch' }}>
-          Document Scan &amp; Review
-        </h1>
-        <p className="hint" style={{ maxWidth: '42rem' }}>
-          Upload banking documents, correct extracted fields, add more documents for the same
-          customer, then Save as a Branch Entry.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Branch tools"
+        title="Document Scan & Review"
+        badge="CNIC · Payslip · Remittance"
+        description="Upload banking documents, run the Cognexa AI verification pipeline, correct extracted fields, and save multi-document Branch Entries."
+      />
 
       <div className="scan-layout">
         {/* ── Upload panel ── */}
@@ -576,6 +621,10 @@ export default function BranchScanPage() {
                 >
                   <option value="account_opening">Account Opening Workflow</option>
                 </select>
+                <p className="hint" style={{ marginTop: '0.5rem' }}>
+                  Per customer: Account Opening Form + Payslip. CNIC front is optional.
+                  CNIC back is not required. Separate customers with a blank page.
+                </p>
               </label>
             )}
           </div>
@@ -701,11 +750,13 @@ export default function BranchScanPage() {
               )}
             </div>
 
-            {(error || workflowError) && (
-              <p className="status-line error" style={{ marginTop: '0.75rem' }}>
-                {processingMode === 'workflow' ? workflowError || error : error}
-              </p>
-            )}
+            {(error || workflowError) ? (
+              <AlertBanner
+                type="error"
+                title="Scan failed"
+                message={processingMode === 'workflow' ? (workflowError || error) : error}
+              />
+            ) : null}
 
             <div className="actions" style={{ marginTop: '1.1rem' }}>
               {processingMode === 'workflow' ? (
@@ -841,36 +892,10 @@ export default function BranchScanPage() {
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  onClick={async () => {
-                    if (!workflowResult?.customer_groups?.length) return
-                    setWorkflowAnalyzeAllLoading(true)
-                    try {
-                      let remaining = workflowResult.customer_groups.length
-                      while (remaining > 0) {
-                        const form = new FormData()
-                        form.append('workflow_type', workflowResult.workflow_type)
-                        form.append('group_index', 0)
-                        form.append('file', file)
-                        const res = await api('/api/v1/branch/process-workflow/commit-group', {
-                          method: 'POST',
-                          body: form,
-                        })
-                        showToast('Queued for Analysis', res.message || 'Started extraction for a workflow group.')
-                        setWorkflowResult((prev) => ({
-                          ...prev,
-                          customer_groups: (prev.customer_groups || []).slice(1),
-                        }))
-                        remaining -= 1
-                      }
-                    } catch (err) {
-                      showToast('Analyze all failed', err.message || 'Failed while queuing workflow groups.')
-                    } finally {
-                      setWorkflowAnalyzeAllLoading(false)
-                    }
-                  }}
+                  onClick={commitAllWorkflowGroups}
                   disabled={!file || workflowAnalyzeAllLoading || groupAnalyzeLoading || !workflowResult?.customer_groups?.length}
                 >
-                  {workflowAnalyzeAllLoading ? 'Queuing all…' : 'Analyze All'}
+                  {workflowAnalyzeAllLoading ? 'Queuing all…' : 'Analyze All & Open Queue'}
                 </button>
               </div>
               {workflowResult.customer_groups.map((group, gidx) => (
@@ -901,31 +926,10 @@ export default function BranchScanPage() {
                     <button
                       type="button"
                       className="btn btn-ghost"
-                      onClick={async () => {
-                        setGroupAnalyzeLoading(true)
-                        try {
-                          const form = new FormData()
-                          form.append('workflow_type', workflowResult.workflow_type)
-                          form.append('group_index', gidx)
-                          form.append('file', file)
-                          const res = await api('/api/v1/branch/process-workflow/commit-group', {
-                            method: 'POST',
-                            body: form,
-                          })
-                          showToast('Queued for Analysis', res.message || 'Started extraction for selected group.')
-                          setWorkflowResult((prev) => ({
-                            ...prev,
-                            customer_groups: (prev.customer_groups || []).filter((_, i) => i !== gidx),
-                          }))
-                        } catch (err) {
-                          showToast('Analyze failed', err.message || 'Failed to start analysis')
-                        } finally {
-                          setGroupAnalyzeLoading(false)
-                        }
-                      }}
+                      onClick={() => commitWorkflowGroup(gidx)}
                       disabled={!file || groupAnalyzeLoading || workflowAnalyzeAllLoading}
                     >
-                      {groupAnalyzeLoading ? 'Analyzing…' : 'Analyze'}
+                      {groupAnalyzeLoading ? 'Queuing…' : 'Analyze & Open Queue'}
                     </button>
                   </div>
                 </div>
@@ -955,30 +959,7 @@ export default function BranchScanPage() {
                 </div>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
                   <button type="button" className="btn" onClick={() => setReviewingGroupIndex(null)}>Close</button>
-                  <button type="button" className="btn btn-ghost" onClick={async () => {
-                    // reuse analyze action from group card: commit and start extraction
-                    setGroupAnalyzeLoading(true)
-                    try {
-                      const form = new FormData()
-                      form.append('workflow_type', workflowResult.workflow_type)
-                      form.append('group_index', reviewingGroupIndex)
-                      form.append('file', file)
-                      const res = await api('/api/v1/branch/process-workflow/commit-group', {
-                        method: 'POST',
-                        body: form,
-                      })
-                      showToast('Queued for Analysis', res.message || 'Started extraction for selected group.')
-                      setWorkflowResult((prev) => ({
-                        ...prev,
-                        customer_groups: (prev.customer_groups || []).filter((_, i) => i !== reviewingGroupIndex),
-                      }))
-                      setReviewingGroupIndex(null)
-                    } catch (err) {
-                      showToast('Analyze failed', err.message || 'Failed to start analysis')
-                    } finally {
-                      setGroupAnalyzeLoading(false)
-                    }
-                  }} disabled={!file || groupAnalyzeLoading}>{groupAnalyzeLoading ? 'Analyzing…' : 'Analyze Group'}</button>
+                  <button type="button" className="btn btn-ghost" onClick={() => commitWorkflowGroup(reviewingGroupIndex)} disabled={!file || groupAnalyzeLoading}>{groupAnalyzeLoading ? 'Queuing…' : 'Analyze & Open Queue'}</button>
                 </div>
               </div>
             </div>
@@ -1191,7 +1172,7 @@ export default function BranchScanPage() {
                 </div>
 
                 {savedNote && (
-                  <p className="status-line ok" style={{ marginTop: '0.75rem' }}>{savedNote}</p>
+                  <AlertBanner type="success" message={savedNote} className="alert-banner-compact" />
                 )}
                 <p className="hint" style={{ marginTop: '0.65rem' }}>
                   Correct any fields, then Save with a customer name — or add another document
@@ -1303,7 +1284,7 @@ export default function BranchScanPage() {
               />
             </label>
             {saveError && (
-              <p className="status-line error" style={{ marginTop: '0.75rem' }}>{saveError}</p>
+              <AlertBanner type="error" message={saveError} className="alert-banner-compact" />
             )}
             <div className="actions" style={{ marginTop: '1.1rem' }}>
               <button type="button" className="btn" onClick={confirmSave} disabled={saving}>

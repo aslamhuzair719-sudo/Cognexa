@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api, downloadUrl } from '../api'
 import { AiActivityPanel } from '../components/AiActivityPanel.jsx'
 import BrandHeader from '../components/BrandHeader.jsx'
 import ReportView from '../components/ReportView.jsx'
 import StatusPill from '../components/StatusPill.jsx'
+import AlertBanner from '../components/ui/AlertBanner.jsx'
+import PageHeader from '../components/ui/PageHeader.jsx'
 import { useToast } from '../components/ui/ToastProvider.jsx'
 
 const DOC_LABELS = {
@@ -12,6 +14,14 @@ const DOC_LABELS = {
   cnic_back: 'CNIC back',
   payslip: 'Payslip',
   bank_statement: 'Bank statement',
+}
+
+function bannerTypeForMessage(message) {
+  const text = String(message || '').toLowerCase()
+  if (!text) return 'info'
+  if (text.includes('fail') || text.includes('error') || text.includes('required')) return 'error'
+  if (text.includes('accept') || text.includes('reject') || text.includes('queued') || text.includes('sent')) return 'success'
+  return 'info'
 }
 
 export default function BranchApplicationPage() {
@@ -209,9 +219,26 @@ export default function BranchApplicationPage() {
           variant="bar"
           subtitle={user.branch.name}
           actionTo="/branch"
-          actionLabel="Back to grid"
+          actionLabel="Back to dashboard"
           rightSlot={<span className="ai-badge">Case review</span>}
         />
+
+        <PageHeader
+          eyebrow="Application review"
+          title={detail.full_name}
+          description={`Application ID ${detail.id} · ${detail.email || 'No email on file'}`}
+          actions={
+            <Link to="/branch/queue" className="btn btn-secondary">
+              View queue
+            </Link>
+          }
+        >
+          <div className="page-header-pills">
+            <StatusPill status={detail.status} />
+            {detail.has_report ? <span className="page-header-badge">Report ready</span> : null}
+            <span className="page-header-badge">{docCount} documents</span>
+          </div>
+        </PageHeader>
 
         {/* Dynamic AI Status Banner */}
         {['pending', 'analyzing'].includes(detail.status) || detail.ai_progress ? (
@@ -237,22 +264,16 @@ export default function BranchApplicationPage() {
         ) : null}
 
         {/* 2-Column Dashboard Layout */}
-        <div className="dashboard-grid">
+        <div className="dashboard-grid application-review-grid">
           {/* LEFT SIDEBAR: Applicant Metadata & Decision Actions */}
           <aside className="sidebar-column">
-            <div className="panel sticky-panel">
-              <div className="detail-header">
-                <div>
-                  <p className="eyebrow">Application dossier</p>
-                  <h2>{detail.full_name}</h2>
-                  <p className="meta">ID {detail.id}</p>
-                </div>
+            <div className="panel sticky-panel dossier-panel">
+              <div className="dossier-panel-head">
+                <p className="eyebrow">Application dossier</p>
                 <StatusPill status={detail.status} />
               </div>
 
-              <hr className="divider" />
-
-              <div className="kv-grid compact">
+              <div className="kv-grid compact dossier-kv">
                 <div><span className="kv-label">Email</span><p>{detail.email}</p></div>
                 <div><span className="kv-label">Phone</span><p>{detail.mobile_number}</p></div>
                 <div><span className="kv-label">Company</span><p>{detail.company_name || '—'}</p></div>
@@ -306,7 +327,13 @@ export default function BranchApplicationPage() {
                     Download PDF report
                   </button>
                 ) : null}
-                {actionStatus ? <p className="status-line">{actionStatus}</p> : null}
+                {actionStatus ? (
+                  <AlertBanner
+                    type={bannerTypeForMessage(actionStatus)}
+                    message={actionStatus}
+                    className="alert-banner-compact"
+                  />
+                ) : null}
               </div>
 
               {/* Decision Section */}
@@ -348,68 +375,63 @@ export default function BranchApplicationPage() {
                       </div>
                     </div>
                   ) : null}
-                  {decideStatus ? <p className="status-line">{decideStatus}</p> : null}
+                  {decideStatus ? (
+                    <AlertBanner
+                      type={bannerTypeForMessage(decideStatus)}
+                      message={decideStatus}
+                      className="alert-banner-compact"
+                    />
+                  ) : null}
                 </div>
               ) : null}
             </div>
           </aside>
 
           {/* RIGHT MAIN WORKSPACE: Tabbed Views */}
-          <main className="main-column">
-            <div className="top-summary">
-              <div className="overview-grid">
-                <div className="overview-card">
-                  <span className="overview-label">Cognexa AI score</span>
-                  <p className="overview-value">{report || detail.overall_score ? scoreLabel : 'Pending'}</p>
-                </div>
-                <div className="overview-card">
-                  <span className="overview-label">Documents</span>
-                  <p className="overview-value">{docCount}</p>
-                </div>
-                <div className="overview-card">
-                  <span className="overview-label">Verification</span>
-                  <p className="overview-value">{verificationLabel}</p>
-                </div>
-                <div className="overview-card">
-                  <span className="overview-label">Application</span>
-                  <p className="overview-value">{detail.application_type || detail.document_type || 'Standard'}</p>
-                </div>
+          <main className="main-column application-main">
+            <div className="overview-grid application-stats">
+              <div className="overview-card">
+                <span className="overview-label">Cognexa AI score</span>
+                <p className="overview-value">{report || detail.overall_score ? scoreLabel : 'Pending'}</p>
               </div>
-
-              <div className="panel panel-accent" style={{ padding: '1.25rem 1.4rem' }}>
-                <div className="section-heading">
-                  <div>
-                    <p className="eyebrow">Insight overview</p>
-                    <h3 style={{ margin: '0.35rem 0 0' }}>
-                      Review the latest Cognexa AI assessment, documents and verification workflow.
-                    </h3>
-                  </div>
-                  <StatusPill status={detail.status} />
-                </div>
-                <p className="hint" style={{ marginTop: '0.85rem' }}>
-                  Use the tabs below to inspect the case report, review uploaded documents, and manage verification emails.
-                </p>
+              <div className="overview-card">
+                <span className="overview-label">Documents</span>
+                <p className="overview-value">{docCount}</p>
+              </div>
+              <div className="overview-card">
+                <span className="overview-label">Verification</span>
+                <p className="overview-value overview-value-sm">{verificationLabel}</p>
+              </div>
+              <div className="overview-card">
+                <span className="overview-label">Application</span>
+                <p className="overview-value overview-value-sm">{detail.application_type || detail.document_type || 'Standard'}</p>
               </div>
             </div>
 
-            <nav className="tab-bar">
+            <nav className="app-tab-bar" role="tablist" aria-label="Application views">
               <button
                 type="button"
-                className={`tab-btn ${activeTab === 'report' ? 'active' : ''}`}
+                role="tab"
+                aria-selected={activeTab === 'report'}
+                className={`app-tab${activeTab === 'report' ? ' active' : ''}`}
                 onClick={() => setActiveTab('report')}
               >
                 Cognexa AI Report {detail.has_report ? '✓' : ''}
               </button>
               <button
                 type="button"
-                className={`tab-btn ${activeTab === 'docs' ? 'active' : ''}`}
+                role="tab"
+                aria-selected={activeTab === 'docs'}
+                className={`app-tab${activeTab === 'docs' ? ' active' : ''}`}
                 onClick={() => setActiveTab('docs')}
               >
                 Documents ({docCount})
               </button>
               <button
                 type="button"
-                className={`tab-btn ${activeTab === 'verification' ? 'active' : ''}`}
+                role="tab"
+                aria-selected={activeTab === 'verification'}
+                className={`app-tab${activeTab === 'verification' ? ' active' : ''}`}
                 onClick={() => setActiveTab('verification')}
               >
                 Email Verification
@@ -420,7 +442,9 @@ export default function BranchApplicationPage() {
               {activeTab === 'report' && (
                 <div className="tab-pane">
                   {report ? (
-                    <ReportView report={report} documents={detail.documents} />
+                    <div className="panel report-panel">
+                      <ReportView report={report} documents={detail.documents} />
+                    </div>
                   ) : (
                     <div className="panel empty-pane">
                       <h3>No Cognexa AI report generated yet</h3>
@@ -525,7 +549,11 @@ export default function BranchApplicationPage() {
                         </button>
                       </div>
                       {verificationStatusMessage ? (
-                        <p className="status-line">{verificationStatusMessage}</p>
+                        <AlertBanner
+                          type={bannerTypeForMessage(verificationStatusMessage)}
+                          message={verificationStatusMessage}
+                          className="alert-banner-compact"
+                        />
                       ) : null}
                     </div>
                   </form>

@@ -68,13 +68,6 @@ export default function BranchHistoryPage() {
 
       {error ? <AlertBanner type="error" title="Could not load history" message={error} /> : null}
 
-      <section className="panel panel-accent">
-        <div className="hero-row">
-          <span className="hero-pill tone-green-pill">Accepted · {accepted}</span>
-          <span className="hero-pill tone-rose-pill">Rejected · {rejected}</span>
-        </div>
-      </section>
-
       <section className="panel panel-warm">
         <div className="search-toolbar" style={{ gridTemplateColumns: 'minmax(220px, 1.6fr) minmax(140px, 0.8fr)' }}>
           <SearchBar
@@ -82,16 +75,14 @@ export default function BranchHistoryPage() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search name, CNIC, note…"
           />
-          <label className="field">Decision
+          <FormField label="Decision">
             <select value={decisionFilter} onChange={(e) => setDecisionFilter(e.target.value)}>
               <option value="all">Accepted + rejected</option>
               <option value="accepted">Accepted only</option>
               <option value="rejected">Rejected only</option>
             </select>
-          </label>
+          </FormField>
         </div>
-
-        {error ? <p className="status-line error shake">{error}</p> : null}
 
         <div className="table-wrap" style={{ marginTop: '0.85rem' }}>
           {loading ? (

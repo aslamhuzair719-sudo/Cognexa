@@ -141,6 +141,11 @@ class BranchEntry(Base):
         ForeignKey("users.id"), nullable=True
     )
     customer_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="saved", index=True)
+    workflow_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    workflow_group_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    workflow_meta_json: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    analyzed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow, index=True
     )
@@ -186,6 +191,34 @@ class BranchEntryDocument(Base):
     )
 
     branch_entry: Mapped["BranchEntry"] = relationship(back_populates="documents")
+
+
+class DocumentArchive(Base):
+    """Searchable OCR / vision extracted text index for branch archival search."""
+
+    __tablename__ = "document_archives"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    branch_id: Mapped[int] = mapped_column(
+        ForeignKey("branches.id"), nullable=False, index=True
+    )
+    source: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    record_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False, index=True)
+    document_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    document_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    document_label: Mapped[str] = mapped_column(String(128), nullable=False, default="")
+    customer_name: Mapped[str] = mapped_column(String(255), nullable=False, default="")
+    original_filename: Mapped[str] = mapped_column(String(255), nullable=False, default="")
+    file_path: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    extracted_text: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow, index=True
+    )
+    indexed_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow
+    )
 
 
 class Verification(Base):

@@ -31,10 +31,12 @@ from app.utils.normalize import (
 EXPECTED_WORKFLOW_TYPES = {
     "account_opening": {
         "label": "Account Opening Workflow",
-        "expected_documents": [
-            "cnic",
-            "payslip",
+        "required_documents": [
             "account_opening_form",
+            "payslip",
+        ],
+        "optional_documents": [
+            "cnic",  # front only — CNIC back is not required
         ],
     },
 }
@@ -67,7 +69,7 @@ class WorkflowService:
     def __init__(self) -> None:
         self.classifier = KeywordClassifier()
         self.ocr = TesseractOCRService()
-        self.llm = get_llm_service()
+        self.llm = get_llm_service(branch=True)
         self.pipeline = ExtractionPipeline(self.ocr, self.classifier, self.llm)
         self.logger = get_logger(__name__)
 
@@ -336,39 +338,103 @@ class WorkflowService:
         finally:
             tmp_path.unlink(missing_ok=True)
 
+    def _validate_group_documents(
+        self,
+        docs: List[Dict[str, Any]],
+        workflow_type: str = "account_opening",
+    ) -> Dict[str, Any]:
+        spec = EXPECTED_WORKFLOW_TYPES.get(workflow_type, {})
+        required = set(spec.get("required_documents", spec.get("expected_documents", [])))
+        optional = set(spec.get("optional_documents", []))
+        allowed = required | optional
+
+        page_types = [doc.get("document_type") for doc in docs]
+        missing = [DOCUMENT_TYPE_LABELS[doc] for doc in required if doc not in page_types]
+        unexpected = [
+            doc.get("document_type_label") or doc.get("document_type", "unknown")
+            for doc in docs
+            if doc.get("document_type") not in allowed
+        ]
+        cnic_pages = sum(1 for doc_type in page_types if doc_type == "cnic")
+        cross_checks = self._cross_document_checks(docs)
+        cross_mismatch = any(not check.get("match", True) for check in cross_checks)
+        needs_review = (
+            any(doc.get("needs_review") for doc in docs)
+            or bool(missing)
+            or bool(unexpected)
+            or cross_mismatch
+        )
+        validation_status = "COMPLETE" if not needs_review else "REVIEW_REQUIRED"
+        validation_messages: List[str] = []
+        if missing:
+            validation_messages.append(f"Missing documents: {', '.join(missing)}.")
+        if cnic_pages > 1:
+            validation_messages.append(
+                "Multiple CNIC pages detected; only CNIC front is used. "
+                "CNIC back is not required for account opening workflow."
+            )
+        if unexpected:
+            validation_messages.append(
+                f"Unexpected document types detected: {', '.join(unexpected)}."
+            )
+        if cross_mismatch:
+            validation_messages.append("Cross-document field mismatches detected.")
+        if not missing and not unexpected and not cross_mismatch:
+            validation_messages.append(
+                "Account opening form and payslip present; personal details are taken from the form."
+            )
+
+        return {
+            "status": validation_status,
+            "messages": validation_messages,
+            "cross_document_checks": cross_checks,
+        }
+
     def _build_groups(self, groups: List[Dict[str, Any]], documents: Dict[int, Dict[str, Any]]) -> List[Dict[str, Any]]:
         result: List[Dict[str, Any]] = []
-        expected = set(EXPECTED_WORKFLOW_TYPES["account_opening"]["expected_documents"])
-
         for group in groups:
             docs = [documents[page] for page in group["pages"] if page in documents]
-            page_types = [doc["document_type"] for doc in docs]
-            missing = [DOCUMENT_TYPE_LABELS[doc] for doc in expected if doc not in page_types]
-            unexpected = [doc["document_type_label"] for doc in docs if doc["document_type"] not in expected]
-            needs_review = any(doc["needs_review"] for doc in docs) or bool(missing) or bool(unexpected)
-            validation_status = "COMPLETE" if not needs_review else "REVIEW_REQUIRED"
-            validation_messages = []
-            if missing:
-                validation_messages.append(f"Missing documents: {', '.join(missing)}.")
-            if unexpected:
-                validation_messages.append(
-                    f"Unexpected document types detected: {', '.join(unexpected)}."
-                )
-            if not missing and not unexpected:
-                validation_messages.append("Expected documents detected.")
+            validation = self._validate_group_documents(docs)
             result.append(
                 {
                     "customer_id": group["customer_id"],
                     "pages": docs,
                     "separator_page": group["separator_page"],
                     "validation": {
-                        "status": validation_status,
-                        "messages": validation_messages,
+                        "status": validation["status"],
+                        "messages": validation["messages"],
                     },
-                    "cross_document_checks": self._cross_document_checks(docs),
+                    "cross_document_checks": validation["cross_document_checks"],
                 }
             )
         return result
+
+    def extract_saved_documents(
+        self,
+        documents: List[Any],
+        *,
+        workflow_type: str = "account_opening",
+        on_progress: Optional[Any] = None,
+    ) -> Dict[str, Any]:
+        """Run onboarding-style OCR + LLM extraction and ValidationEngine cross-checks."""
+        from app.services.branch_workflow_pipeline import BranchWorkflowPipeline
+
+        pipeline = BranchWorkflowPipeline()
+        return pipeline.verify_entry(
+            documents,
+            workflow_type=workflow_type,
+            on_progress=on_progress,
+        )
+
+    @staticmethod
+    def infer_customer_name(documents: List[Dict[str, Any]]) -> str:
+        for doc in documents:
+            fields = doc.get("fields") or {}
+            for key in ("name", "applicant_name", "employee_name", "full_name"):
+                value = fields.get(key)
+                if value and str(value).strip():
+                    return str(value).strip()
+        return ""
 
     def _cross_document_checks(self, docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         if not docs:
@@ -378,7 +444,7 @@ class WorkflowService:
         values: Dict[str, List[str]] = {}
         for doc in docs:
             fields = doc.get("fields") or {}
-            raw_text = doc.get("extracted_text") or ""
+            raw_text = doc.get("extracted_text") or doc.get("raw_text") or ""
             values.setdefault("cnic", [])
             if fields.get("cnic_number"):
                 values["cnic"].append(fields["cnic_number"])

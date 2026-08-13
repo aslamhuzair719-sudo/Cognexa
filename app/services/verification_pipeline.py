@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 from collections.abc import Callable
 
 from app import config
@@ -72,14 +72,11 @@ class VerificationPipeline:
         documents: Dict[str, Optional[Path]],
         *,
         on_progress: Optional[Callable[[str, str], None]] = None,
-    ) -> VerificationReport:
+    ) -> Tuple[VerificationReport, Dict[str, str]]:
         """Run full verification for an application.
 
-        Args:
-            form: Customer application form data.
-            documents: Mapping of document labels to saved file paths
-                       (cnic_front, cnic_back, payslip, bank_statement).
-            on_progress: Optional callback(stage, message) for live AI activity UI.
+        Returns the verification report and a map of document label → OCR/vision text
+        for archival indexing.
         """
         def _progress(stage: str, message: str) -> None:
             if on_progress:
@@ -97,6 +94,7 @@ class VerificationPipeline:
         cnic_back_fields: Optional[CNICFields] = None
         payslip_fields: Optional[PayslipFields] = None
         bank_fields: Optional[BankStatementFields] = None
+        extractions: Dict[str, str] = {}
 
         friendly = {
             "cnic_front": "CNIC front",
@@ -127,6 +125,7 @@ class VerificationPipeline:
                 expected_document_type=EXPECTED_CLASSIFICATION[label],
             )
             ocr_text = extraction.get("extracted_text") or ""
+            extractions[label] = ocr_text
             iq = self.image_quality.assess(str(path), label, ocr_text)
             quality_results.append(iq)
             readable_map[label] = iq.readable
@@ -183,7 +182,7 @@ class VerificationPipeline:
             report.overall_score,
         )
         _progress("complete", "Cognexa AI analysis complete — parsing and LLM summary done.")
-        return report
+        return report, extractions
 
     def save_upload(self, filename: str, data: bytes) -> Path:
         """Persist an uploaded file under UPLOAD_DIR and return its path."""

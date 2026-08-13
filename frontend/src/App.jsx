@@ -10,6 +10,7 @@ import BranchAuditPage from './pages/BranchAuditPage.jsx'
 import BranchApplicationPage from './pages/BranchApplicationPage.jsx'
 import BranchScanPage from './pages/BranchScanPage.jsx'
 import BranchSignaturesPage from './pages/BranchSignaturesPage.jsx'
+import BranchArchivePage from './pages/BranchArchivePage.jsx'
 import BranchEntryPage from './pages/BranchEntryPage.jsx'
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="audit" element={<PageTransition><BranchAuditPage /></PageTransition>} />
         <Route path="scan" element={<PageTransition><BranchScanPage /></PageTransition>} />
         <Route path="signatures" element={<PageTransition><BranchSignaturesPage /></PageTransition>} />
+        <Route path="archive" element={<PageTransition><BranchArchivePage /></PageTransition>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

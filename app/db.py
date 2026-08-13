@@ -36,6 +36,7 @@ def init_db() -> None:
         migrate_application_form_fields,
         migrate_application_status,
         migrate_branch_entries,
+        migrate_document_archives,
         migrate_signature_records,
         migrate_verifications,
     )
@@ -46,6 +47,7 @@ def init_db() -> None:
         migrate_application_status(engine)
         migrate_application_form_fields(engine)
         migrate_branch_entries(engine)
+        migrate_document_archives(engine)
         migrate_signature_records(engine)
         migrate_verifications(engine)
     except Exception:
@@ -55,6 +57,18 @@ def init_db() -> None:
     db = SessionLocal()
     try:
         seed_branches_and_users(db)
+        from app.models import BranchEntryDocument, DocumentArchive
+        from app.services.document_archive import backfill_branch_documents
+
+        if db.query(DocumentArchive).count() == 0:
+            has_text = (
+                db.query(BranchEntryDocument)
+                .filter(BranchEntryDocument.extracted_text.isnot(None))
+                .filter(BranchEntryDocument.extracted_text != "")
+                .count()
+            )
+            if has_text:
+                backfill_branch_documents(db)
         db.commit()
         logger.info("Database initialized and seeded")
     except Exception:

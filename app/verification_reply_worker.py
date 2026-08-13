@@ -32,6 +32,11 @@ def _handle_message(db, item: dict) -> None:
     message_id = item.get("message_id")
 
     logger.info("Processing unread message: subject=%s message_id=%s", subject, message_id)
+    if not imap_service.is_verification_reply_subject(subject):
+        # Leave unrelated inbox mail unread; IMAP fetch already filters these.
+        logger.debug("Skipping non-verification subject: %s", subject)
+        return
+
     verification_public_id = imap_service.extract_verification_id(subject)
     if not verification_public_id:
         logger.warning("Verification ID not found in subject: %s", subject)
@@ -41,7 +46,7 @@ def _handle_message(db, item: dict) -> None:
             message="No verification id found in reply subject",
             details={"subject": subject, "from": from_hdr},
         )
-        # mark seen to avoid repeated logs
+        # Only mark seen for verification-shaped subjects missing a VER- id
         try:
             imap_service.mark_seen(uid)
         except Exception:

@@ -2540,3 +2540,1101 @@ RuntimeError: Gemini vision extraction failed after 3 attempts for cnic: Failed 
 2026-08-08 19:38:50 | INFO     | app.services.ocr_service | Running OCR on image: tmpvf_9lzre.png
 2026-08-08 19:38:50 | INFO     | app.services.ocr_service | Running OCR on image: tmpaxfnbw22.png
 2026-08-08 19:38:51 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 13:33:03 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 13:33:03 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 13:33:03 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 13:33:03 | INFO     | app.db | Database initialized and seeded
+2026-08-10 13:33:03 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 13:33:03 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 13:33:53 | INFO     | app.services.ocr_service | Running OCR on image: tmpm23cvaf3.png
+2026-08-10 13:33:53 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 13:33:53 | INFO     | app.services.ocr_service | Running OCR on image: tmp8bmlwsd8.png
+2026-08-10 13:33:54 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 13:33:54 | INFO     | app.services.ocr_service | Running OCR on image: tmp6uro_pfw.png
+2026-08-10 13:33:56 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 13:33:56 | INFO     | app.services.ocr_service | Running OCR on image: tmpo0dshkja.png
+2026-08-10 13:33:56 | INFO     | app.services.ocr_service | Running OCR on image: tmp6vh86bbf.png
+2026-08-10 13:33:57 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 13:45:34 | INFO     | app.services.ocr_service | Running OCR on image: tmp_n7k90n6.png
+2026-08-10 13:45:34 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 13:45:34 | INFO     | app.services.ocr_service | Running OCR on image: tmp1tfnwli_.png
+2026-08-10 13:45:35 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 13:45:35 | INFO     | app.services.ocr_service | Running OCR on image: tmpmrqi_z39.png
+2026-08-10 13:45:37 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 13:45:37 | INFO     | app.services.ocr_service | Running OCR on image: tmpphg7id1r.png
+2026-08-10 13:45:38 | INFO     | app.services.ocr_service | Running OCR on image: tmp4w7xnuri.png
+2026-08-10 13:45:39 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 16:26:38 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 16:26:38 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 16:26:38 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 16:26:38 | INFO     | app.db | Database initialized and seeded
+2026-08-10 16:26:38 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 16:26:38 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 16:31:10 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 16:31:10 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 16:31:10 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 16:31:10 | INFO     | app.db | Database initialized and seeded
+2026-08-10 16:31:10 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 16:31:11 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 16:31:59 | INFO     | app.services.ocr_service | Running OCR on image: tmpqc2awtzc.png
+2026-08-10 16:32:00 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 16:32:00 | INFO     | app.services.ocr_service | Running OCR on image: tmp9m09p31b.png
+2026-08-10 16:32:01 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 16:32:01 | INFO     | app.services.ocr_service | Running OCR on image: tmp3175fzvc.png
+2026-08-10 16:32:04 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 16:32:04 | INFO     | app.services.ocr_service | Running OCR on image: tmp_rygztkd.png
+2026-08-10 16:32:05 | INFO     | app.services.ocr_service | Running OCR on image: tmpfn5gpwf7.png
+2026-08-10 16:32:06 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 16:32:19 | INFO     | app.services.ocr_service | Running OCR on image: tmpjw7dkk6f.png
+2026-08-10 16:32:19 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 16:32:19 | INFO     | app.services.ocr_service | Running OCR on image: tmppufljzid.png
+2026-08-10 16:32:20 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 16:32:20 | INFO     | app.services.ocr_service | Running OCR on image: tmpa2yah9_j.png
+2026-08-10 16:32:24 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 16:32:24 | INFO     | app.services.ocr_service | Running OCR on image: tmpmqf16wc_.png
+2026-08-10 16:32:24 | INFO     | app.services.ocr_service | Running OCR on image: tmpibtezaoz.png
+2026-08-10 16:32:25 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 16:32:29 | INFO     | app.services.ocr_service | Running OCR on image: tmp49_cw3ym.png
+2026-08-10 16:32:30 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 16:32:30 | INFO     | app.services.ocr_service | Running OCR on image: tmpg4ruafug.png
+2026-08-10 16:32:31 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 16:32:31 | INFO     | app.services.ocr_service | Running OCR on image: tmp2tigb1wk.png
+2026-08-10 16:33:01 | INFO     | app.services.ocr_service | Running OCR on image: tmph0tdm5s1.png
+2026-08-10 16:33:02 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 16:33:02 | INFO     | app.services.ocr_service | Running OCR on image: tmpzh0l0dep.png
+2026-08-10 16:33:02 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 16:33:02 | INFO     | app.services.ocr_service | Running OCR on image: tmphl40t_6q.png
+2026-08-10 16:33:05 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 16:33:05 | INFO     | app.services.ocr_service | Running OCR on image: tmp_udgre86.png
+2026-08-10 16:33:05 | INFO     | app.services.ocr_service | Running OCR on image: tmp_nie7d91.png
+2026-08-10 16:33:06 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 16:33:13 | INFO     | app.services.ocr_service | Running OCR on image: tmpni5z4vga.png
+2026-08-10 16:33:14 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 16:33:14 | INFO     | app.services.ocr_service | Running OCR on image: tmp145hw0lc.png
+2026-08-10 16:33:15 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 16:33:15 | INFO     | app.services.ocr_service | Running OCR on image: tmp_2a0my22.png
+2026-08-10 16:33:18 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 16:33:18 | INFO     | app.services.ocr_service | Running OCR on image: tmprn69lwb9.png
+2026-08-10 16:33:18 | INFO     | app.services.ocr_service | Running OCR on image: tmp4wh13_wq.png
+2026-08-10 16:33:20 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 16:33:23 | INFO     | app.services.ocr_service | Running OCR on image: tmpuzkbjhz9.png
+2026-08-10 16:33:24 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 16:33:24 | INFO     | app.services.ocr_service | Running OCR on image: tmpuw5vxcgd.png
+2026-08-10 16:33:25 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 16:33:25 | INFO     | app.services.ocr_service | Running OCR on image: tmp4z7hufiu.png
+2026-08-10 16:33:28 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 16:33:28 | INFO     | app.services.ocr_service | Running OCR on image: tmpnow_3881.png
+2026-08-10 16:33:28 | INFO     | app.services.ocr_service | Running OCR on image: tmpu4qgnxof.png
+2026-08-10 16:33:29 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 16:33:32 | INFO     | app.services.ocr_service | Running OCR on image: tmpzydei6l3.png
+2026-08-10 16:33:32 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 16:33:32 | INFO     | app.services.ocr_service | Running OCR on image: tmpvi5fig24.png
+2026-08-10 16:33:33 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 16:33:33 | INFO     | app.services.ocr_service | Running OCR on image: tmp52ezh_i4.png
+2026-08-10 16:33:36 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 16:33:36 | INFO     | app.services.ocr_service | Running OCR on image: tmp23_3k739.png
+2026-08-10 16:33:37 | INFO     | app.services.ocr_service | Running OCR on image: tmp39ip61no.png
+2026-08-10 16:33:38 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 16:33:41 | INFO     | app.services.ocr_service | Running OCR on image: tmpxd9wbp_t.png
+2026-08-10 16:33:42 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 16:33:42 | INFO     | app.services.ocr_service | Running OCR on image: tmp_jgiuedx.png
+2026-08-10 16:33:43 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 16:33:43 | INFO     | app.services.ocr_service | Running OCR on image: tmpta1_a1k9.png
+2026-08-10 16:33:46 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 16:33:46 | INFO     | app.services.ocr_service | Running OCR on image: tmpawmkw61_.png
+2026-08-10 16:33:47 | INFO     | app.services.ocr_service | Running OCR on image: tmp0kxo9xo4.png
+2026-08-10 16:33:48 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 17:24:39 | INFO     | app.db_migrate | Added branch_entries.status
+2026-08-10 17:24:39 | INFO     | app.db_migrate | Added branch_entries.workflow_type
+2026-08-10 17:24:39 | INFO     | app.db_migrate | Added branch_entries.workflow_group_id
+2026-08-10 17:24:39 | INFO     | app.db_migrate | Added branch_entries.workflow_meta_json
+2026-08-10 17:24:39 | INFO     | app.db_migrate | Added branch_entries.analyzed_at
+2026-08-10 17:24:39 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:24:39 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:24:39 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:24:39 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:24:39 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:24:39 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:25:03 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:25:03 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:25:03 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:25:03 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:25:03 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:25:03 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:25:16 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:25:16 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:25:16 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:25:16 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:25:17 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:25:17 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:25:28 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:25:28 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:25:28 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:25:28 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:25:28 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:25:29 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:25:38 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:25:39 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:25:39 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:25:39 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:25:39 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:25:39 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:25:39 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-10 17:25:53 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:25:53 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:25:53 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:25:53 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:25:53 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:25:53 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:25:53 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-10 17:26:59 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:26:59 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:26:59 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:26:59 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:26:59 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:26:59 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:26:59 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-10 17:27:05 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:27:05 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:27:05 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:27:05 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:27:05 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:27:05 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:27:05 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-10 17:28:57 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:28:57 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:28:57 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:28:57 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:28:57 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:28:57 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:28:57 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-10 17:29:19 | INFO     | app.services.ocr_service | Running OCR on image: tmput2vvhi4.png
+2026-08-10 17:29:19 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 17:29:19 | INFO     | app.services.ocr_service | Running OCR on image: tmprcp2m936.png
+2026-08-10 17:29:20 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 17:29:20 | INFO     | app.services.ocr_service | Running OCR on image: tmpt_51a7vn.png
+2026-08-10 17:29:22 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 17:29:22 | INFO     | app.services.ocr_service | Running OCR on image: tmpy9uc62ak.png
+2026-08-10 17:29:22 | INFO     | app.services.ocr_service | Running OCR on image: tmpoai0cwbc.png
+2026-08-10 17:29:23 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 17:29:29 | INFO     | app.services.ocr_service | Running OCR on image: tmpsem0p4wa.png
+2026-08-10 17:29:29 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 17:29:29 | INFO     | app.services.ocr_service | Running OCR on image: tmpv7sgtayl.png
+2026-08-10 17:29:30 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 17:29:30 | INFO     | app.services.ocr_service | Running OCR on image: tmp6d3moukm.png
+2026-08-10 17:29:32 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 17:29:32 | INFO     | app.services.ocr_service | Running OCR on image: tmpc7qvtyip.png
+2026-08-10 17:29:32 | INFO     | app.services.ocr_service | Running OCR on image: tmp321ec8j2.png
+2026-08-10 17:29:33 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 17:29:35 | INFO     | app.services.ocr_service | Running OCR on image: tmpst8ckjh6.png
+2026-08-10 17:29:35 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 17:29:35 | INFO     | app.services.ocr_service | Running OCR on image: tmphx67h80c.png
+2026-08-10 17:29:36 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 17:29:36 | INFO     | app.services.ocr_service | Running OCR on image: tmp7fq64f0l.png
+2026-08-10 17:29:38 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 17:29:38 | INFO     | app.services.ocr_service | Running OCR on image: tmppt274jfc.png
+2026-08-10 17:29:38 | INFO     | app.services.ocr_service | Running OCR on image: tmpb8s2_a9w.png
+2026-08-10 17:29:39 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 17:29:39 | INFO     | app.services.workflow_queue | Queued branch entry fcd53e0c-3925-4b21-84b1-3d066b5d50e5 for workflow extraction
+2026-08-10 17:29:39 | INFO     | app.services.ocr_service | Running OCR on image: 184b2394-36aa-4fe0-bc70-3ae8ecc89268.png
+2026-08-10 17:29:40 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 17:29:40 | INFO     | app.services.ocr_service | Running OCR on image: 6567db7c-e771-429e-8792-f2d208141dfb.png
+2026-08-10 17:29:40 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-10 17:30:21 | INFO     | app.services.ocr_service | Running OCR on image: 0a6b88a0-2735-4256-b7c9-c97c9e0aa50e.png
+2026-08-10 17:30:23 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-10 17:31:45 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 1 failed: Invalid JSON from LLM: Extra data: line 10 column 2 (char 245). Cleaned string: '{
+    "name": "Syed Huzair Aslam",
+    "father_name": "Syed Aslam Manzoor",
+    "gender": null,
+    "country_to_stay": "Pakistan",
+    "cnic_number": "42101-0101012-8",
+    "date_of_birth": null,
+    "issue_date": null,
+    "expiry_date": null
+}{"name": "Syed Huzair Aslam", "father_name": "Syed Asla'
+2026-08-10 17:31:45 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 2/3 for cnic
+2026-08-10 17:33:45 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 2 failed: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-10 17:33:45 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 3/3 for cnic
+2026-08-10 17:35:45 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 3 failed: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-10 17:35:45 | ERROR    | app.services.extraction_service | Extraction failed for E:\Document_Scan\uploads\branch_entries\fcd53e0c-3925-4b21-84b1-3d066b5d50e5\0a6b88a0-2735-4256-b7c9-c97c9e0aa50e.png
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\extraction_service.py", line 104, in process
+    validated = self.llm_service.extract_structured_from_image(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\gemini_service.py", line 196, in extract_structured_from_image
+    raise RuntimeError(
+RuntimeError: Gemini vision extraction failed after 3 attempts for cnic: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-10 17:35:45 | INFO     | app.services.ocr_service | Running OCR on image: tmp2m0gbv0o.png
+2026-08-10 17:35:48 | INFO     | app.services.workflow_service | Workflow OCR-only extraction for cnic: filled=0
+2026-08-10 17:35:48 | INFO     | app.services.workflow_queue | Completed workflow processing for fcd53e0c-3925-4b21-84b1-3d066b5d50e5
+2026-08-10 17:36:42 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:36:42 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:36:42 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:36:42 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:36:42 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:36:42 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:36:42 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-10 17:36:58 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:36:58 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:36:58 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:36:59 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:36:59 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:36:59 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:36:59 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-10 17:37:20 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:37:20 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:37:20 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:37:20 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:37:20 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:37:20 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:37:20 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-10 17:37:31 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:37:31 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:37:31 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:37:31 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:37:31 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:37:31 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:37:31 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-10 17:37:44 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-10 17:37:44 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-10 17:37:44 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-10 17:37:44 | INFO     | app.db | Database initialized and seeded
+2026-08-10 17:37:44 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-10 17:37:45 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-10 17:37:45 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-10 19:22:21 | INFO     | app.services.ocr_service | Running OCR on image: tmpdtk2lsnc.png
+2026-08-10 19:22:21 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 19:22:21 | INFO     | app.services.ocr_service | Running OCR on image: tmp_beasg6g.png
+2026-08-10 19:22:22 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 19:22:22 | INFO     | app.services.ocr_service | Running OCR on image: tmp879jf2b9.png
+2026-08-10 19:22:24 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 19:22:24 | INFO     | app.services.ocr_service | Running OCR on image: tmp4i3mx8hi.png
+2026-08-10 19:22:24 | INFO     | app.services.ocr_service | Running OCR on image: tmpqe8qdhj7.png
+2026-08-10 19:22:25 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 19:22:34 | INFO     | app.services.ocr_service | Running OCR on image: tmpoxbwzrhw.png
+2026-08-10 19:22:35 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 19:22:35 | INFO     | app.services.ocr_service | Running OCR on image: tmplsfxwt7m.png
+2026-08-10 19:22:36 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 19:22:36 | INFO     | app.services.ocr_service | Running OCR on image: tmpd2baigme.png
+2026-08-10 19:22:38 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 19:22:38 | INFO     | app.services.ocr_service | Running OCR on image: tmpj7f5lpfr.png
+2026-08-10 19:22:39 | INFO     | app.services.ocr_service | Running OCR on image: tmp6oro7z5t.png
+2026-08-10 19:22:40 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 19:22:42 | INFO     | app.services.ocr_service | Running OCR on image: tmp2lox3bfp.png
+2026-08-10 19:22:43 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 19:22:43 | INFO     | app.services.ocr_service | Running OCR on image: tmp7ipeha2e.png
+2026-08-10 19:22:43 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-10 19:22:43 | INFO     | app.services.ocr_service | Running OCR on image: tmpwogtq418.png
+2026-08-10 19:22:46 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-10 19:22:46 | INFO     | app.services.ocr_service | Running OCR on image: tmpma7cdh96.png
+2026-08-10 19:22:46 | INFO     | app.services.ocr_service | Running OCR on image: tmpjbf1e7t6.png
+2026-08-10 19:22:47 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-10 19:22:47 | INFO     | app.services.workflow_queue | Queued branch entry dbc12b54-d687-4897-ac13-accc27c42a1a for workflow extraction
+2026-08-10 19:22:47 | INFO     | app.services.workflow_queue | Queued branch entry c9e5e170-2169-40f7-8246-fdf66da8d21c for workflow extraction
+2026-08-10 19:22:48 | INFO     | app.services.ocr_service | Running OCR on image: d87609e8-3842-4fbf-a842-db78a0edbace.png
+2026-08-10 19:22:48 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-10 19:22:49 | INFO     | app.services.ocr_service | Running OCR on image: 1069ec06-0cf8-445e-b44b-13eb00d7c145.png
+2026-08-10 19:22:49 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-10 19:23:29 | INFO     | app.services.ocr_service | Running OCR on image: acddb207-27c9-4c8b-8680-6d65e0b2d24c.png
+2026-08-10 19:23:32 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-10 19:24:55 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 1 failed: Invalid JSON from LLM: Extra data: line 10 column 2 (char 245). Cleaned string: '{
+    "name": "Syed Huzair Aslam",
+    "father_name": "Syed Aslam Manzoor",
+    "gender": null,
+    "country_to_stay": "Pakistan",
+    "cnic_number": "42101-0101012-8",
+    "date_of_birth": null,
+    "issue_date": null,
+    "expiry_date": null
+}{"name": "Syed Huzair Aslam", "father_name": "Syed Asla'
+2026-08-10 19:24:55 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 2/3 for cnic
+2026-08-10 19:26:56 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 2 failed: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-10 19:26:56 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 3/3 for cnic
+2026-08-10 19:28:57 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 3 failed: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-10 19:28:57 | ERROR    | app.services.extraction_service | Extraction failed for E:\Document_Scan\uploads\branch_entries\dbc12b54-d687-4897-ac13-accc27c42a1a\acddb207-27c9-4c8b-8680-6d65e0b2d24c.png
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\extraction_service.py", line 104, in process
+    validated = self.llm_service.extract_structured_from_image(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\gemini_service.py", line 196, in extract_structured_from_image
+    raise RuntimeError(
+RuntimeError: Gemini vision extraction failed after 3 attempts for cnic: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-10 19:28:57 | ERROR    | app.services.workflow_queue | Workflow processing failed for dbc12b54-d687-4897-ac13-accc27c42a1a
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\workflow_queue.py", line 144, in _process
+    result = self._service.extract_saved_documents(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\workflow_service.py", line 409, in extract_saved_documents
+    return pipeline.verify_entry(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\branch_workflow_pipeline.py", line 132, in verify_entry
+    reference_form = self._build_reference_form(form_fields, cnic_fields, payslip_fields)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\branch_workflow_pipeline.py", line 235, in _build_reference_form
+    personal=PersonalInfo(
+             ^^^^^^^^^^^^^
+  File "E:\Document_Scan\.venv\Lib\site-packages\pydantic\main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonalInfo
+age
+  String should have at least 1 character [type=string_too_short, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.13/v/string_too_short
+2026-08-10 19:28:57 | INFO     | app.services.ocr_service | Running OCR on image: 5534ea4a-dc19-4598-9bdd-1a4e2f9ef1ee.png
+2026-08-10 19:28:58 | INFO     | app.services.ocr_service | Running OCR on image: 38b1f818-9041-42a2-a944-989a98621796.png
+2026-08-10 19:28:58 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-10 19:29:53 | ERROR    | app.services.workflow_queue | Workflow processing failed for c9e5e170-2169-40f7-8246-fdf66da8d21c
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\workflow_queue.py", line 144, in _process
+    result = self._service.extract_saved_documents(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\workflow_service.py", line 409, in extract_saved_documents
+    return pipeline.verify_entry(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\branch_workflow_pipeline.py", line 132, in verify_entry
+    reference_form = self._build_reference_form(form_fields, cnic_fields, payslip_fields)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\branch_workflow_pipeline.py", line 235, in _build_reference_form
+    personal=PersonalInfo(
+             ^^^^^^^^^^^^^
+  File "E:\Document_Scan\.venv\Lib\site-packages\pydantic\main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonalInfo
+age
+  String should have at least 1 character [type=string_too_short, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.13/v/string_too_short
+2026-08-11 19:18:33 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-11 19:18:33 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-11 19:18:33 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-11 19:18:33 | INFO     | app.db | Database initialized and seeded
+2026-08-11 19:18:33 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-11 19:18:33 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-11 19:18:33 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 13:42:04 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 13:42:04 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 13:42:04 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 13:42:04 | INFO     | app.db | Database initialized and seeded
+2026-08-12 13:42:04 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 13:42:04 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 13:42:04 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 14:08:46 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 14:08:46 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 14:08:46 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 14:08:46 | INFO     | app.db | Database initialized and seeded
+2026-08-12 14:08:46 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 14:08:46 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 14:08:46 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 14:08:51 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 14:08:51 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 14:08:51 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 14:08:51 | INFO     | app.db | Database initialized and seeded
+2026-08-12 14:08:51 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 14:08:51 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 14:08:51 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 14:09:15 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 14:09:15 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 14:09:15 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 14:09:15 | INFO     | app.db | Database initialized and seeded
+2026-08-12 14:09:15 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 14:09:15 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 14:09:15 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 14:09:21 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 14:09:21 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 14:09:21 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 14:09:21 | INFO     | app.db | Database initialized and seeded
+2026-08-12 14:09:21 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 14:09:21 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 14:09:21 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 14:11:53 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 14:11:53 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 14:11:53 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 14:11:53 | INFO     | app.db | Database initialized and seeded
+2026-08-12 14:11:53 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 14:11:53 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 14:11:53 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 14:12:11 | INFO     | app.services.ocr_service | Running OCR on image: tmpzmz326g8.png
+2026-08-12 14:12:12 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 14:12:12 | INFO     | app.services.ocr_service | Running OCR on image: tmpzm1eisgb.png
+2026-08-12 14:12:13 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-12 14:12:13 | INFO     | app.services.ocr_service | Running OCR on image: tmp7hsw_bwi.png
+2026-08-12 14:12:15 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 14:12:15 | INFO     | app.services.ocr_service | Running OCR on image: tmpskzp7uq0.png
+2026-08-12 14:12:15 | INFO     | app.services.ocr_service | Running OCR on image: tmpri_0ovxj.png
+2026-08-12 14:12:16 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-12 14:12:25 | INFO     | app.services.ocr_service | Running OCR on image: tmpcun1oms1.png
+2026-08-12 14:12:26 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 14:12:26 | INFO     | app.services.ocr_service | Running OCR on image: tmpifynp082.png
+2026-08-12 14:12:26 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-12 14:12:26 | INFO     | app.services.ocr_service | Running OCR on image: tmpv8k7xvek.png
+2026-08-12 14:12:29 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 14:12:29 | INFO     | app.services.ocr_service | Running OCR on image: tmp1l03te3z.png
+2026-08-12 14:12:30 | INFO     | app.services.ocr_service | Running OCR on image: tmpzjqjd0hv.png
+2026-08-12 14:12:31 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-12 14:12:34 | INFO     | app.services.ocr_service | Running OCR on image: tmp0xm461ym.png
+2026-08-12 14:12:34 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 14:12:34 | INFO     | app.services.ocr_service | Running OCR on image: tmpsbhj7l0d.png
+2026-08-12 14:12:35 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-12 14:12:35 | INFO     | app.services.ocr_service | Running OCR on image: tmppvmgu5c_.png
+2026-08-12 14:12:38 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 14:12:38 | INFO     | app.services.ocr_service | Running OCR on image: tmpw3nqpzlv.png
+2026-08-12 14:12:39 | INFO     | app.services.ocr_service | Running OCR on image: tmp37i5tlcp.png
+2026-08-12 14:12:40 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-12 14:12:40 | INFO     | app.services.workflow_queue | Queued branch entry 0f396114-261f-42a4-b032-abd1d0765312 for workflow extraction
+2026-08-12 14:12:40 | INFO     | app.services.ocr_service | Running OCR on image: 32a8788a-c5fe-431d-b655-0c3467ae66ba.png
+2026-08-12 14:12:41 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 14:12:41 | INFO     | app.services.ocr_service | Running OCR on image: de6b2c10-01ce-413f-9268-9332d7b0beff.png
+2026-08-12 14:12:42 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-12 14:13:23 | INFO     | app.services.ocr_service | Running OCR on image: 0653aafe-32fe-4023-9e10-743ccadeeeee.png
+2026-08-12 14:13:25 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-12 14:14:49 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 1 failed: Invalid JSON from LLM: Extra data: line 10 column 2 (char 245). Cleaned string: '{
+    "name": "Syed Huzair Aslam",
+    "father_name": "Syed Aslam Manzoor",
+    "gender": null,
+    "country_to_stay": "Pakistan",
+    "cnic_number": "42101-0101012-8",
+    "date_of_birth": null,
+    "issue_date": null,
+    "expiry_date": null
+}{"name": "Syed Huzair Aslam", "father_name": "Syed Asla'
+2026-08-12 14:14:49 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 2/3 for cnic
+2026-08-12 14:16:49 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 2 failed: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-12 14:16:49 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 3/3 for cnic
+2026-08-12 14:18:49 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 3 failed: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-12 14:18:49 | ERROR    | app.services.extraction_service | Extraction failed for E:\Document_Scan\uploads\branch_entries\0f396114-261f-42a4-b032-abd1d0765312\0653aafe-32fe-4023-9e10-743ccadeeeee.png
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\extraction_service.py", line 104, in process
+    validated = self.llm_service.extract_structured_from_image(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\gemini_service.py", line 196, in extract_structured_from_image
+    raise RuntimeError(
+RuntimeError: Gemini vision extraction failed after 3 attempts for cnic: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-12 14:18:49 | ERROR    | app.services.workflow_queue | Workflow processing failed for 0f396114-261f-42a4-b032-abd1d0765312
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\workflow_queue.py", line 144, in _process
+    result = self._service.extract_saved_documents(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\workflow_service.py", line 409, in extract_saved_documents
+    return pipeline.verify_entry(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\branch_workflow_pipeline.py", line 141, in verify_entry
+    reference_form = self._build_reference_form(form_fields, merged_cnic, payslip_fields)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\branch_workflow_pipeline.py", line 254, in _build_reference_form
+    personal=PersonalInfo(
+             ^^^^^^^^^^^^^
+  File "E:\Document_Scan\.venv\Lib\site-packages\pydantic\main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonalInfo
+age
+  String should have at least 1 character [type=string_too_short, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.13/v/string_too_short
+2026-08-12 14:31:09 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 14:31:09 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 14:31:09 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 14:31:09 | INFO     | app.db | Database initialized and seeded
+2026-08-12 14:31:09 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 14:31:09 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 14:31:09 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 14:31:18 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 14:31:18 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 14:31:18 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 14:31:18 | INFO     | app.db | Database initialized and seeded
+2026-08-12 14:31:18 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 14:31:18 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 14:31:18 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 14:31:26 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 14:31:26 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 14:31:26 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 14:31:26 | INFO     | app.db | Database initialized and seeded
+2026-08-12 14:31:26 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 14:31:26 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 14:31:26 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 14:32:58 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 14:32:58 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 14:32:58 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 14:32:58 | INFO     | app.db | Database initialized and seeded
+2026-08-12 14:32:58 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 14:32:58 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 14:32:58 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 14:34:11 | INFO     | app.services.ocr_service | Running OCR on image: tmp3whtivnc.png
+2026-08-12 14:34:12 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 14:34:12 | INFO     | app.services.ocr_service | Running OCR on image: tmpmlbk9b2q.png
+2026-08-12 14:34:12 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-12 14:34:12 | INFO     | app.services.ocr_service | Running OCR on image: tmpigisrckh.png
+2026-08-12 14:34:15 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 14:34:15 | INFO     | app.services.ocr_service | Running OCR on image: tmp9zp20_e1.png
+2026-08-12 14:34:15 | INFO     | app.services.ocr_service | Running OCR on image: tmpwhkfseqz.png
+2026-08-12 14:34:16 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-12 14:34:58 | INFO     | app.services.ocr_service | Running OCR on image: tmpet3ygpfi.png
+2026-08-12 14:34:58 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 14:34:58 | INFO     | app.services.ocr_service | Running OCR on image: tmpcm3fm1ge.png
+2026-08-12 14:34:59 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-12 14:34:59 | INFO     | app.services.ocr_service | Running OCR on image: tmp4uxs7bzi.png
+2026-08-12 14:35:02 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 14:35:02 | INFO     | app.services.ocr_service | Running OCR on image: tmpcdo__gyp.png
+2026-08-12 14:35:02 | INFO     | app.services.ocr_service | Running OCR on image: tmp2lhc1axg.png
+2026-08-12 14:35:03 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-12 14:35:07 | INFO     | app.services.ocr_service | Running OCR on image: tmpgbinksrx.png
+2026-08-12 14:35:07 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 14:35:07 | INFO     | app.services.ocr_service | Running OCR on image: tmp5mxvsggg.png
+2026-08-12 14:35:08 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-12 14:35:08 | INFO     | app.services.ocr_service | Running OCR on image: tmp7vauik0m.png
+2026-08-12 14:35:11 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 14:35:11 | INFO     | app.services.ocr_service | Running OCR on image: tmpghf9amjw.png
+2026-08-12 14:35:11 | INFO     | app.services.ocr_service | Running OCR on image: tmp9m5ac9ah.png
+2026-08-12 14:35:12 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-12 14:35:12 | INFO     | app.services.workflow_queue | Queued branch entry ca21333e-fa4d-44a8-9062-35c3b537d6f9 for workflow extraction
+2026-08-12 14:35:12 | INFO     | app.services.ocr_service | Running OCR on image: 9d388725-bde3-4b38-9994-831f5caff7c1.png
+2026-08-12 14:35:13 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 14:35:13 | INFO     | app.services.ocr_service | Running OCR on image: 18af67a1-ebc9-4d44-bb93-25eddbc52a0c.png
+2026-08-12 14:35:14 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-12 14:35:54 | INFO     | app.services.ocr_service | Running OCR on image: 4bc3fb97-a3a1-4163-b1cb-2f9475a095ba.png
+2026-08-12 14:35:56 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-12 14:37:19 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 1 failed: Invalid JSON from LLM: Extra data: line 10 column 2 (char 245). Cleaned string: '{
+    "name": "Syed Huzair Aslam",
+    "father_name": "Syed Aslam Manzoor",
+    "gender": null,
+    "country_to_stay": "Pakistan",
+    "cnic_number": "42101-0101012-8",
+    "date_of_birth": null,
+    "issue_date": null,
+    "expiry_date": null
+}{"name": "Syed Huzair Aslam", "father_name": "Syed Asla'
+2026-08-12 14:37:19 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 2/3 for cnic
+2026-08-12 14:39:20 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 2 failed: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-12 14:39:20 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 3/3 for cnic
+2026-08-12 14:41:20 | WARNING  | app.services.gemini_service | Gemini vision extraction attempt 3 failed: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-12 14:41:20 | ERROR    | app.services.extraction_service | Extraction failed for E:\Document_Scan\uploads\branch_entries\ca21333e-fa4d-44a8-9062-35c3b537d6f9\4bc3fb97-a3a1-4163-b1cb-2f9475a095ba.png
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\extraction_service.py", line 104, in process
+    validated = self.llm_service.extract_structured_from_image(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Document_Scan\app\services\gemini_service.py", line 196, in extract_structured_from_image
+    raise RuntimeError(
+RuntimeError: Gemini vision extraction failed after 3 attempts for cnic: Failed to reach Gemini at https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=120)
+2026-08-12 14:41:20 | INFO     | app.services.workflow_queue | Completed workflow processing for ca21333e-fa4d-44a8-9062-35c3b537d6f9
+2026-08-12 15:00:39 | INFO     | app.services.ocr_service | Running OCR on image: tmpu_w2dv95.png
+2026-08-12 15:00:40 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 15:00:40 | INFO     | app.services.ocr_service | Running OCR on image: tmpjegwrbrn.png
+2026-08-12 15:00:40 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-12 15:00:40 | INFO     | app.services.ocr_service | Running OCR on image: tmpmo81c1s9.png
+2026-08-12 15:00:40 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 15:56:54 | INFO     | app.services.ocr_service | Running OCR on image: tmpkugv73sp.png
+2026-08-12 15:56:55 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 15:56:55 | INFO     | app.services.ocr_service | Running OCR on image: tmpxo25t9vx.png
+2026-08-12 15:56:55 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-12 15:56:55 | INFO     | app.services.ocr_service | Running OCR on image: tmphrv76j64.png
+2026-08-12 15:56:56 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 15:57:05 | INFO     | app.services.ocr_service | Running OCR on image: tmped1no3co.png
+2026-08-12 15:57:05 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 15:57:05 | INFO     | app.services.ocr_service | Running OCR on image: tmppu0uuqg_.png
+2026-08-12 15:57:06 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-12 15:57:06 | INFO     | app.services.ocr_service | Running OCR on image: tmpu89w1w2l.png
+2026-08-12 15:57:06 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 15:57:06 | INFO     | app.services.ocr_service | Running OCR on image: tmplxcdbf76.png
+2026-08-12 15:57:07 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 15:57:07 | INFO     | app.services.ocr_service | Running OCR on image: tmpywp30gln.png
+2026-08-12 15:57:07 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-12 15:57:07 | INFO     | app.services.ocr_service | Running OCR on image: tmpzbeysdqi.png
+2026-08-12 15:57:07 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 15:57:08 | INFO     | app.services.workflow_queue | Queued branch entry 6d3d1ba2-ac5a-4920-bedd-256c52581dd9 for workflow extraction
+2026-08-12 15:57:08 | INFO     | app.services.ocr_service | Running OCR on image: b593b724-6097-4f07-913d-2aef276746c9.png
+2026-08-12 15:57:08 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-12 15:57:32 | INFO     | app.services.ocr_service | Running OCR on image: f6179c40-f4fa-4eed-a348-d026ab17be35.png
+2026-08-12 15:57:33 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-12 15:57:51 | INFO     | app.services.ocr_service | Running OCR on image: 6f35e577-9c7d-4c29-915c-f76a98676a9a.png
+2026-08-12 15:57:51 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-12 15:58:34 | INFO     | app.services.workflow_queue | Completed workflow processing for 6d3d1ba2-ac5a-4920-bedd-256c52581dd9
+2026-08-12 16:09:29 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 16:09:29 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 16:09:29 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 16:09:29 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 16:09:29 | INFO     | app.db | Database initialized and seeded
+2026-08-12 16:09:29 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 16:09:29 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 16:09:29 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 16:15:42 | INFO     | app.services.ocr_service | Running OCR on image: tmpmb11x7bi.png
+2026-08-12 16:15:43 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 16:15:43 | INFO     | app.services.ocr_service | Running OCR on image: tmpq3p5cyk0.png
+2026-08-12 16:15:44 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-12 16:15:44 | INFO     | app.services.ocr_service | Running OCR on image: tmpt26kdq3t.png
+2026-08-12 16:15:44 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 16:16:36 | INFO     | app.services.ocr_service | Running OCR on image: tmpjsp9h2ie.png
+2026-08-12 16:16:37 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 16:16:37 | INFO     | app.services.ocr_service | Running OCR on image: tmp0ogi8w_2.png
+2026-08-12 16:16:39 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.45)
+2026-08-12 16:16:39 | INFO     | app.services.ocr_service | Running OCR on image: tmpwv_a2woq.png
+2026-08-12 16:16:43 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 16:16:43 | INFO     | app.services.ocr_service | Running OCR on image: tmpo68bow82.png
+2026-08-12 16:16:43 | INFO     | app.services.ocr_service | Running OCR on image: tmpsefdj8ip.png
+2026-08-12 16:16:45 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.18)
+2026-08-12 16:25:27 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 16:25:27 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 16:25:27 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 16:25:27 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 16:25:27 | INFO     | app.db | Database initialized and seeded
+2026-08-12 16:25:27 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 16:25:27 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 16:25:27 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 16:25:38 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 16:25:38 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 16:25:38 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 16:25:38 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 16:25:39 | INFO     | app.db | Database initialized and seeded
+2026-08-12 16:25:39 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 16:25:39 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 16:25:39 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 16:25:50 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 16:25:50 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 16:25:50 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 16:25:50 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 16:25:50 | INFO     | app.db | Database initialized and seeded
+2026-08-12 16:25:50 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 16:25:50 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 16:25:50 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 16:26:15 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 16:26:15 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 16:26:15 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 16:26:15 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 16:26:15 | INFO     | app.db | Database initialized and seeded
+2026-08-12 16:26:15 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 16:26:15 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 16:26:15 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 17:54:09 | INFO     | app.services.ocr_service | Running OCR on image: tmp8a5r3gzq.png
+2026-08-12 17:54:09 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 17:54:09 | INFO     | app.services.ocr_service | Running OCR on image: tmp8a1beucg.png
+2026-08-12 17:54:10 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 17:54:10 | INFO     | app.services.ocr_service | Running OCR on image: tmp1_etsdeg.png
+2026-08-12 17:54:10 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-12 17:54:10 | INFO     | app.services.ocr_service | Running OCR on image: tmp2hk0bvue.png
+2026-08-12 17:54:11 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 17:54:11 | INFO     | app.services.ocr_service | Running OCR on image: tmp1lg28c2j.png
+2026-08-12 17:54:11 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 17:54:11 | INFO     | app.services.ocr_service | Running OCR on image: tmpl0kyux_v.png
+2026-08-12 17:54:11 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 17:54:11 | INFO     | app.services.ocr_service | Running OCR on image: tmpjof2_wp2.png
+2026-08-12 17:54:12 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 17:54:12 | INFO     | app.services.ocr_service | Running OCR on image: tmpoazzc_7w.png
+2026-08-12 17:54:12 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 17:54:12 | INFO     | app.services.ocr_service | Running OCR on image: tmp1m2i0nyo.png
+2026-08-12 17:54:12 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 18:04:42 | INFO     | app.services.ocr_service | Running OCR on image: tmpmt8y7yyb.png
+2026-08-12 18:04:42 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 18:04:42 | INFO     | app.services.ocr_service | Running OCR on image: tmpo_uir4r4.png
+2026-08-12 18:04:43 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 18:04:43 | INFO     | app.services.ocr_service | Running OCR on image: tmpfcxpjsf2.png
+2026-08-12 18:04:43 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-12 18:04:43 | INFO     | app.services.ocr_service | Running OCR on image: tmpmg3g307l.png
+2026-08-12 18:04:44 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 18:04:44 | INFO     | app.services.ocr_service | Running OCR on image: tmpyh1rod4q.png
+2026-08-12 18:04:44 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 18:04:44 | INFO     | app.services.ocr_service | Running OCR on image: tmp98v5rlu4.png
+2026-08-12 18:04:44 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 18:04:44 | INFO     | app.services.ocr_service | Running OCR on image: tmpsg666agh.png
+2026-08-12 18:04:45 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 18:04:45 | INFO     | app.services.ocr_service | Running OCR on image: tmp3dzr0pau.png
+2026-08-12 18:04:45 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 18:04:45 | INFO     | app.services.ocr_service | Running OCR on image: tmp8xdtgcn8.png
+2026-08-12 18:04:45 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 18:04:46 | INFO     | app.services.ocr_service | Running OCR on image: tmpm57zrf8b.png
+2026-08-12 18:04:47 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 18:04:47 | INFO     | app.services.ocr_service | Running OCR on image: tmpeu8ult4i.png
+2026-08-12 18:04:47 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 18:04:47 | INFO     | app.services.ocr_service | Running OCR on image: tmposoakoam.png
+2026-08-12 18:04:47 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-12 18:04:47 | INFO     | app.services.ocr_service | Running OCR on image: tmpxxoclz0b.png
+2026-08-12 18:04:48 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 18:04:48 | INFO     | app.services.ocr_service | Running OCR on image: tmppgby0ez2.png
+2026-08-12 18:04:48 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 18:04:48 | INFO     | app.services.ocr_service | Running OCR on image: tmpv_c6z6nz.png
+2026-08-12 18:04:49 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 18:04:49 | INFO     | app.services.ocr_service | Running OCR on image: tmp33ketcgv.png
+2026-08-12 18:04:49 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 18:04:49 | INFO     | app.services.ocr_service | Running OCR on image: tmpv3c5tc1p.png
+2026-08-12 18:04:49 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 18:04:49 | INFO     | app.services.ocr_service | Running OCR on image: tmp0_uq0z8_.png
+2026-08-12 18:04:50 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 18:04:50 | INFO     | app.services.workflow_queue | Queued branch entry b4c9876d-f198-43c1-9e6e-713b94d10e4f for workflow extraction
+2026-08-12 18:04:50 | INFO     | app.services.ocr_service | Running OCR on image: c8e9c3e8-e94a-4aff-9da2-5de40e3d4734.png
+2026-08-12 18:04:51 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-12 18:05:05 | INFO     | app.services.ocr_service | Running OCR on image: tmplhjeqd5i.png
+2026-08-12 18:05:05 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 18:05:05 | INFO     | app.services.ocr_service | Running OCR on image: tmpz_x1_wy0.png
+2026-08-12 18:05:05 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 18:05:05 | INFO     | app.services.ocr_service | Running OCR on image: tmpwwvzx8km.png
+2026-08-12 18:05:06 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-12 18:05:06 | INFO     | app.services.ocr_service | Running OCR on image: tmpb5knzf2b.png
+2026-08-12 18:05:06 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 18:05:06 | INFO     | app.services.ocr_service | Running OCR on image: tmp5oretlih.png
+2026-08-12 18:05:07 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 18:05:07 | INFO     | app.services.ocr_service | Running OCR on image: tmpn9as_xpo.png
+2026-08-12 18:05:07 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 18:05:07 | INFO     | app.services.ocr_service | Running OCR on image: tmp7un1buys.png
+2026-08-12 18:05:07 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-12 18:05:07 | INFO     | app.services.ocr_service | Running OCR on image: tmp955iuvp1.png
+2026-08-12 18:05:08 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-12 18:05:08 | INFO     | app.services.ocr_service | Running OCR on image: tmpdka82j4y.png
+2026-08-12 18:05:08 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-12 18:05:13 | INFO     | app.services.ocr_service | Running OCR on image: fd1eef7e-1949-421f-ad4a-77820aa5f8f4.png
+2026-08-12 18:05:14 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-12 18:05:56 | INFO     | app.services.ocr_service | Running OCR on image: 52d4e273-daf7-4fa0-ab6d-b730ac01ebf6.png
+2026-08-12 18:05:56 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-12 18:06:12 | INFO     | app.services.workflow_queue | Completed workflow processing for b4c9876d-f198-43c1-9e6e-713b94d10e4f
+2026-08-12 18:31:56 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 18:31:56 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 18:31:56 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 18:31:56 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 18:31:56 | INFO     | app.db | Database initialized and seeded
+2026-08-12 18:31:56 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 18:31:56 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 18:31:56 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 18:32:00 | INFO     | __main__ | Test email sent to m.ali@3em.tech
+2026-08-12 18:37:48 | INFO     | __main__ | Test email sent to m.ali@3em.tech
+2026-08-12 18:45:15 | WARNING  | app.services.email_service | Unable to conclusively verify recipient m.ali@3em.tech at ['3em.tech']: temporary or connection failure.
+2026-08-12 18:45:25 | WARNING  | app.services.email_service | Unable to conclusively verify recipient m.ali@3em.tech at ['3em.tech']: temporary or connection failure.
+2026-08-12 18:45:25 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-12 18:45:27 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-12 18:48:07 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 18:48:07 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 18:48:07 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 18:48:07 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 18:48:07 | INFO     | app.db | Database initialized and seeded
+2026-08-12 18:48:07 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 18:48:07 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-12 18:48:07 | INFO     | app.services.email_queue | Recovered 1 pending verification(s) into email queue
+2026-08-12 18:48:07 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 18:48:07 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 18:48:09 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-12 18:48:54 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 18:48:54 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 18:48:54 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 18:48:54 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 18:48:54 | INFO     | app.db | Database initialized and seeded
+2026-08-12 18:48:54 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 18:48:54 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-12 18:48:54 | INFO     | app.services.email_queue | Recovered 1 pending verification(s) into email queue
+2026-08-12 18:48:54 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 18:48:54 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 18:48:56 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-12 18:51:40 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 18:51:40 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 18:51:40 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 18:51:40 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 18:51:40 | INFO     | app.db | Database initialized and seeded
+2026-08-12 18:51:40 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 18:51:40 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-12 18:51:40 | INFO     | app.services.email_queue | Recovered 1 pending verification(s) into email queue
+2026-08-12 18:51:40 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 18:51:40 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 18:51:41 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-12 18:54:27 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 18:54:27 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 18:54:27 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 18:54:27 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 18:54:27 | INFO     | app.db | Database initialized and seeded
+2026-08-12 18:54:27 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 18:54:27 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-12 18:54:27 | INFO     | app.services.email_queue | Recovered 1 pending verification(s) into email queue
+2026-08-12 18:54:27 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 18:54:27 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 18:54:29 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-12 18:55:28 | WARNING  | app.services.email_service | Unable to conclusively verify recipient syedhuzair113@gmail.com at ['gmail-smtp-in.l.google.com', 'alt1.gmail-smtp-in.l.google.com', 'alt2.gmail-smtp-in.l.google.com', 'alt3.gmail-smtp-in.l.google.com', 'alt4.gmail-smtp-in.l.google.com']: temporary or connection failure.
+2026-08-12 18:56:18 | WARNING  | app.services.email_service | Unable to conclusively verify recipient syedhuzair113@gmail.com at ['gmail-smtp-in.l.google.com', 'alt1.gmail-smtp-in.l.google.com', 'alt2.gmail-smtp-in.l.google.com', 'alt3.gmail-smtp-in.l.google.com', 'alt4.gmail-smtp-in.l.google.com']: temporary or connection failure.
+2026-08-12 18:56:18 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-12 18:56:19 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-12 18:59:05 | WARNING  | app.services.email_service | Unable to conclusively verify recipient muhammad.ali.khi@gmail.com at ['gmail-smtp-in.l.google.com', 'alt1.gmail-smtp-in.l.google.com', 'alt2.gmail-smtp-in.l.google.com', 'alt3.gmail-smtp-in.l.google.com', 'alt4.gmail-smtp-in.l.google.com']: temporary or connection failure.
+2026-08-12 18:59:55 | WARNING  | app.services.email_service | Unable to conclusively verify recipient muhammad.ali.khi@gmail.com at ['gmail-smtp-in.l.google.com', 'alt1.gmail-smtp-in.l.google.com', 'alt2.gmail-smtp-in.l.google.com', 'alt3.gmail-smtp-in.l.google.com', 'alt4.gmail-smtp-in.l.google.com']: temporary or connection failure.
+2026-08-12 18:59:55 | INFO     | app.services.email_queue | Queued verification VER-15c305b800eb481c for email delivery
+2026-08-12 18:59:56 | INFO     | app.services.email_queue | Verification email delivered for VER-15c305b800eb481c
+2026-08-12 19:26:58 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 19:26:58 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 19:26:58 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 19:26:58 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 19:26:58 | INFO     | app.db | Database initialized and seeded
+2026-08-12 19:26:58 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 19:26:58 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-12 19:26:58 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-12 19:26:58 | INFO     | app.services.email_queue | Queued verification VER-15c305b800eb481c for email delivery
+2026-08-12 19:26:58 | INFO     | app.services.email_queue | Recovered 3 pending verification(s) into email queue
+2026-08-12 19:26:58 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 19:26:58 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 19:26:59 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-12 19:27:00 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-12 19:27:01 | INFO     | app.services.email_queue | Verification email delivered for VER-15c305b800eb481c
+2026-08-12 19:32:33 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
+2026-08-12 19:32:34 | ERROR    | app.services.imap_service | IMAP connection failed (check IMAP_HOST/PORT and network connectivity)
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\imap_service.py", line 40, in fetch_unread_messages
+    client = _connect()
+             ^^^^^^^^^^
+  File "E:\Document_Scan\app\services\imap_service.py", line 25, in _connect
+    client.login(config.IMAP_USERNAME, config.IMAP_PASSWORD)
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 612, in login
+    raise self.error(dat[-1])
+imaplib.IMAP4.error: b'[AUTHENTICATIONFAILED] Invalid credentials (Failure)'
+2026-08-12 19:33:35 | ERROR    | app.services.imap_service | IMAP connection failed (check IMAP_HOST/PORT and network connectivity)
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\imap_service.py", line 40, in fetch_unread_messages
+    client = _connect()
+             ^^^^^^^^^^
+  File "E:\Document_Scan\app\services\imap_service.py", line 25, in _connect
+    client.login(config.IMAP_USERNAME, config.IMAP_PASSWORD)
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 612, in login
+    raise self.error(dat[-1])
+imaplib.IMAP4.error: b'[AUTHENTICATIONFAILED] Invalid credentials (Failure)'
+2026-08-12 19:34:36 | ERROR    | app.services.imap_service | IMAP connection failed (check IMAP_HOST/PORT and network connectivity)
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\imap_service.py", line 40, in fetch_unread_messages
+    client = _connect()
+             ^^^^^^^^^^
+  File "E:\Document_Scan\app\services\imap_service.py", line 25, in _connect
+    client.login(config.IMAP_USERNAME, config.IMAP_PASSWORD)
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 612, in login
+    raise self.error(dat[-1])
+imaplib.IMAP4.error: b'[AUTHENTICATIONFAILED] Invalid credentials (Failure)'
+2026-08-12 19:39:13 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 19:39:13 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 19:39:13 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 19:39:13 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 19:39:13 | INFO     | app.db | Database initialized and seeded
+2026-08-12 19:39:13 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 19:39:13 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-12 19:39:13 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-12 19:39:13 | INFO     | app.services.email_queue | Queued verification VER-15c305b800eb481c for email delivery
+2026-08-12 19:39:13 | INFO     | app.services.email_queue | Recovered 3 pending verification(s) into email queue
+2026-08-12 19:39:13 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 19:39:13 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 19:39:15 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-12 19:39:16 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-12 19:39:17 | INFO     | app.services.email_queue | Verification email delivered for VER-15c305b800eb481c
+2026-08-12 19:39:20 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
+2026-08-12 19:40:03 | INFO     | __main__ | IMAP poll found 81 unread message(s)
+2026-08-12 19:40:03 | INFO     | __main__ | Processing unread message: subject=Thanks for applying to Pavago message_id=<2146b394-8092-4d65-a489-e846d0e4fbcc@workablemail.com>
+2026-08-12 19:40:03 | WARNING  | __main__ | Verification ID not found in subject: Thanks for applying to Pavago
+2026-08-12 19:40:05 | INFO     | __main__ | Processing unread message: subject=20 new QA QC Engineer jobs in Pakistan! message_id=<7416306.1785331936.bayt@l065t4118>
+2026-08-12 19:40:05 | WARNING  | __main__ | Verification ID not found in subject: 20 new QA QC Engineer jobs in Pakistan!
+2026-08-12 19:40:07 | INFO     | __main__ | Processing unread message: subject=20 new Software Engineer jobs in United Arab Emirates! message_id=<7992061.1785331936.bayt@l065t4118>
+2026-08-12 19:40:07 | WARNING  | __main__ | Verification ID not found in subject: 20 new Software Engineer jobs in United Arab Emirates!
+2026-08-12 19:40:09 | INFO     | __main__ | Processing unread message: subject=Welcome to Build a computer vision app with Azure Cognitive Services message_id=<5A.FF.54491.87B277A6@i-083fcd8f09720c0d7.mta1vrest.sd.prd.sparkpost>
+2026-08-12 19:40:09 | WARNING  | __main__ | Verification ID not found in subject: Welcome to Build a computer vision app with Azure Cognitive Services
+2026-08-12 19:40:11 | INFO     | __main__ | Processing unread message: subject=Welcome to Raqami! Your Account is Ready💜 message_id=<d0dd784fa1fd03f7ff3c768d103270f506ed120184d7a95f26de6b04a94f7474@raqamidigital.com>
+2026-08-12 19:40:11 | WARNING  | __main__ | Verification ID not found in subject: Welcome to Raqami! Your Account is Ready💜
+2026-08-12 19:40:13 | INFO     | __main__ | Processing unread message: subject=Successful Login to Your Raqami Account! message_id=<be0c4b1c19e974bf93c6af9fd3268a6dba2d1f0b76757d4bb630a7a4ae68bdaa@raqamidigital.com>
+2026-08-12 19:40:13 | WARNING  | __main__ | Verification ID not found in subject: Successful Login to Your Raqami Account!
+2026-08-12 19:40:15 | INFO     | __main__ | Processing unread message: subject=ayatj70682026 and 26 others started following you message_id=<993df11f-2c94-4bea-924d-ec1a6a629ef6@mail.instagram.com>
+2026-08-12 19:40:15 | WARNING  | __main__ | Verification ID not found in subject: ayatj70682026 and 26 others started following you
+2026-08-12 19:40:17 | INFO     | __main__ | Processing unread message: subject=Successful Login to Your Raqami Account! message_id=<1317dff832ebf17cffaf94e73eaba527c4fa08c799dda40005bd6bb4b4aa1405@raqamidigital.com>
+2026-08-12 19:40:17 | WARNING  | __main__ | Verification ID not found in subject: Successful Login to Your Raqami Account!
+2026-08-12 19:40:23 | INFO     | __main__ | Processing unread message: subject=Project Engineer | Onsite | KHI | PKR Salary and 5 other jobs for you message_id=<8285843.1786021877.bayt@l065t4118>
+2026-08-12 19:40:23 | WARNING  | __main__ | Verification ID not found in subject: Project Engineer | Onsite | KHI | PKR Salary and 5 other jobs for you
+2026-08-12 19:40:25 | INFO     | __main__ | Processing unread message: subject="9709/52" message_id=<0100019fe7184c5e-080104f8-7b6c-4463-8add-d3ed3edfa362-000000@email.amazonses.com>
+2026-08-12 19:40:25 | WARNING  | __main__ | Verification ID not found in subject: "9709/52"
+2026-08-12 19:40:28 | INFO     | __main__ | Processing unread message: subject=Final Summary: Your search report archive message_id=<202608091534.62228702703@smtp-relay.mailin.fr>
+2026-08-12 19:40:28 | WARNING  | __main__ | Verification ID not found in subject: Final Summary: Your search report archive
+2026-08-12 19:40:30 | INFO     | __main__ | Processing unread message: subject=📚 Start Build a computer vision app with Azure Cognitive Services! message_id=<A0.45.28086.00AB87A6@i-0e3fc891c0ab65317.mta1vrest.sd.prd.sparkpost>
+2026-08-12 19:40:30 | WARNING  | __main__ | Verification ID not found in subject: 📚 Start Build a computer vision app with Azure Cognitive Services!
+2026-08-12 19:40:39 | INFO     | __main__ | Processing unread message: subject=Successful Login to Your Raqami Account! message_id=<ecb35585dec91cee8defeba875c74b4ee960e7f6b0930337bc8386433ec8932d@raqamidigital.com>
+2026-08-12 19:40:39 | WARNING  | __main__ | Verification ID not found in subject: Successful Login to Your Raqami Account!
+2026-08-12 19:40:41 | INFO     | __main__ | Processing unread message: subject=You shared some Google Account data with CallApp message_id=<2816adc9534915a66e97a17e7169d7b01f4b8009-20376977-337030291@google.com>
+2026-08-12 19:40:41 | WARNING  | __main__ | Verification ID not found in subject: You shared some Google Account data with CallApp
+2026-08-12 19:40:43 | INFO     | __main__ | Processing unread message: subject=This was the Game Changer message_id=<0109019fe90bfcd7-5e2d0057-c754-462c-9b50-f3921fd4e0fd-000000@ap-south-1.amazonses.com>
+2026-08-12 19:40:43 | WARNING  | __main__ | Verification ID not found in subject: This was the Game Changer
+2026-08-12 19:40:45 | INFO     | __main__ | Processing unread message: subject=20 new QA QC Engineer jobs in Egypt! message_id=<8832983.1786021877.bayt@l065t4118>
+2026-08-12 19:40:45 | WARNING  | __main__ | Verification ID not found in subject: 20 new QA QC Engineer jobs in Egypt!
+2026-08-12 19:40:47 | INFO     | __main__ | Processing unread message: subject=Let Brevo do the heavy lifting message_id=<202608100615.67347294208@smtp-relay.mailin.fr>
+2026-08-12 19:40:47 | WARNING  | __main__ | Verification ID not found in subject: Let Brevo do the heavy lifting
+2026-08-12 19:40:49 | INFO     | __main__ | Processing unread message: subject=Successful Login to Your Raqami Account! message_id=<f4dd14c4eb8a6a7ab4f9e05cce70b810724efae228dc3c2aedcf7ca6c43bda29@raqamidigital.com>
+2026-08-12 19:40:49 | WARNING  | __main__ | Verification ID not found in subject: Successful Login to Your Raqami Account!
+2026-08-12 19:40:51 | INFO     | __main__ | Processing unread message: subject=From fatafat_killer_2.0 and others: 3 unread messages message_id=<a9cc1279-ae5e-4f0b-933f-44fc942e40bf@mail.instagram.com>
+2026-08-12 19:40:51 | WARNING  | __main__ | Verification ID not found in subject: From fatafat_killer_2.0 and others: 3 unread messages
+2026-08-12 19:40:53 | INFO     | __main__ | Processing unread message: subject=20 new QA QC Engineer jobs in United Arab Emirates! message_id=<9319929.1786021877.bayt@l065t4118>
+2026-08-12 19:40:53 | WARNING  | __main__ | Verification ID not found in subject: 20 new QA QC Engineer jobs in United Arab Emirates!
+2026-08-12 19:40:56 | INFO     | __main__ | Processing unread message: subject=Successful Login to Your Raqami Account! message_id=<5e2e74e30a25b921ed24eb035326c8b83b4d17d739ccae780057a23b970cfeb4@raqamidigital.com>
+2026-08-12 19:40:56 | WARNING  | __main__ | Verification ID not found in subject: Successful Login to Your Raqami Account!
+2026-08-12 19:40:59 | INFO     | __main__ | Processing unread message: subject="MAKAUT SCAM" message_id=<0100019fec44e1e5-a3046b0c-fa65-48ce-8e72-cf974403a5b5-000000@email.amazonses.com>
+2026-08-12 19:40:59 | WARNING  | __main__ | Verification ID not found in subject: "MAKAUT SCAM"
+2026-08-12 19:41:01 | INFO     | __main__ | Processing unread message: subject=Here's how to deepen your search message_id=<202608101534.80054085540@smtp-relay.mailin.fr>
+2026-08-12 19:41:01 | WARNING  | __main__ | Verification ID not found in subject: Here's how to deepen your search
+2026-08-12 19:41:03 | INFO     | __main__ | Processing unread message: subject=New ways to build safely on Lovable message_id=<20260810163757.eacdf8ac732a5e76@cioeu109333.lovable.dev>
+2026-08-12 19:41:03 | WARNING  | __main__ | Verification ID not found in subject: New ways to build safely on Lovable
+2026-08-12 19:41:05 | INFO     | __main__ | Processing unread message: subject=Dive into  Build a computer vision app with Azure Cognitive Services! message_id=<FA.3E.26321.58B0A7A6@i-0476808c27e71976c.mta1vrest.sd.prd.sparkpost>
+2026-08-12 19:41:05 | WARNING  | __main__ | Verification ID not found in subject: Dive into  Build a computer vision app with Azure Cognitive Services!
+2026-08-12 19:41:07 | INFO     | __main__ | Processing unread message: subject=Your weekly learning snapshot is here 📊 message_id=<8A.6C.43851.5C12A7A6@i-0ed925b9e69ce275e.mta1vrest.sd.prd.sparkpost>
+2026-08-12 19:41:07 | WARNING  | __main__ | Verification ID not found in subject: Your weekly learning snapshot is here 📊
+2026-08-12 19:41:09 | INFO     | __main__ | Processing unread message: subject=20 new QA QC Engineer jobs in India! message_id=<11420023.1786021877.bayt@l065t4118>
+2026-08-12 19:41:09 | WARNING  | __main__ | Verification ID not found in subject: 20 new QA QC Engineer jobs in India!
+2026-08-12 19:41:11 | INFO     | __main__ | Processing unread message: subject=Resize your post for all platforms message_id=<wHkG9rGaRHCZWJBlBktq2Q@geopod-ismtpd-114>
+2026-08-12 19:41:11 | WARNING  | __main__ | Verification ID not found in subject: Resize your post for all platforms
+2026-08-12 19:41:13 | INFO     | __main__ | Processing unread message: subject=20 new QA QC Engineer jobs in United Arab Emirates! message_id=<12396976.1786021877.bayt@l065t4118>
+2026-08-12 19:41:13 | WARNING  | __main__ | Verification ID not found in subject: 20 new QA QC Engineer jobs in United Arab Emirates!
+2026-08-12 19:41:15 | INFO     | __main__ | Processing unread message: subject=Backend.rar has been downloaded message_id=<snYhB5R4SwyN96ckc7DpOw@geopod-ismtpd-canary-0>
+2026-08-12 19:41:15 | WARNING  | __main__ | Verification ID not found in subject: Backend.rar has been downloaded
+2026-08-12 19:41:18 | INFO     | __main__ | Processing unread message: subject=20 new Electrical Automation Engineer jobs in Pakistan! message_id=<12524628.1786021877.bayt@l065t4118>
+2026-08-12 19:41:18 | WARNING  | __main__ | Verification ID not found in subject: 20 new Electrical Automation Engineer jobs in Pakistan!
+2026-08-12 19:41:19 | INFO     | __main__ | Processing unread message: subject=Successful Login to Your Raqami Account! message_id=<e3fd1846131daf19abbba0a07c1fcb46c57f1522028f38abb4661a632aaa4089@raqamidigital.com>
+2026-08-12 19:41:19 | WARNING  | __main__ | Verification ID not found in subject: Successful Login to Your Raqami Account!
+2026-08-12 19:41:22 | INFO     | __main__ | Processing unread message: subject=See what projapoti.r88 and 8 others shared message_id=<8a93d153-0d93-49b4-bedb-86e22bfd2377@priority.instagram.com>
+2026-08-12 19:41:22 | WARNING  | __main__ | Verification ID not found in subject: See what projapoti.r88 and 8 others shared
+2026-08-12 19:41:23 | INFO     | __main__ | Processing unread message: subject=20 new Software Tester jobs in Egypt! message_id=<12790373.1786021877.bayt@l065t4118>
+2026-08-12 19:41:23 | WARNING  | __main__ | Verification ID not found in subject: 20 new Software Tester jobs in Egypt!
+2026-08-12 19:41:26 | INFO     | __main__ | Processing unread message: subject=20 new QA QC Engineer jobs in United Arab Emirates! message_id=<13033448.1786021877.bayt@l065t4118>
+2026-08-12 19:41:26 | WARNING  | __main__ | Verification ID not found in subject: 20 new QA QC Engineer jobs in United Arab Emirates!
+2026-08-12 19:41:28 | INFO     | __main__ | Processing unread message: subject=CARD_CAP_UAT.zip has been downloaded message_id=<7hCHYDj0TI-Qeg2yVuPe2Q@geopod-ismtpd-3>
+2026-08-12 19:41:28 | WARNING  | __main__ | Verification ID not found in subject: CARD_CAP_UAT.zip has been downloaded
+2026-08-12 19:41:30 | INFO     | __main__ | Processing unread message: subject=Your files have been downloaded message_id=<Hk8VeQ9GRBefbaF94W2npw@geopod-ismtpd-15>
+2026-08-12 19:41:30 | WARNING  | __main__ | Verification ID not found in subject: Your files have been downloaded
+2026-08-12 19:41:32 | INFO     | __main__ | Processing unread message: subject=20 new QA QC Engineer jobs in Pakistan! message_id=<13467530.1786021877.bayt@l065t4118>
+2026-08-12 19:41:32 | WARNING  | __main__ | Verification ID not found in subject: 20 new QA QC Engineer jobs in Pakistan!
+2026-08-12 19:41:34 | INFO     | __main__ | Processing unread message: subject=Your files have been downloaded message_id=<RKkW9mkDR5iI07Tn9XtkGg@geopod-ismtpd-12>
+2026-08-12 19:41:34 | WARNING  | __main__ | Verification ID not found in subject: Your files have been downloaded
+2026-08-12 19:41:42 | INFO     | __main__ | Processing unread message: subject=Qwen3.8-Max Is Now Available + Free Credits message_id=<2cd81427-ff06-421a-a674-5dec66a7c17d@qoder.com>
+2026-08-12 19:41:42 | WARNING  | __main__ | Verification ID not found in subject: Qwen3.8-Max Is Now Available + Free Credits
+2026-08-12 19:41:44 | INFO     | __main__ | Processing unread message: subject=19 new QA QC Engineer jobs in Türkiye! message_id=<13962579.1786021877.bayt@l065t4118>
+2026-08-12 19:41:44 | WARNING  | __main__ | Verification ID not found in subject: 19 new QA QC Engineer jobs in Türkiye!
+2026-08-12 19:41:46 | INFO     | __main__ | Processing unread message: subject="Scam/Hack - HBL" message_id=<0100019ff16baeea-6bc20a68-811c-48ec-b015-a57311856337-000000@email.amazonses.com>
+2026-08-12 19:41:46 | WARNING  | __main__ | Verification ID not found in subject: "Scam/Hack - HBL"
+2026-08-12 19:41:49 | INFO     | __main__ | Processing unread message: subject=Data protection is included with your Social Catfish membership. message_id=<202608111534.75223618933@smtp-relay.mailin.fr>
+2026-08-12 19:41:49 | WARNING  | __main__ | Verification ID not found in subject: Data protection is included with your Social Catfish membership.
+2026-08-12 19:41:51 | INFO     | __main__ | Processing unread message: subject=Successful Login to Your Raqami Account! message_id=<3df06c58200d2940511bbe2f95d43296b3341c7c00c7578f92e6ea7e38a4fb22@raqamidigital.com>
+2026-08-12 19:41:51 | WARNING  | __main__ | Verification ID not found in subject: Successful Login to Your Raqami Account!
+2026-08-12 19:41:53 | INFO     | __main__ | Processing unread message: subject=Muse Glimmer is now available message_id=<0100019ff1ccf685-2cf5b943-d23a-4c25-9586-6c038e0ca269-000000@email.amazonses.com>
+2026-08-12 19:41:53 | WARNING  | __main__ | Verification ID not found in subject: Muse Glimmer is now available
+2026-08-12 19:41:55 | INFO     | __main__ | Processing unread message: subject=New jobs: Senior AI/ML Engineer at Pilot (pilotplans.com) and  1 more jobs message_id=<A9.A4.28086.A9B9B7A6@i-0e3fc891c0ab65317.mta1vrest.sd.prd.sparkpost>
+2026-08-12 19:41:55 | WARNING  | __main__ | Verification ID not found in subject: New jobs: Senior AI/ML Engineer at Pilot (pilotplans.com) and  1 more jobs
+2026-08-12 19:41:57 | INFO     | __main__ | Processing unread message: subject=New recommendation available for Default Directory message_id=<WA98QSIW0UU4.Y2R9XA4EDB0I@ds3pepf00011396>
+2026-08-12 19:41:57 | WARNING  | __main__ | Verification ID not found in subject: New recommendation available for Default Directory
+2026-08-12 19:41:59 | INFO     | __main__ | Processing unread message: subject=New recommendation available for Default Directory message_id=<XER71TIW0UU4.FJCPYDYKV3MI3@ds3pepf00011397>
+2026-08-12 19:41:59 | WARNING  | __main__ | Verification ID not found in subject: New recommendation available for Default Directory
+2026-08-12 19:42:01 | INFO     | __main__ | Processing unread message: subject=New recommendation available for Default Directory message_id=<Q557039X0UU4.QJMWWNNDQB3J3@ds3pepf00011398>
+2026-08-12 19:42:01 | WARNING  | __main__ | Verification ID not found in subject: New recommendation available for Default Directory
+2026-08-12 19:42:03 | INFO     | __main__ | Processing unread message: subject=New recommendation available for Default Directory message_id=<0UPK139X0UU4.UFGYBH8P38IU2@ds3pepf00011396>
+2026-08-12 19:42:03 | WARNING  | __main__ | Verification ID not found in subject: New recommendation available for Default Directory
+2026-08-12 19:42:06 | INFO     | __main__ | Processing unread message: subject=20 new QA QC Engineer jobs in India! message_id=<15123255.1786021877.bayt@l065t4118>
+2026-08-12 19:42:06 | WARNING  | __main__ | Verification ID not found in subject: 20 new QA QC Engineer jobs in India!
+2026-08-12 19:42:08 | INFO     | __main__ | Processing unread message: subject=Current Status of Your Job Applications message_id=<14832042.1786021877.bayt@l065t4118>
+2026-08-12 19:42:08 | WARNING  | __main__ | Verification ID not found in subject: Current Status of Your Job Applications
+2026-08-12 19:42:10 | INFO     | __main__ | Processing unread message: subject=Make the most of your Brevo account message_id=<202608120618.17513989807@smtp-relay.mailin.fr>
+2026-08-12 19:42:10 | WARNING  | __main__ | Verification ID not found in subject: Make the most of your Brevo account
+2026-08-12 19:42:12 | INFO     | __main__ | Processing unread message: subject=You have 3 more days to access Slack’s premium features message_id=<0101019ff4e29e15-1c66db34-c98f-4901-a68f-118774ed5b90-000000@us-west-2.amazonses.com>
+2026-08-12 19:42:12 | WARNING  | __main__ | Verification ID not found in subject: You have 3 more days to access Slack’s premium features
+2026-08-12 19:42:15 | INFO     | __main__ | Processing unread message: subject=20 new QA QC Engineer jobs in United Arab Emirates! message_id=<15972355.1786021877.bayt@l065t4118>
+2026-08-12 19:42:15 | WARNING  | __main__ | Verification ID not found in subject: 20 new QA QC Engineer jobs in United Arab Emirates!
+2026-08-12 19:42:17 | INFO     | __main__ | Processing unread message: subject=20 new Software Tester jobs in Egypt! message_id=<16271810.1786021877.bayt@l065t4118>
+2026-08-12 19:42:17 | WARNING  | __main__ | Verification ID not found in subject: 20 new Software Tester jobs in Egypt!
+2026-08-12 19:42:18 | INFO     | __main__ | Processing unread message: subject=You shared some Google Account data with Kimi message_id=<1d85ad4205b6a122602838993417fda6f349b9d4-20376977-337030291@google.com>
+2026-08-12 19:42:18 | WARNING  | __main__ | Verification ID not found in subject: You shared some Google Account data with Kimi
+2026-08-12 19:43:40 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 19:43:40 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 19:43:40 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 19:43:40 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 19:43:40 | INFO     | app.db | Database initialized and seeded
+2026-08-12 19:43:40 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 19:43:40 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-12 19:43:40 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-12 19:43:40 | INFO     | app.services.email_queue | Queued verification VER-15c305b800eb481c for email delivery
+2026-08-12 19:43:40 | INFO     | app.services.email_queue | Recovered 3 pending verification(s) into email queue
+2026-08-12 19:43:40 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 19:43:40 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 19:43:41 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-12 19:43:43 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-12 19:43:44 | INFO     | app.services.email_queue | Verification email delivered for VER-15c305b800eb481c
+2026-08-12 19:43:49 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
+2026-08-12 19:43:52 | INFO     | __main__ | IMAP poll found 2 unread message(s)
+2026-08-12 19:43:52 | INFO     | __main__ | Processing unread message: subject=Re: [Application Verification: VER-15c305b800eb481c] message_id=<CACsFm8qjrrEhCxi1rKA3jzuq4hhO01hx_uFOA+GY41koZkjyQQ@mail.gmail.com>
+2026-08-12 19:43:52 | INFO     | __main__ | Reply parsing: extracted='Rejected' normalized='rejected'
+2026-08-12 19:43:52 | INFO     | __main__ | Verification VER-15c305b800eb481c processed as rejected
+2026-08-12 19:43:54 | INFO     | __main__ | Processing unread message: subject=[Application Verification: VER-c14868b7c8c54b7a] message_id=<202608121443.67195690061@smtp-relay.sendinblue.com>
+2026-08-12 19:43:54 | WARNING  | __main__ | Reply sender mismatch for VER-c14868b7c8c54b7a: expected=syedhuzair113@gmail.com got=syedhuzair113@11822841.brevosend.com
+2026-08-12 19:44:01 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-12 19:44:01 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-12 19:44:01 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-12 19:44:01 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-12 19:44:01 | INFO     | app.db | Database initialized and seeded
+2026-08-12 19:44:01 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-12 19:44:01 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-12 19:44:01 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-12 19:44:01 | INFO     | app.services.email_queue | Recovered 2 pending verification(s) into email queue
+2026-08-12 19:44:01 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-12 19:44:01 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-12 19:44:03 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-12 19:44:04 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-12 19:44:59 | INFO     | __main__ | IMAP poll found 1 unread message(s)
+2026-08-12 19:44:59 | INFO     | __main__ | Processing unread message: subject=[Application Verification: VER-c14868b7c8c54b7a] message_id=<202608121444.82325305625@smtp-relay.sendinblue.com>
+2026-08-12 19:44:59 | WARNING  | __main__ | Reply sender mismatch for VER-c14868b7c8c54b7a: expected=syedhuzair113@gmail.com got=syedhuzair113@11822841.brevosend.com
+2026-08-13 00:09:03 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-13 00:09:03 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-13 00:09:03 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-13 00:09:03 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-13 00:09:03 | INFO     | app.db | Database initialized and seeded
+2026-08-13 00:09:03 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-13 00:09:03 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-13 00:09:03 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-13 00:09:03 | INFO     | app.services.email_queue | Recovered 2 pending verification(s) into email queue
+2026-08-13 00:09:03 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-13 00:09:03 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-13 00:09:05 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-13 00:09:07 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-13 00:09:07 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
+2026-08-13 00:10:21 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-13 00:10:21 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-13 00:10:21 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-13 00:10:21 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-13 00:10:21 | INFO     | app.db | Database initialized and seeded
+2026-08-13 00:10:21 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-13 00:10:21 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-13 00:10:21 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-13 00:10:21 | INFO     | app.services.email_queue | Recovered 2 pending verification(s) into email queue
+2026-08-13 00:10:21 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-13 00:10:21 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-13 00:10:23 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-13 00:10:24 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-13 00:10:29 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
+2026-08-13 00:10:34 | INFO     | __main__ | IMAP poll found 2 unread message(s)
+2026-08-13 00:10:34 | INFO     | __main__ | Processing unread message: subject=[Application Verification: VER-c14868b7c8c54b7a] message_id=<202608121909.95387031317@smtp-relay.sendinblue.com>
+2026-08-13 00:10:34 | WARNING  | __main__ | Reply sender mismatch for VER-c14868b7c8c54b7a: expected=syedhuzair113@gmail.com got=syedhuzair113@11822841.brevosend.com
+2026-08-13 00:10:37 | INFO     | __main__ | Processing unread message: subject=[Application Verification: VER-c14868b7c8c54b7a] message_id=<202608121910.40520355015@smtp-relay.sendinblue.com>
+2026-08-13 00:10:37 | WARNING  | __main__ | Reply sender mismatch for VER-c14868b7c8c54b7a: expected=syedhuzair113@gmail.com got=syedhuzair113@11822841.brevosend.com
+2026-08-13 00:11:09 | INFO     | app.services.email_queue | Queued verification VER-55539d248c6c40d4 for email delivery
+2026-08-13 00:11:10 | INFO     | app.services.email_queue | Verification email delivered for VER-55539d248c6c40d4
+2026-08-13 00:12:45 | INFO     | __main__ | IMAP poll found 1 unread message(s)
+2026-08-13 00:12:45 | INFO     | __main__ | Processing unread message: subject=Re: [Application Verification: VER-55539d248c6c40d4] message_id=<CAKOT5gcN+MuGe+uKqaGGXSgKJEK1yfwvKWMhw+LLX11LQtQqWQ@mail.gmail.com>
+2026-08-13 00:12:45 | INFO     | __main__ | Reply parsing: extracted='Approved' normalized='approved'
+2026-08-13 00:12:45 | INFO     | __main__ | Verification VER-55539d248c6c40d4 processed as verified
+2026-08-13 00:14:21 | INFO     | app.services.signature_siamese | Loaded Siamese signature weights from E:\Document_Scan\models\signature_siamese.pt
+2026-08-13 00:14:21 | INFO     | app.services.signature_siamese | Siamese signature compare: similarity=94.0%
+2026-08-13 00:14:35 | INFO     | app.services.signature_siamese | Siamese signature compare: similarity=81.6%
+2026-08-13 00:14:46 | INFO     | app.services.signature_siamese | Siamese signature compare: similarity=93.3%
+2026-08-13 00:14:55 | INFO     | app.services.signature_siamese | Siamese signature compare: similarity=81.0%
+2026-08-13 00:15:07 | INFO     | app.services.signature_siamese | Siamese signature compare: similarity=64.4%
+2026-08-13 11:32:07 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-13 11:32:07 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-13 11:32:07 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-13 11:32:07 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-13 11:32:07 | INFO     | app.db | Database initialized and seeded
+2026-08-13 11:32:07 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-13 11:32:07 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-13 11:32:07 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-13 11:32:07 | INFO     | app.services.email_queue | Recovered 2 pending verification(s) into email queue
+2026-08-13 11:32:07 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-13 11:32:07 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-13 11:32:08 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-13 11:32:09 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-13 11:32:29 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
+2026-08-13 11:32:33 | INFO     | __main__ | IMAP poll found 1 unread message(s)
+2026-08-13 11:32:33 | INFO     | __main__ | Processing unread message: subject=[Application Verification: VER-c14868b7c8c54b7a] message_id=<202608130632.63908184378@smtp-relay.sendinblue.com>
+2026-08-13 11:32:33 | WARNING  | __main__ | Reply sender mismatch for VER-c14868b7c8c54b7a: expected=syedhuzair113@gmail.com got=syedhuzair113@11822841.brevosend.com
+2026-08-13 11:49:37 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-13 11:49:37 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-13 11:49:37 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-13 11:49:37 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-13 11:49:37 | INFO     | app.db | Database initialized and seeded
+2026-08-13 11:49:37 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-13 11:49:37 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-13 11:49:37 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-13 11:49:37 | INFO     | app.services.email_queue | Recovered 2 pending verification(s) into email queue
+2026-08-13 11:49:37 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-13 11:49:37 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-13 11:49:38 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-13 11:49:40 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a

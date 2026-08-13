@@ -76,6 +76,7 @@ class ValidationEngine:
         bank_statement: Optional[BankStatementFields] = None,
         uploads: Optional[Dict[str, bool]] = None,
         image_quality_readable: Optional[Dict[str, bool]] = None,
+        workflow_profile: Optional[str] = None,
     ) -> Dict[str, SectionResult]:
         uploads = uploads or {}
         image_quality_readable = image_quality_readable or {}
@@ -83,9 +84,21 @@ class ValidationEngine:
         cnic_merged = self._merge_cnic(cnic_front, cnic_back)
 
         customer = self._customer_info_section(form, cnic_merged, payslip, bank_statement)
-        cnic_section = self._cnic_section(form, cnic_merged, uploads, image_quality_readable)
+        cnic_section = self._cnic_section(
+            form,
+            cnic_merged,
+            uploads,
+            image_quality_readable,
+            workflow_profile=workflow_profile,
+        )
         payslip_section = self._payslip_section(form, payslip, uploads, image_quality_readable)
-        bank_section = self._bank_section(form, bank_statement, uploads, image_quality_readable)
+        if workflow_profile == "branch_account_opening":
+            bank_section = self._workflow_skipped_section(
+                "Bank Statement Validation",
+                "Bank statement is not required for branch account opening workflow.",
+            )
+        else:
+            bank_section = self._bank_section(form, bank_statement, uploads, image_quality_readable)
         cross = self._cross_section(form, cnic_merged, payslip, bank_statement)
 
         return {
@@ -211,31 +224,39 @@ class ValidationEngine:
         cnic: Optional[CNICFields],
         uploads: Dict[str, bool],
         readable: Dict[str, bool],
+        workflow_profile: Optional[str] = None,
     ) -> SectionResult:
         comparisons: List[FieldComparison] = []
 
         front_up = uploads.get("cnic_front", False)
         back_up = uploads.get("cnic_back", False)
+        branch_workflow = workflow_profile == "branch_account_opening"
         comparisons.append(
             FieldComparison(
                 field="CNIC Front Uploaded",
-                customer_value="Required",
+                customer_value="Optional" if branch_workflow else "Required",
                 document_value="Uploaded" if front_up else "Missing",
                 document_source="Upload",
-                result=CheckResult.PASS if front_up else CheckResult.FAIL,
-                is_critical=True,
+                result=CheckResult.PASS
+                if front_up
+                else (CheckResult.WARNING if branch_workflow else CheckResult.FAIL),
+                is_critical=not branch_workflow,
+                message="Optional for account opening workflow; form holds personal details"
+                if branch_workflow and not front_up
+                else None,
             )
         )
-        comparisons.append(
-            FieldComparison(
-                field="CNIC Back Uploaded",
-                customer_value="Required",
-                document_value="Uploaded" if back_up else "Missing",
-                document_source="Upload",
-                result=CheckResult.PASS if back_up else CheckResult.FAIL,
-                is_critical=True,
+        if not branch_workflow:
+            comparisons.append(
+                FieldComparison(
+                    field="CNIC Back Uploaded",
+                    customer_value="Required",
+                    document_value="Uploaded" if back_up else "Missing",
+                    document_source="Upload",
+                    result=CheckResult.PASS if back_up else CheckResult.FAIL,
+                    is_critical=True,
+                )
             )
-        )
 
         if cnic:
             comparisons.append(
@@ -303,16 +324,20 @@ class ValidationEngine:
             comparisons.append(
                 FieldComparison(
                     field="CNIC Extraction",
-                    customer_value="Required",
+                    customer_value="Expected" if not branch_workflow else "Optional",
                     document_value=None,
                     document_source="CNIC",
-                    result=CheckResult.FAIL,
-                    is_critical=True,
-                    message="Could not extract CNIC fields",
+                    result=CheckResult.WARNING if branch_workflow else CheckResult.FAIL,
+                    is_critical=not branch_workflow,
+                    message="Personal details taken from account opening form"
+                    if branch_workflow
+                    else "No CNIC fields extracted",
                 )
             )
 
         for label in ("cnic_front", "cnic_back"):
+            if branch_workflow and label == "cnic_back":
+                continue
             if label in readable and not readable[label]:
                 comparisons.append(
                     FieldComparison(
@@ -764,6 +789,25 @@ class ValidationEngine:
             result=result,
             is_critical=False,
             message=message,
+        )
+
+    @staticmethod
+    def _workflow_skipped_section(title: str, note: str) -> SectionResult:
+        return SectionResult(
+            title=title,
+            status=CheckResult.PASS,
+            comparisons=[
+                FieldComparison(
+                    field="Not required",
+                    customer_value="N/A",
+                    document_value="N/A",
+                    document_source="Workflow",
+                    result=CheckResult.PASS,
+                    is_critical=False,
+                    message=note,
+                )
+            ],
+            notes=[note],
         )
 
     @staticmethod

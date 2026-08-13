@@ -75,13 +75,36 @@ function sectionResultCounts(comparisons) {
 function SectionToggleHeader({ title, subtitle, isOpen, onToggle }) {
   return (
     <div className="section-toggle-header">
-      <div>
+      <div className="section-toggle-copy">
         <h3>{title}</h3>
         {subtitle ? <p className="hint">{subtitle}</p> : null}
       </div>
-      <button type="button" className="toggle-button" onClick={onToggle}>
+      <button type="button" className="btn btn-secondary btn-sm toggle-button" onClick={onToggle}>
         {isOpen ? 'Hide details' : 'Show details'}
       </button>
+    </div>
+  )
+}
+
+function UploadDocSummary({ items }) {
+  const total = items?.length || 0
+  const uploaded = (items || []).filter((d) => d.uploaded).length
+  const extracted = (items || []).filter((d) => d.extraction_ok).length
+  const missing = total - uploaded
+  return (
+    <div className="section-summary-grid">
+      <div className="summary-stat summary-stat-neutral">
+        <span className="summary-label">Uploaded</span>
+        <strong>{uploaded}</strong>
+      </div>
+      <div className="summary-stat summary-stat-pass">
+        <span className="summary-label">Extracted OK</span>
+        <strong>{extracted}</strong>
+      </div>
+      <div className="summary-stat summary-stat-warn">
+        <span className="summary-label">Missing</span>
+        <strong>{missing}</strong>
+      </div>
     </div>
   )
 }
@@ -90,15 +113,15 @@ function SectionSummary({ comparisons }) {
   const { pass, fail, warn } = sectionResultCounts(comparisons)
   return (
     <div className="section-summary-grid">
-      <div>
+      <div className="summary-stat summary-stat-pass">
         <span className="summary-label">Pass</span>
         <strong>{pass}</strong>
       </div>
-      <div>
+      <div className="summary-stat summary-stat-fail">
         <span className="summary-label">Fail</span>
         <strong>{fail}</strong>
       </div>
-      <div>
+      <div className="summary-stat summary-stat-warn">
         <span className="summary-label">Warnings</span>
         <strong>{warn}</strong>
       </div>
@@ -185,6 +208,11 @@ export default function ReportView({ report, documents }) {
   const extractionOk = (report.uploaded_documents || []).filter((d) => d.extraction_ok).length
   const score = Number(report.overall_score) || 0
   const scoreTone = score >= 80 ? 'pass' : score >= 60 ? 'warn' : 'fail'
+  const statusTone = String(report.recommendation || report.application_status || '').toLowerCase().includes('accept')
+    ? 'pass'
+    : String(report.recommendation || report.application_status || '').toLowerCase().includes('reject')
+      ? 'fail'
+      : 'warn'
 
   const [expandedSections, setExpandedSections] = useState(() => ({
     uploaded_documents: false,
@@ -209,17 +237,17 @@ export default function ReportView({ report, documents }) {
   const missing = report.missing_information || []
 
   return (
-    <section className="report">
+    <section className="report report-v2">
       <header className="report-premium-header">
-        <div>
+        <div className="report-header-copy">
           <p className="eyebrow">Cognexa AI Verification Report</p>
-          <h2>{report.application_status}</h2>
-          <p style={{ fontWeight: 700, color: 'var(--accent-deep)', margin: '0.35rem 0 0' }}>
+          <h2 className={`report-status report-status-${statusTone}`}>{report.application_status}</h2>
+          <p className={`report-recommendation report-recommendation-${statusTone}`}>
             Recommendation: {report.recommendation}
           </p>
         </div>
         <div className="report-score-block">
-          <div className="score-ring">{score}%</div>
+          <div className={`score-ring score-ring-${scoreTone}`}>{score}%</div>
           <span className="score-ring-label">Overall score</span>
         </div>
       </header>
@@ -227,28 +255,39 @@ export default function ReportView({ report, documents }) {
       <div className="report-summary-grid">
         <article className="report-summary-card">
           <span className="summary-label">Documents uploaded</span>
-          <strong>{uploadCount}</strong>
+          <strong className="summary-value">{uploadCount}</strong>
         </article>
         <article className="report-summary-card">
           <span className="summary-label">Extraction OK</span>
-          <strong>{extractionOk}/{uploadCount || '—'}</strong>
+          <strong className="summary-value">{extractionOk}<span className="summary-value-sub">/{uploadCount || '—'}</span></strong>
         </article>
         <article className="report-summary-card">
           <span className="summary-label">Quality pass</span>
-          <strong>{qualityStats.pass}</strong>
+          <strong className="summary-value summary-value-pass">{qualityStats.pass}</strong>
         </article>
         <article className="report-summary-card">
           <span className="summary-label">Warnings</span>
-          <strong>{warnings.length}</strong>
+          <strong className="summary-value summary-value-warn">{warnings.length}</strong>
         </article>
       </div>
 
+      {(warnings.length > 0 || missing.length > 0) && (
+        <div className="report-alerts">
+          {warnings.slice(0, 2).map((item) => (
+            <div key={item} className="report-alert report-alert-warn">{item}</div>
+          ))}
+          {missing.slice(0, 1).map((item) => (
+            <div key={item} className="report-alert report-alert-fail">{item}</div>
+          ))}
+        </div>
+      )}
+
       <div className="section-block report-summary-toggle">
-        <button type="button" className="link-btn" onClick={() => setShowAllDetails((prev) => !prev)}>
+        <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowAllDetails((prev) => !prev)}>
           {showAllDetails ? 'Hide full report details' : 'Show full report details'}
         </button>
-        <p className="hint" style={{ margin: '0.75rem 0 0' }}>
-          By default, only top-level summaries are shown to reduce scrolling.
+        <p className="hint report-toggle-hint">
+          Expand to inspect validation sections, document previews, and field-level comparisons.
         </p>
       </div>
 
@@ -265,11 +304,11 @@ export default function ReportView({ report, documents }) {
           </ul>
         </section>
       ) : (
-        <section className="section-block">
-          <h3>Full report details hidden</h3>
-          <p className="hint" style={{ margin: 0 }}>
-            Only the highest-level report summary is shown to keep this page short.
-            Expand the full report to inspect warnings, missing items, documents, and validation results.
+        <section className="section-block report-collapsed-note">
+          <h3>Detailed validation hidden</h3>
+          <p className="hint">
+            Use “Show full report details” above to open uploaded documents, image quality checks,
+            and field-by-field validation results.
           </p>
         </section>
       )}
@@ -319,7 +358,7 @@ export default function ReportView({ report, documents }) {
                 </table>
               </div>
             ) : (
-              <SectionSummary comparisons={report.uploaded_documents || []} />
+              <UploadDocSummary items={report.uploaded_documents || []} />
             )}
           </article>
 

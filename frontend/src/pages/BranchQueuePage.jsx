@@ -54,7 +54,7 @@ export default function BranchQueuePage() {
       list = list.filter((a) => a.source === sourceFilter)
     }
     if (statusFilter === 'active') {
-      list = list.filter((a) => ['pending', 'analyzing', 'completed', 'saved'].includes(a.status))
+      list = list.filter((a) => ['pending', 'analyzing', 'completed', 'saved', 'review_required', 'failed'].includes(a.status))
     } else if (statusFilter !== 'all') {
       list = list.filter((a) => a.status === statusFilter)
     }
@@ -92,7 +92,7 @@ export default function BranchQueuePage() {
     navigate(`/branch/applications/${row.id}`)
   }
 
-  const autoRefresh = rows.some((a) => a.status === 'pending' || a.status === 'analyzing')
+  const autoRefresh = rows.some((a) => ['pending', 'analyzing'].includes(a.status))
 
   return (
     <>
@@ -112,11 +112,11 @@ export default function BranchQueuePage() {
         <AlertBanner type="error" title="Could not load queue" message={listError} />
       ) : null}
 
-      {autoRefresh ? (
+        {autoRefresh ? (
         <AlertBanner
           type="info"
-          title="Cognexa AI analysis in progress"
-          message="The queue refreshes automatically every 4 seconds while applications are pending or analyzing."
+          title="Processing in progress"
+          message="The queue refreshes every 4 seconds while applications or workflow customers are pending or analyzing."
         />
       ) : null}
 
@@ -142,6 +142,8 @@ export default function BranchQueuePage() {
               <option value="analyzing">Analyzing</option>
               <option value="completed">Completed</option>
               <option value="saved">Saved</option>
+              <option value="review_required">Review required</option>
+              <option value="failed">Failed</option>
               <option value="accepted">Accepted</option>
               <option value="rejected">Rejected</option>
             </select>

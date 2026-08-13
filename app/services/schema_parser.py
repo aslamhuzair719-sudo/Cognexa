@@ -11,11 +11,13 @@ from pydantic import BaseModel
 from app.schemas.bank_statement import BankStatementSchema
 from app.schemas.cnic import CNICSchema
 from app.schemas.payslip import PayslipSchema
+from app.schemas.account_opening_form import AccountOpeningFormSchema
 
 SCHEMA_MAP: Dict[str, Type[BaseModel]] = {
     "cnic": CNICSchema,
     "payslip": PayslipSchema,
     "bank_statement": BankStatementSchema,
+    "account_opening_form": AccountOpeningFormSchema,
 }
 
 

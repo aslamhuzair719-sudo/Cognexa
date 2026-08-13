@@ -15,6 +15,7 @@ const NAV_SECTIONS = [
     label: 'Tools',
     items: [
       { to: '/branch/scan', end: false, label: 'Document Scan', icon: 'camera' },
+      { to: '/branch/archive', end: false, label: 'Archival Search', icon: 'search' },
       { to: '/branch/signatures', end: false, label: 'Signatures', icon: 'pen' },
     ],
   },
@@ -32,6 +33,7 @@ const PAGE_TITLES = {
   '/branch/history': 'History',
   '/branch/audit': 'Audit Log',
   '/branch/scan': 'Document Scan',
+  '/branch/archive': 'Archival Search',
   '/branch/signatures': 'Signature Scan',
 }
 
@@ -82,6 +84,13 @@ function NavIcon({ type }) {
           <path d="m12 6 6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
       )
+    case 'search':
+      return (
+        <svg {...props}>
+          <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
+          <path d="m16 16 5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      )
     default:
       return null
   }
@@ -97,12 +106,17 @@ export default function BranchShell() {
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState(null)
+  const [navOpen, setNavOpen] = useState(false)
 
   useEffect(() => {
     api('/api/v1/auth/me')
       .then(setUser)
       .catch(() => navigate('/branch/login', { replace: true }))
   }, [navigate])
+
+  useEffect(() => {
+    setNavOpen(false)
+  }, [location.pathname])
 
   async function logout() {
     await api('/api/v1/auth/logout', { method: 'POST' })
@@ -125,7 +139,16 @@ export default function BranchShell() {
 
   return (
     <div className="branch-app">
-      <aside className="branch-sidebar" aria-label="Branch navigation">
+      {navOpen ? (
+        <button
+          type="button"
+          className="branch-sidebar-backdrop"
+          aria-label="Close menu"
+          onClick={() => setNavOpen(false)}
+        />
+      ) : null}
+
+      <aside className={`branch-sidebar${navOpen ? ' open' : ''}`} aria-label="Branch navigation">
         <div className="branch-sidebar-brand">
           <img src="/ubl-logo.png" alt="UBL" />
           <p className="branch-sidebar-product">Cognexa Verification</p>
@@ -175,11 +198,24 @@ export default function BranchShell() {
 
       <div className="branch-main">
         <header className="branch-main-topbar">
-          <div>
-            <p className="branch-main-topbar-title">{pageTitle}</p>
-            <p className="branch-main-topbar-meta">
-              {user.branch.name} · Code {user.branch.code}
-            </p>
+          <div className="branch-topbar-left">
+            <button
+              type="button"
+              className="branch-sidebar-toggle"
+              aria-label={navOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={navOpen}
+              onClick={() => setNavOpen((v) => !v)}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
+            <div>
+              <p className="branch-main-topbar-title">{pageTitle}</p>
+              <p className="branch-main-topbar-meta">
+                {user.branch.name} · Code {user.branch.code}
+              </p>
+            </div>
           </div>
           <span className="branch-live-badge">Live</span>
         </header>

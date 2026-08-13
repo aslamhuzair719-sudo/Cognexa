@@ -73,10 +73,26 @@ BANK_STATEMENT_FIELD_KEYS = (
     "address",
 )
 
+ACCOUNT_OPENING_FORM_FIELD_KEYS = (
+    "applicant_name",
+    "father_name",
+    "cnic_number",
+    "date_of_birth",
+    "gender",
+    "country_to_stay",
+    "mobile_number",
+    "email",
+    "company_name",
+    "designation",
+    "monthly_income",
+    "employee_id",
+)
+
 DOCUMENT_FIELD_KEYS = {
     "cnic": CNIC_FIELD_KEYS,
     "payslip": PAYSLIP_FIELD_KEYS,
     "bank_statement": BANK_STATEMENT_FIELD_KEYS,
+    "account_opening_form": ACCOUNT_OPENING_FORM_FIELD_KEYS,
 }
 
 _DATE_RE = re.compile(r"^\d{1,2}/\d{1,2}/\d{2,4}$")
