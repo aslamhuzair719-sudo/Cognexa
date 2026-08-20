@@ -3745,3 +3745,262 @@ Traceback (most recent call last):
   File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1185, in _get_line
     raise self.abort('socket error: EOF')
 imaplib.IMAP4.abort: socket error: EOF
+2026-08-13 14:49:56 | ERROR    | app.services.imap_service | IMAP connection failed (check IMAP_HOST/PORT and network connectivity)
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\imap_service.py", line 55, in fetch_unread_messages
+    client = _connect()
+             ^^^^^^^^^^
+  File "E:\Document_Scan\app\services\imap_service.py", line 22, in _connect
+    client = imaplib.IMAP4_SSL(config.IMAP_HOST, config.IMAP_PORT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1323, in __init__
+    IMAP4.__init__(self, host, port, timeout)
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 202, in __init__
+    self.open(host, port, timeout)
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1336, in open
+    IMAP4.open(self, host, port, timeout)
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 312, in open
+    self.sock = self._create_socket(timeout)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1326, in _create_socket
+    sock = IMAP4._create_socket(self, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 302, in _create_socket
+    return socket.create_connection(address)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 826, in create_connection
+    for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 961, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+2026-08-13 14:54:36 | ERROR    | app.services.imap_service | IMAP connection failed (check IMAP_HOST/PORT and network connectivity)
+Traceback (most recent call last):
+  File "E:\Document_Scan\app\services\imap_service.py", line 55, in fetch_unread_messages
+    client = _connect()
+             ^^^^^^^^^^
+  File "E:\Document_Scan\app\services\imap_service.py", line 22, in _connect
+    client = imaplib.IMAP4_SSL(config.IMAP_HOST, config.IMAP_PORT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1323, in __init__
+    IMAP4.__init__(self, host, port, timeout)
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 205, in __init__
+    self._connect()
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 247, in _connect
+    self.welcome = self._get_response()
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1075, in _get_response
+    resp = self._get_line()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\syedh\AppData\Local\Programs\Python\Python311\Lib\imaplib.py", line 1185, in _get_line
+    raise self.abort('socket error: EOF')
+imaplib.IMAP4.abort: socket error: EOF
+2026-08-20 13:04:22 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-20 13:04:22 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-20 13:04:22 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-20 13:04:22 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-20 13:04:22 | INFO     | app.db | Database initialized and seeded
+2026-08-20 13:04:22 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-20 13:04:22 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-20 13:04:22 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-20 13:04:22 | INFO     | app.services.email_queue | Queued verification VER-33e0498e7c274af7 for email delivery
+2026-08-20 13:04:22 | INFO     | app.services.email_queue | Recovered 3 pending verification(s) into email queue
+2026-08-20 13:04:22 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-20 13:04:22 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-20 13:04:25 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-20 13:04:27 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-20 13:04:28 | INFO     | app.services.email_queue | Verification email delivered for VER-33e0498e7c274af7
+2026-08-20 15:10:40 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-20 15:10:40 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-20 15:10:40 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-20 15:10:40 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-20 15:10:40 | INFO     | app.db | Database initialized and seeded
+2026-08-20 15:10:40 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-20 15:10:40 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-20 15:10:40 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-20 15:10:40 | INFO     | app.services.email_queue | Queued verification VER-33e0498e7c274af7 for email delivery
+2026-08-20 15:10:40 | INFO     | app.services.email_queue | Recovered 3 pending verification(s) into email queue
+2026-08-20 15:10:40 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-20 15:10:40 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-20 15:10:42 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-20 15:10:43 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-20 15:10:45 | INFO     | app.services.email_queue | Verification email delivered for VER-33e0498e7c274af7
+2026-08-20 15:24:18 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-20 15:24:18 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-20 15:24:18 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-20 15:24:18 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-20 15:24:18 | INFO     | app.db | Database initialized and seeded
+2026-08-20 15:24:18 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-20 15:24:18 | INFO     | app.services.email_queue | Queued verification VER-5aa93d9cfae744e5 for email delivery
+2026-08-20 15:24:18 | INFO     | app.services.email_queue | Queued verification VER-c14868b7c8c54b7a for email delivery
+2026-08-20 15:24:18 | INFO     | app.services.email_queue | Queued verification VER-33e0498e7c274af7 for email delivery
+2026-08-20 15:24:18 | INFO     | app.services.email_queue | Recovered 3 pending verification(s) into email queue
+2026-08-20 15:24:18 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-20 15:24:18 | INFO     | app.services.workflow_queue | Seeded workflow duration from 4 audit sample(s)
+2026-08-20 15:24:18 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-20 15:24:20 | INFO     | app.services.email_queue | Verification email delivered for VER-5aa93d9cfae744e5
+2026-08-20 15:24:22 | INFO     | app.services.email_queue | Verification email delivered for VER-c14868b7c8c54b7a
+2026-08-20 15:24:23 | INFO     | app.services.email_queue | Verification email delivered for VER-33e0498e7c274af7
+2026-08-20 15:26:48 | INFO     | app.services.ocr_service | Running OCR on image: tmpi193u5my.png
+2026-08-20 15:26:49 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:26:49 | INFO     | app.services.ocr_service | Running OCR on image: tmpzvxdd9mz.png
+2026-08-20 15:26:49 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:26:49 | INFO     | app.services.ocr_service | Running OCR on image: tmp7sjkp25c.png
+2026-08-20 15:26:50 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-20 15:26:50 | INFO     | app.services.ocr_service | Running OCR on image: tmpm2kxx3xm.png
+2026-08-20 15:26:50 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:26:50 | INFO     | app.services.ocr_service | Running OCR on image: tmpbpvw725u.png
+2026-08-20 15:26:51 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:26:51 | INFO     | app.services.ocr_service | Running OCR on image: tmpmac74kif.png
+2026-08-20 15:26:51 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 15:26:51 | INFO     | app.services.ocr_service | Running OCR on image: tmp70al_w34.png
+2026-08-20 15:26:51 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:26:51 | INFO     | app.services.ocr_service | Running OCR on image: tmp292j0bhd.png
+2026-08-20 15:26:52 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:26:52 | INFO     | app.services.ocr_service | Running OCR on image: tmp3dfqcxgc.png
+2026-08-20 15:26:52 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 15:29:49 | INFO     | app.services.ocr_service | Running OCR on image: tmpgkda7kop.png
+2026-08-20 15:29:50 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:29:50 | INFO     | app.services.ocr_service | Running OCR on image: tmp8q8qbd8x.png
+2026-08-20 15:29:50 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:29:50 | INFO     | app.services.ocr_service | Running OCR on image: tmpux_o_h7q.png
+2026-08-20 15:29:50 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-20 15:29:50 | INFO     | app.services.ocr_service | Running OCR on image: tmp1vch2ewi.png
+2026-08-20 15:29:51 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:29:51 | INFO     | app.services.ocr_service | Running OCR on image: tmpwci988yw.png
+2026-08-20 15:29:51 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:29:51 | INFO     | app.services.ocr_service | Running OCR on image: tmpau5f0vgf.png
+2026-08-20 15:29:51 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 15:29:51 | INFO     | app.services.ocr_service | Running OCR on image: tmp7k9_jwo9.png
+2026-08-20 15:29:52 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:29:52 | INFO     | app.services.ocr_service | Running OCR on image: tmp7l83p9p5.png
+2026-08-20 15:29:52 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:29:52 | INFO     | app.services.ocr_service | Running OCR on image: tmpdjajrw50.png
+2026-08-20 15:29:52 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 15:30:08 | INFO     | app.services.ocr_service | Running OCR on image: tmpvdhf8ina.png
+2026-08-20 15:30:08 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:30:08 | INFO     | app.services.ocr_service | Running OCR on image: tmpl0yjn4wl.png
+2026-08-20 15:30:09 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:30:09 | INFO     | app.services.ocr_service | Running OCR on image: tmpmotjg3pf.png
+2026-08-20 15:30:09 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-20 15:30:09 | INFO     | app.services.ocr_service | Running OCR on image: tmp3kb_b143.png
+2026-08-20 15:30:10 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:30:10 | INFO     | app.services.ocr_service | Running OCR on image: tmphg0pz1j7.png
+2026-08-20 15:30:10 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:30:10 | INFO     | app.services.ocr_service | Running OCR on image: tmpopg_gfbm.png
+2026-08-20 15:30:11 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 15:30:11 | INFO     | app.services.ocr_service | Running OCR on image: tmpdqgu86mc.png
+2026-08-20 15:30:11 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:30:11 | INFO     | app.services.ocr_service | Running OCR on image: tmp9plg7mna.png
+2026-08-20 15:30:12 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:30:12 | INFO     | app.services.ocr_service | Running OCR on image: tmpi_3pig9p.png
+2026-08-20 15:30:12 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 15:30:13 | INFO     | app.services.ocr_service | Running OCR on image: tmpdpwxqplw.png
+2026-08-20 15:30:13 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:30:13 | INFO     | app.services.ocr_service | Running OCR on image: tmp_pd8vp3y.png
+2026-08-20 15:30:14 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:30:14 | INFO     | app.services.ocr_service | Running OCR on image: tmpqede337k.png
+2026-08-20 15:30:14 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.30)
+2026-08-20 15:30:14 | INFO     | app.services.ocr_service | Running OCR on image: tmpx3bcu2v2.png
+2026-08-20 15:30:15 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:30:15 | INFO     | app.services.ocr_service | Running OCR on image: tmpw590g80p.png
+2026-08-20 15:30:15 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:30:15 | INFO     | app.services.ocr_service | Running OCR on image: tmpn1olts3o.png
+2026-08-20 15:30:16 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 15:30:16 | INFO     | app.services.ocr_service | Running OCR on image: tmpmy7f56h8.png
+2026-08-20 15:30:16 | INFO     | app.services.classifier | Classified document as cnic (confidence=0.10)
+2026-08-20 15:30:16 | INFO     | app.services.ocr_service | Running OCR on image: tmp09r_ya02.png
+2026-08-20 15:30:17 | INFO     | app.services.classifier | Classified document as payslip (confidence=0.27)
+2026-08-20 15:30:17 | INFO     | app.services.ocr_service | Running OCR on image: tmpdinpz8rz.png
+2026-08-20 15:30:18 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 15:30:18 | INFO     | app.services.workflow_queue | Queued branch entry 972bed54-c9b2-4abe-8d58-2c64eb78ec76 for workflow extraction
+2026-08-20 15:30:18 | INFO     | app.services.workflow_queue | Queued branch entry 450f2b3d-6fe9-48bf-a39e-ee2ed7bf1d5c for workflow extraction
+2026-08-20 15:30:18 | INFO     | app.services.workflow_queue | Queued branch entry 7343cf67-b035-4d85-a8f2-cc07701fd007 for workflow extraction
+2026-08-20 15:30:18 | INFO     | app.services.ocr_service | Running OCR on image: 5b58eae7-a411-4472-b42d-d67c2e47b512.png
+2026-08-20 15:30:19 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-20 15:30:42 | INFO     | app.services.ocr_service | Running OCR on image: df092178-0b82-490f-8433-50df57c87251.png
+2026-08-20 15:30:43 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-20 15:31:26 | INFO     | app.services.ocr_service | Running OCR on image: 26ddc093-a8b6-48f5-ab2c-864bf07b872c.png
+2026-08-20 15:31:26 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-20 15:31:44 | INFO     | app.services.workflow_queue | Completed workflow processing for 972bed54-c9b2-4abe-8d58-2c64eb78ec76
+2026-08-20 15:31:44 | INFO     | app.services.ocr_service | Running OCR on image: 99812d05-5f21-4faa-9e2f-c0186553e4ed.png
+2026-08-20 15:31:45 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-20 15:32:14 | INFO     | app.services.ocr_service | Running OCR on image: e3d8ffd0-1c28-490d-bc64-04988e223ca9.png
+2026-08-20 15:32:15 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-20 15:32:57 | INFO     | app.services.ocr_service | Running OCR on image: 537ca11b-b8d0-4d75-8f95-f53fe2d85ce4.png
+2026-08-20 15:32:58 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 15:32:58 | INFO     | app.services.workflow_queue | Completed workflow processing for 450f2b3d-6fe9-48bf-a39e-ee2ed7bf1d5c
+2026-08-20 15:32:58 | INFO     | app.services.ocr_service | Running OCR on image: 722c8c24-6515-41fa-b660-9a560d34f8b6.png
+2026-08-20 15:32:58 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-20 15:33:22 | INFO     | app.services.ocr_service | Running OCR on image: 6d27abb3-70c1-4d49-82f9-c351d0c78124.png
+2026-08-20 15:33:22 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-20 15:34:04 | INFO     | app.services.ocr_service | Running OCR on image: 56a226d8-8575-4f06-bb6e-e0da8fe12c47.png
+2026-08-20 15:34:05 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 15:34:05 | INFO     | app.services.workflow_queue | Completed workflow processing for 7343cf67-b035-4d85-a8f2-cc07701fd007
+2026-08-20 16:29:56 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-20 16:29:56 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-20 16:29:56 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-20 16:29:56 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-20 16:29:56 | INFO     | app.db | Database initialized and seeded
+2026-08-20 16:29:56 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-20 16:29:56 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-20 16:29:56 | INFO     | app.services.workflow_queue | Seeded workflow duration from 7 audit sample(s)
+2026-08-20 16:29:56 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-20 16:31:06 | INFO     | app.services.ocr_service | Running OCR on image: tmpth2_cgat.png
+2026-08-20 16:31:07 | INFO     | app.services.ocr_service | Running OCR on image: tmp7d51zzcx.png
+2026-08-20 16:31:07 | INFO     | app.services.ocr_service | Running OCR on image: tmpk2_rgqai.png
+2026-08-20 16:31:07 | INFO     | app.services.ocr_service | Running OCR on image: tmp5g2wprao.png
+2026-08-20 16:31:08 | INFO     | app.services.ocr_service | Running OCR on image: tmpssxpatjv.png
+2026-08-20 16:31:08 | INFO     | app.services.ocr_service | Running OCR on image: tmp2mieckdp.png
+2026-08-20 16:31:08 | INFO     | app.services.ocr_service | Running OCR on image: tmpoodimte5.png
+2026-08-20 16:31:09 | INFO     | app.services.ocr_service | Running OCR on image: tmpsts9yzy7.png
+2026-08-20 16:31:09 | INFO     | app.services.ocr_service | Running OCR on image: tmp9lldwtof.png
+2026-08-20 16:31:09 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 16:31:09 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 16:31:32 | INFO     | app.services.ocr_service | Running OCR on image: tmpo6w_k3qy.png
+2026-08-20 16:31:32 | INFO     | app.services.ocr_service | Running OCR on image: tmpfq_09z00.png
+2026-08-20 16:31:33 | INFO     | app.services.ocr_service | Running OCR on image: tmp_7rlxevv.png
+2026-08-20 16:31:33 | INFO     | app.services.ocr_service | Running OCR on image: tmpcj3ysobs.png
+2026-08-20 16:31:33 | INFO     | app.services.ocr_service | Running OCR on image: tmp25kmlse8.png
+2026-08-20 16:31:34 | INFO     | app.services.ocr_service | Running OCR on image: tmp75idrj85.png
+2026-08-20 16:31:34 | INFO     | app.services.ocr_service | Running OCR on image: tmpp8qyo5e1.png
+2026-08-20 16:31:34 | INFO     | app.services.ocr_service | Running OCR on image: tmp436lm5lb.png
+2026-08-20 16:31:35 | INFO     | app.services.ocr_service | Running OCR on image: tmpss824do4.png
+2026-08-20 16:31:35 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 16:31:35 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 16:31:36 | INFO     | app.services.ocr_service | Running OCR on image: tmppyxjnrlq.png
+2026-08-20 16:31:36 | INFO     | app.services.ocr_service | Running OCR on image: tmpdow69kb5.png
+2026-08-20 16:31:36 | INFO     | app.services.ocr_service | Running OCR on image: tmphvn5kct3.png
+2026-08-20 16:31:37 | INFO     | app.services.ocr_service | Running OCR on image: tmphuzhsuyo.png
+2026-08-20 16:31:37 | INFO     | app.services.ocr_service | Running OCR on image: tmp9kk6p1_8.png
+2026-08-20 16:31:38 | INFO     | app.services.ocr_service | Running OCR on image: tmp6dcxijw2.png
+2026-08-20 16:31:38 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 16:31:38 | INFO     | app.services.ocr_service | Running OCR on image: tmpcdziomga.png
+2026-08-20 16:31:38 | INFO     | app.services.ocr_service | Running OCR on image: tmp2afv1hmq.png
+2026-08-20 16:31:39 | INFO     | app.services.ocr_service | Running OCR on image: tmp3tke8hhv.png
+2026-08-20 16:31:39 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 16:31:39 | INFO     | app.services.workflow_queue | Queued branch entry cd5c360f-7fa9-4b66-a922-cfa32c45b0dc for workflow extraction
+2026-08-20 16:31:39 | INFO     | app.services.workflow_queue | Queued branch entry 71803fa9-102d-4e35-a780-ba12f0d4b49c for workflow extraction
+2026-08-20 16:31:39 | INFO     | app.services.workflow_queue | Queued branch entry e63adeac-12e4-40c6-a1ce-228a6f439878 for workflow extraction
+2026-08-20 16:31:39 | INFO     | app.services.ocr_service | Running OCR on image: 4d4f9eee-796b-4879-ad72-445e53e557b9.png
+2026-08-20 16:31:39 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for account_opening_form
+2026-08-20 16:32:11 | INFO     | app.services.ocr_service | Running OCR on image: 5a86cfd1-a1b3-4c40-bbf7-59e5bb58aa73.png
+2026-08-20 16:32:11 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-20 16:32:52 | INFO     | app.services.ocr_service | Running OCR on image: 991b470e-c9c0-41ad-8485-3ef89400ace6.png
+2026-08-20 16:32:52 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-20 16:33:08 | INFO     | app.services.workflow_queue | Completed workflow processing for cd5c360f-7fa9-4b66-a922-cfa32c45b0dc
+2026-08-20 16:33:08 | INFO     | app.services.ocr_service | Running OCR on image: 3ea82042-a3a0-4bc4-b27c-2d78e8f3ebd1.png
+2026-08-20 16:33:09 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for account_opening_form
+2026-08-20 16:33:39 | INFO     | app.services.ocr_service | Running OCR on image: ed299269-bafa-4052-a1d9-f8c8a64d51de.png
+2026-08-20 16:33:39 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-20 16:34:22 | INFO     | app.services.ocr_service | Running OCR on image: bcb6a9b9-35a6-4f0c-b9e6-009867356af1.png
+2026-08-20 16:34:22 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 16:34:22 | INFO     | app.services.workflow_queue | Completed workflow processing for 71803fa9-102d-4e35-a780-ba12f0d4b49c
+2026-08-20 16:34:22 | INFO     | app.services.ocr_service | Running OCR on image: 24c2f269-e058-494f-b13d-b078a49ff150.png
+2026-08-20 16:34:23 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for account_opening_form
+2026-08-20 16:34:52 | INFO     | app.services.ocr_service | Running OCR on image: 9c155f2a-34ab-40f2-85bc-bf1b6ce44309.png
+2026-08-20 16:34:53 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-20 16:35:36 | INFO     | app.services.ocr_service | Running OCR on image: 6bf45075-f88c-4e68-bd99-d9626926b23d.png
+2026-08-20 16:35:36 | WARNING  | app.services.classifier | Unable to classify document from OCR text
+2026-08-20 16:35:36 | INFO     | app.services.workflow_queue | Completed workflow processing for e63adeac-12e4-40c6-a1ce-228a6f439878

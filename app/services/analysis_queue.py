@@ -1,12 +1,9 @@
-"""Single-worker queue so Ollama analyzes one application at a time."""
+"""Single-worker queue so LLM analysis runs one application at a time."""
 
 from __future__ import annotations
 
-import queue
-import threading
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from app.db import SessionLocal
 from app.logging_config import get_logger
@@ -16,45 +13,38 @@ from app.services.ai_progress import ai_progress
 from app.services.application_storage import document_paths_map
 from app.services.document_archive import index_application_documents
 from app.services.audit import write_audit
+from app.services.queue_eta import (
+    DEFAULT_PORTAL_SECONDS,
+    PORTAL_DOC_COUNT,
+    InspectableFifo,
+    load_portal_duration_samples,
+    progress_marks_doc_done,
+)
 from app.services.verification_pipeline import VerificationPipeline
 
 logger = get_logger(__name__)
 
 
-class AnalysisQueue:
-    """FIFO queue with one background worker (serial Ollama usage)."""
+class AnalysisQueue(InspectableFifo):
+    """FIFO queue with one background worker (serial LLM usage)."""
 
     def __init__(self) -> None:
-        self._queue: queue.Queue[uuid.UUID] = queue.Queue()
-        self._queued: set[str] = set()
-        self._lock = threading.Lock()
-        self._thread: Optional[threading.Thread] = None
-        self._started = False
+        self.__init_fifo__(default_avg=DEFAULT_PORTAL_SECONDS, per_doc=False)
         self._pipeline = VerificationPipeline()
 
     def start(self) -> None:
-        with self._lock:
-            if self._started:
-                return
-            self._started = True
-            self._thread = threading.Thread(
-                target=self._worker,
-                name="analysis-queue-worker",
-                daemon=True,
-            )
-            self._thread.start()
+        started = self._start_worker(self._worker, "analysis-queue-worker")
+        if not started:
+            return
         self.recover_pending()
+        self._seed_from_audit()
         logger.info("Analysis queue worker started")
 
     def enqueue(self, application_id: uuid.UUID | str) -> None:
-        app_id = uuid.UUID(str(application_id))
-        key = str(app_id)
-        with self._lock:
-            if key in self._queued:
-                logger.info("Application %s already queued", key)
-                return
-            self._queued.add(key)
-        self._queue.put(app_id)
+        key = str(uuid.UUID(str(application_id)))
+        if not self._enqueue_job(key, PORTAL_DOC_COUNT):
+            logger.info("Application %s already queued", key)
+            return
         ai_progress.set(
             key,
             stage="queued",
@@ -92,35 +82,45 @@ class AnalysisQueue:
         finally:
             db.close()
 
+    def _seed_from_audit(self) -> None:
+        db = SessionLocal()
+        try:
+            samples = load_portal_duration_samples(db)
+            if samples:
+                self.seed_duration_samples(samples)
+                logger.info("Seeded analysis duration from %s audit sample(s)", len(samples))
+        except Exception:
+            logger.exception("Failed to seed analysis duration samples")
+        finally:
+            db.close()
+
     def _worker(self) -> None:
         while True:
-            app_id = self._queue.get()
-            key = str(app_id)
+            job_id, _docs_total = self._dequeue_job()
+            recorded = False
             try:
-                self._analyze(app_id)
+                recorded = self._analyze(uuid.UUID(job_id))
             except Exception:
-                logger.exception("Unhandled analysis worker error for %s", key)
+                logger.exception("Unhandled analysis worker error for %s", job_id)
             finally:
-                with self._lock:
-                    self._queued.discard(key)
-                self._queue.task_done()
+                self._finish_job(job_id, record=recorded)
 
-    def _analyze(self, application_id: uuid.UUID) -> None:
+    def _analyze(self, application_id: uuid.UUID) -> bool:
         db = SessionLocal()
         try:
             app = db.query(Application).filter(Application.id == application_id).first()
             if not app:
                 logger.warning("Queued application %s not found", application_id)
-                return
+                return False
             if app.status in (
                 ApplicationStatus.accepted.value,
                 ApplicationStatus.rejected.value,
             ):
                 logger.info("Skipping %s — already decided", application_id)
-                return
+                return False
             if app.status == ApplicationStatus.completed.value and app.report_json:
                 logger.info("Skipping %s — already completed", application_id)
-                return
+                return False
 
             app.status = ApplicationStatus.analyzing.value
             write_audit(
@@ -135,8 +135,11 @@ class AnalysisQueue:
             logger.info("Analyzing application %s", application_id)
 
             app_key = str(application_id)
+            self.set_current_docs_total(PORTAL_DOC_COUNT)
 
             def _on_progress(stage: str, message: str) -> None:
+                if progress_marks_doc_done(stage, message):
+                    self.mark_doc_done()
                 ai_progress.set(
                     app_key,
                     stage=stage,
@@ -179,7 +182,7 @@ class AnalysisQueue:
 
             app = db.query(Application).filter(Application.id == application_id).first()
             if not app:
-                return
+                return False
             app.report_json = report.model_dump(mode="json")
             app.status = ApplicationStatus.completed.value
             app.analyzed_at = datetime.utcnow()
@@ -206,6 +209,7 @@ class AnalysisQueue:
                 done=True,
             )
             logger.info("Completed analysis for %s", application_id)
+            return True
         except Exception as exc:
             db.rollback()
             try:
@@ -224,6 +228,7 @@ class AnalysisQueue:
             except Exception:
                 db.rollback()
             logger.exception("AI analysis failed for %s — returned to pending", application_id)
+            return False
         finally:
             db.close()
 

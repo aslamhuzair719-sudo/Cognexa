@@ -28,6 +28,7 @@ from app.models import (
 )
 from app.services.analysis_queue import analysis_queue
 from app.services.ai_progress import ai_progress
+from app.services.queue_eta import eta_payload
 from app.services.application_storage import resolve_document_path
 from app.services.audit import write_audit
 from app.services.branch_entry_storage import (
@@ -136,6 +137,9 @@ def _detail(app: Application) -> dict:
             "documents": docs,
             "decision_note": app.decision_note,
             "ai_progress": ai_progress.snapshot_for_app(str(app.id), app.status),
+            "queue_eta": eta_payload(
+                str(app.id), app.status, analysis_queue.snapshot()
+            ),
         }
     )
     return payload
@@ -1471,6 +1475,9 @@ def list_records(
     include_portal = source in (None, "", "all", SOURCE_CUSTOMER_PORTAL)
     include_branch = source in (None, "", "all", SOURCE_BRANCH_ENTRY)
 
+    portal_snapshot = analysis_queue.snapshot() if include_portal else None
+    workflow_snapshot = workflow_queue.snapshot() if include_branch else None
+
     if include_portal:
         apps = (
             db.query(Application)
@@ -1483,6 +1490,7 @@ def list_records(
             item = _list_item(app)
             item["source"] = SOURCE_CUSTOMER_PORTAL
             item["document_count"] = 4
+            item["queue_eta"] = eta_payload(str(app.id), app.status, portal_snapshot)
             rows.append(item)
 
     if include_branch:
@@ -1496,7 +1504,12 @@ def list_records(
             .order_by(BranchEntry.created_at.desc())
             .all()
         )
-        rows.extend(_branch_entry_list_item(e) for e in entries)
+        for entry in entries:
+            item = _branch_entry_list_item(entry)
+            item["queue_eta"] = eta_payload(
+                str(entry.id), entry.status, workflow_snapshot
+            )
+            rows.append(item)
 
     rows.sort(key=lambda r: r.get("created_at") or "", reverse=True)
     return rows
@@ -1654,6 +1667,9 @@ def get_branch_entry(
             "verification_email_confirmed_at": entry.verification_email_confirmed_at.isoformat() if entry.verification_email_confirmed_at else None,
             "verification_email_note": entry.verification_email_note,
             "documents": [_branch_entry_doc_meta(entry.id, d) for d in (entry.documents or [])],
+            "queue_eta": eta_payload(
+                str(entry.id), entry.status or "saved", workflow_queue.snapshot()
+            ),
         }
     )
     return item

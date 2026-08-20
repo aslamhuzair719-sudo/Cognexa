@@ -48,19 +48,69 @@ DOCUMENT_TYPE_LABELS = {
 }
 
 ACCOUNT_OPENING_KEYWORDS = [
+    "first applicant",
     "account opening",
     "application form",
-    "customer name",
-    "father name",
-    "signature",
     "opening form",
-    "branch code",
-    "date of application",
-    "account number",
-    "balance",
-    "nominee",
-    "address",
+    "please complete all section",
+    "block capitals",
+    "personal information",
+    "forenames",
+    "current residential address",
+    "date of entry to this address",
+    "country of residence for tax",
+    "related tin",
+    "green card",
+    "residence in the usa",
+    "mr/mrs/miss",
+    "nationality",
+    "post code",
+    "postcode",
+    "section 1",
+    "section 2",
 ]
+
+CNIC_KEYWORDS = [
+    "national identity card",
+    "identity card",
+    "identity number",
+    "nadra",
+    "cnic",
+    "republic of pakistan",
+    "holder's signature",
+    "date of issue",
+    "date of expiry",
+    "issue date",
+    "expiry date",
+]
+
+PAYSLIP_KEYWORDS = [
+    "payslip",
+    "pay slip",
+    "salary slip",
+    "gross salary",
+    "net pay",
+    "net salary",
+    "basic salary",
+    "pay period",
+    "earnings",
+    "deduction",
+    "overtime",
+    "ytd",
+    "year to date",
+]
+
+SEPARATOR_PHRASES = [
+    "blank page",
+    "this page is intentionally left blank",
+    "intentionally left blank",
+    "this page is blank",
+    "page is intentionally blank",
+]
+
+WORKFLOW_SEQUENCE = ("account_opening_form", "payslip", "cnic")
+MAYBE_BLANK_INK_RATIO = 0.08
+SEPARATOR_TEXT_CHAR_LIMIT = 120
 
 
 class WorkflowService:
@@ -87,6 +137,7 @@ class WorkflowService:
                 f"Maximum supported is {config.WORKFLOW_MAX_PAGE_COUNT}."
             )
 
+        self._ocr_and_mark_separators(rendered_pages)
         segments = self._segment_pages(rendered_pages)
         if not segments["groups"]:
             raise ValueError("Workflow PDF contains only blank or separator pages.")
@@ -121,16 +172,19 @@ class WorkflowService:
             for idx, page in enumerate(doc, start=1):
                 pix = page.get_pixmap(dpi=150, colorspace=fitz.csGRAY)
                 image_bytes = pix.tobytes("png")
+                ink_ratio = self._ink_ratio(image_bytes)
                 pages.append({
                     "page": idx,
                     "image_bytes": image_bytes,
-                    "blank": self._is_blank_page(image_bytes),
+                    "ink_ratio": ink_ratio,
+                    "blank": ink_ratio < config.BLANK_PAGE_INK_RATIO_THRESHOLD,
+                    "raw_text": "",
                 })
         finally:
             doc.close()
         return pages
 
-    def _is_blank_page(self, image_bytes: bytes) -> bool:
+    def _ink_ratio(self, image_bytes: bytes) -> float:
         with Image.open(io.BytesIO(image_bytes)) as img:
             image = img.convert("L")
             width, height = image.size
@@ -143,8 +197,41 @@ class WorkflowService:
             crop = image.crop(crop_box)
             pixels = list(crop.getdata())
             dark_pixels = sum(1 for value in pixels if value < 230)
-            ink_ratio = dark_pixels / max(1, len(pixels))
-            return ink_ratio < config.BLANK_PAGE_INK_RATIO_THRESHOLD
+            return dark_pixels / max(1, len(pixels))
+
+    def _is_blank_page(self, image_bytes: bytes) -> bool:
+        return self._ink_ratio(image_bytes) < config.BLANK_PAGE_INK_RATIO_THRESHOLD
+
+    @staticmethod
+    def _letters_only(text: str) -> str:
+        return "".join(ch.lower() if ch.isalnum() or ch.isspace() else " " for ch in (text or ""))
+
+    def _is_separator_text(self, raw_text: str, ink_ratio: float) -> bool:
+        if ink_ratio < config.BLANK_PAGE_INK_RATIO_THRESHOLD:
+            return True
+        letters = " ".join(self._letters_only(raw_text).split())
+        lower = (raw_text or "").lower()
+        if not letters:
+            return ink_ratio < MAYBE_BLANK_INK_RATIO
+        if any(phrase in lower for phrase in SEPARATOR_PHRASES):
+            return len(letters) < SEPARATOR_TEXT_CHAR_LIMIT
+        return len(letters) < 25 and ink_ratio < MAYBE_BLANK_INK_RATIO
+
+    def _ocr_and_mark_separators(self, rendered_pages: List[Dict[str, Any]]) -> None:
+        for page_data in rendered_pages:
+            if page_data.get("blank"):
+                page_data["raw_text"] = ""
+                continue
+            raw_text = self._ocr_page(page_data["image_bytes"], page_data["page"])
+            page_data["raw_text"] = raw_text
+            if self._is_separator_text(raw_text, float(page_data.get("ink_ratio") or 0)):
+                page_data["blank"] = True
+                self.logger.info(
+                    "Treating page %s as a customer separator (ink=%.4f, text=%r)",
+                    page_data["page"],
+                    float(page_data.get("ink_ratio") or 0),
+                    (raw_text or "")[:80],
+                )
 
     def _segment_pages(self, rendered_pages: List[Dict[str, Any]]) -> Dict[str, Any]:
         groups: List[Dict[str, Any]] = []
@@ -191,8 +278,11 @@ class WorkflowService:
             if page_data["blank"]:
                 continue
             page_number = page_data["page"]
-            raw_text = self._ocr_page(page_data["image_bytes"], page_number)
-            doc_type, confidence = self._classify_page(raw_text)
+            raw_text = page_data.get("raw_text") or ""
+            if not raw_text:
+                raw_text = self._ocr_page(page_data["image_bytes"], page_number)
+                page_data["raw_text"] = raw_text
+            doc_type, confidence, scores = self._classify_page(raw_text)
             needs_review = confidence < config.WORKFLOW_CLASSIFICATION_CONFIDENCE_THRESHOLD
             documents[page_number] = {
                 "page": page_number,
@@ -201,6 +291,7 @@ class WorkflowService:
                 "confidence": confidence,
                 "needs_review": needs_review,
                 "raw_text": raw_text,
+                "scores": scores,
                 "fields": {},
                 "summary": {
                     "summary": "Page classified using OCR and keyword rules. LLM extraction will run when the group is queued.",
@@ -221,24 +312,115 @@ class WorkflowService:
         finally:
             tmp_path.unlink(missing_ok=True)
 
-    def _classify_page(self, raw_text: str) -> tuple[str, float]:
-        text = raw_text.strip()
-        if not text:
-            return "unknown", 0.0
+    @staticmethod
+    def _keyword_score(text_lower: str, keywords: List[str]) -> float:
+        if not keywords:
+            return 0.0
+        matched = sum(1 for keyword in keywords if keyword in text_lower)
+        if matched <= 0:
+            return 0.0
+        return round(min(1.0, matched / max(3, len(keywords) * 0.45)), 2)
 
-        classification = self.classifier.classify(text)
-        doc_type = classification["document_type"]
-        confidence = classification["confidence"]
-        text_lower = text.lower()
+    def _type_scores(self, raw_text: str) -> Dict[str, float]:
+        text_lower = (raw_text or "").lower()
+        return {
+            "account_opening_form": self._keyword_score(text_lower, ACCOUNT_OPENING_KEYWORDS),
+            "payslip": self._keyword_score(text_lower, PAYSLIP_KEYWORDS),
+            "cnic": self._keyword_score(text_lower, CNIC_KEYWORDS),
+        }
 
-        if doc_type == "unknown" or doc_type == "bank_statement":
-            if any(keyword in text_lower for keyword in ACCOUNT_OPENING_KEYWORDS):
-                return "account_opening_form", max(confidence, 0.52)
+    def _classify_page(self, raw_text: str) -> tuple[str, float, Dict[str, float]]:
+        text = (raw_text or "").strip()
+        scores = self._type_scores(text)
+        if not text or max(scores.values()) <= 0:
+            classification = self.classifier.classify(text) if text else {
+                "document_type": "unknown",
+                "confidence": 0.0,
+            }
+            fallback_type = classification["document_type"]
+            if fallback_type == "bank_statement":
+                fallback_type = "account_opening_form"
+            if fallback_type not in DOCUMENT_TYPE_LABELS:
+                fallback_type = "unknown"
+            scores[fallback_type] = max(
+                scores.get(fallback_type, 0.0),
+                float(classification.get("confidence") or 0.0),
+            )
+            return fallback_type, float(classification.get("confidence") or 0.0), scores
 
-        if doc_type not in DOCUMENT_TYPE_LABELS:
-            return "unknown", confidence
+        best_type = max(scores, key=scores.get)
+        return best_type, scores[best_type], scores
 
-        return doc_type, confidence
+    def _assign_group_document_types(self, docs: List[Dict[str, Any]]) -> None:
+        """Prefer distinctive scores, then the expected form → payslip → CNIC order."""
+        if not docs:
+            return
+
+        scores_by_index = [doc.get("scores") or self._type_scores(doc.get("raw_text") or "") for doc in docs]
+        assigned: Dict[int, str] = {}
+
+        def best_index(doc_type: str, excluded: set[int]) -> tuple[Optional[int], float]:
+            best_i: Optional[int] = None
+            best_score = -1.0
+            for index, score_map in enumerate(scores_by_index):
+                if index in excluded:
+                    continue
+                value = float(score_map.get(doc_type) or 0.0)
+                if value > best_score:
+                    best_score = value
+                    best_i = index
+            return best_i, best_score
+
+        form_index, form_score = best_index("account_opening_form", set())
+        if len(docs) in {2, 3, 4} and (form_index is None or form_score < 0.2):
+            form_index = 0
+        if form_index is not None:
+            assigned[form_index] = "account_opening_form"
+
+        payslip_index, payslip_score = best_index("payslip", set(assigned))
+        if len(docs) >= 2 and (payslip_index is None or payslip_score < 0.2):
+            fallback = 1 if 1 not in assigned else payslip_index
+            payslip_index = fallback
+        if payslip_index is not None and payslip_index not in assigned:
+            assigned[payslip_index] = "payslip"
+
+        for index, doc in enumerate(docs):
+            if index in assigned:
+                continue
+            cnic_score = float(scores_by_index[index].get("cnic") or 0.0)
+            if cnic_score >= 0.1 or index >= 2:
+                assigned[index] = "cnic"
+            elif doc.get("document_type") in DOCUMENT_TYPE_LABELS:
+                assigned[index] = doc["document_type"]
+            else:
+                assigned[index] = WORKFLOW_SEQUENCE[min(index, len(WORKFLOW_SEQUENCE) - 1)]
+
+        for index, doc in enumerate(docs):
+            new_type = assigned.get(index, doc.get("document_type") or "unknown")
+            old_type = doc.get("document_type")
+            flags = list((doc.get("summary") or {}).get("flags") or [])
+            if new_type != old_type:
+                flags.append("sequence_corrected")
+            score = float((doc.get("scores") or {}).get(new_type) or 0.0)
+            if new_type in {"account_opening_form", "payslip", "cnic"} and score < 0.2:
+                score = max(score, 0.72)
+                flags.append("sequence_assigned")
+            doc["document_type"] = new_type
+            doc["document_type_label"] = DOCUMENT_TYPE_LABELS.get(new_type, new_type)
+            doc["confidence"] = max(float(doc.get("confidence") or 0.0), score)
+            doc["needs_review"] = doc["confidence"] < config.WORKFLOW_CLASSIFICATION_CONFIDENCE_THRESHOLD
+            summary = dict(doc.get("summary") or {})
+            summary["flags"] = flags
+            doc["summary"] = summary
+            doc.pop("scores", None)
+
+        types_present = {doc.get("document_type") for doc in docs}
+        compact_pack = len(docs) in {2, 3, 4} and "account_opening_form" in types_present and "payslip" in types_present
+        if compact_pack:
+            for doc in docs:
+                if doc.get("document_type") in DOCUMENT_TYPE_LABELS:
+                    doc["confidence"] = max(float(doc.get("confidence") or 0.0), 0.75)
+                    doc["needs_review"] = False
 
     def _extract_page(self, image_bytes: bytes, document_type: str, page_number: int) -> Dict[str, Any]:
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
@@ -394,6 +576,7 @@ class WorkflowService:
         result: List[Dict[str, Any]] = []
         for group in groups:
             docs = [documents[page] for page in group["pages"] if page in documents]
+            self._assign_group_document_types(docs)
             validation = self._validate_group_documents(docs)
             result.append(
                 {

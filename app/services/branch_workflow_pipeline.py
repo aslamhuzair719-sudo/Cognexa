@@ -246,13 +246,27 @@ class BranchWorkflowPipeline:
 
         full_name = self._pick(
             ff.get("applicant_name"),
+            " ".join(
+                part
+                for part in (
+                    str(ff.get("title") or "").strip(),
+                    str(ff.get("forenames") or "").strip(),
+                    str(ff.get("surname") or "").strip(),
+                )
+                if part
+            ),
             cf.get("name"),
             pf.get("employee_name"),
             default="Unknown Applicant",
         )
         age = self._pick(ff.get("age"), default="N/A")
         email = self._pick(ff.get("email"), pf.get("email"), default="workflow@example.com")
-        mobile = self._pick(ff.get("mobile_number"), pf.get("phone"), default="03000000000")
+        mobile = self._pick(
+            ff.get("mobile_number"),
+            ff.get("home_phone"),
+            pf.get("phone"),
+            default="03000000000",
+        )
 
         father_name = self._pick(ff.get("father_name"), cf.get("father_name"), default=full_name)
         cnic_number = self._pick(ff.get("cnic_number"), cf.get("cnic_number"), default="00000-0000000-0")
@@ -260,7 +274,12 @@ class BranchWorkflowPipeline:
         issue_date = self._pick(cf.get("issue_date"), default="01.01.2020")
         expiry_date = self._pick(cf.get("expiry_date"), default="01.01.2030")
         gender = self._pick(ff.get("gender"), cf.get("gender"), default="M")
-        country = self._pick(ff.get("country_to_stay"), cf.get("country_to_stay"), default="Pakistan")
+        country = self._pick(
+            ff.get("country_to_stay"),
+            ff.get("nationality"),
+            cf.get("country_to_stay"),
+            default="Pakistan",
+        )
 
         company = self._pick(ff.get("company_name"), pf.get("company_name"), default="N/A")
         designation = self._pick(ff.get("designation"), pf.get("designation"), default="N/A")

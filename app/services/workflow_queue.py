@@ -2,63 +2,77 @@
 
 from __future__ import annotations
 
-import queue
-import threading
 import uuid
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy import func
+from sqlalchemy.orm import joinedload
+
 from app.db import SessionLocal
 from app.logging_config import get_logger
-from app.models import BranchEntry
+from app.models import BranchEntry, BranchEntryDocument
 from app.services.audit import write_audit
 from app.services.document_archive import index_branch_entry
+from app.services.queue_eta import (
+    DEFAULT_WORKFLOW_SECONDS_PER_DOC,
+    InspectableFifo,
+    load_workflow_duration_samples,
+    progress_marks_doc_done,
+)
 from app.services.workflow_service import WorkflowService, DOCUMENT_TYPE_LABELS
-from sqlalchemy.orm import joinedload
 
 logger = get_logger(__name__)
 
 
-class WorkflowQueue:
+class WorkflowQueue(InspectableFifo):
     """FIFO queue — processes one customer workflow (branch entry) at a time."""
 
     def __init__(self) -> None:
-        self._queue: queue.Queue[uuid.UUID] = queue.Queue()
-        self._queued: set[str] = set()
-        self._lock = threading.Lock()
-        self._thread: Optional[threading.Thread] = None
-        self._started = False
+        self.__init_fifo__(
+            default_avg=DEFAULT_WORKFLOW_SECONDS_PER_DOC * 3,
+            per_doc=True,
+            default_per_doc=DEFAULT_WORKFLOW_SECONDS_PER_DOC,
+        )
         self._service = WorkflowService()
 
     def start(self) -> None:
-        with self._lock:
-            if self._started:
-                return
-            self._started = True
-            self._thread = threading.Thread(
-                target=self._worker,
-                name="workflow-queue-worker",
-                daemon=True,
-            )
-            self._thread.start()
+        started = self._start_worker(self._worker, "workflow-queue-worker")
+        if not started:
+            return
         self.recover_pending()
+        self._seed_from_audit()
         logger.info("Workflow queue worker started")
 
-    def enqueue(self, entry_id: uuid.UUID | str) -> None:
+    def enqueue(self, entry_id: uuid.UUID | str, docs_total: Optional[int] = None) -> None:
         key = str(entry_id)
-        with self._lock:
-            if key in self._queued:
-                logger.info("Branch entry %s already queued for workflow", key)
-                return
-            self._queued.add(key)
-        self._queue.put(uuid.UUID(str(entry_id)))
+        count = docs_total if docs_total is not None else self._lookup_doc_count(key)
+        if not self._enqueue_job(key, count):
+            logger.info("Branch entry %s already queued for workflow", key)
+            return
         logger.info("Queued branch entry %s for workflow extraction", key)
+
+    def _lookup_doc_count(self, entry_id: str) -> int:
+        db = SessionLocal()
+        try:
+            n = (
+                db.query(func.count(BranchEntryDocument.id))
+                .filter(BranchEntryDocument.branch_entry_id == entry_id)
+                .scalar()
+            )
+            return max(1, int(n or 1))
+        except Exception:
+            logger.exception("Failed to count documents for workflow entry %s", entry_id)
+            return 3
+        finally:
+            db.close()
 
     def recover_pending(self) -> None:
         db = SessionLocal()
         try:
             stuck = (
                 db.query(BranchEntry)
+                .options(joinedload(BranchEntry.documents))
                 .filter(BranchEntry.status.in_(["pending", "analyzing"]))
                 .filter(BranchEntry.workflow_type.isnot(None))
                 .order_by(BranchEntry.created_at.asc())
@@ -67,7 +81,7 @@ class WorkflowQueue:
             for entry in stuck:
                 if entry.status == "analyzing":
                     entry.status = "pending"
-                self.enqueue(entry.id)
+                self.enqueue(entry.id, docs_total=max(1, len(entry.documents or [])))
             db.commit()
             if stuck:
                 logger.info("Recovered %s workflow branch entr(ies) into queue", len(stuck))
@@ -77,20 +91,30 @@ class WorkflowQueue:
         finally:
             db.close()
 
+    def _seed_from_audit(self) -> None:
+        db = SessionLocal()
+        try:
+            samples = load_workflow_duration_samples(db)
+            if samples:
+                self.seed_duration_samples(samples)
+                logger.info("Seeded workflow duration from %s audit sample(s)", len(samples))
+        except Exception:
+            logger.exception("Failed to seed workflow duration samples")
+        finally:
+            db.close()
+
     def _worker(self) -> None:
         while True:
-            entry_id = self._queue.get()
-            key = str(entry_id)
+            job_id, _docs_total = self._dequeue_job()
+            recorded = False
             try:
-                self._process(entry_id)
+                recorded = self._process(uuid.UUID(job_id))
             except Exception:
-                logger.exception("Unhandled workflow worker error for %s", key)
+                logger.exception("Unhandled workflow worker error for %s", job_id)
             finally:
-                with self._lock:
-                    self._queued.discard(key)
-                self._queue.task_done()
+                self._finish_job(job_id, record=recorded)
 
-    def _process(self, entry_id: uuid.UUID) -> None:
+    def _process(self, entry_id: uuid.UUID) -> bool:
         db = SessionLocal()
         try:
             entry = (
@@ -101,10 +125,10 @@ class WorkflowQueue:
             )
             if not entry:
                 logger.warning("Queued branch entry %s not found", entry_id)
-                return
+                return False
             if entry.status in {"completed", "review_required"} and entry.analyzed_at:
                 logger.info("Skipping %s — workflow already processed", entry_id)
-                return
+                return False
 
             entry.status = "analyzing"
             entry.workflow_meta_json = {
@@ -124,9 +148,12 @@ class WorkflowQueue:
             db.commit()
 
             documents = list(entry.documents or [])
+            self.set_current_docs_total(max(1, len(documents)))
             workflow_type = entry.workflow_type or "account_opening"
 
             def _on_progress(stage: str, message: str) -> None:
+                if progress_marks_doc_done(stage, message):
+                    self.mark_doc_done()
                 session = SessionLocal()
                 try:
                     row = session.query(BranchEntry).filter(BranchEntry.id == entry_id).first()
@@ -207,6 +234,7 @@ class WorkflowQueue:
             index_branch_entry(db, entry, document_type_labels=DOCUMENT_TYPE_LABELS)
             db.commit()
             logger.info("Completed workflow processing for %s", entry_id)
+            return True
         except Exception as exc:
             db.rollback()
             try:
@@ -233,6 +261,7 @@ class WorkflowQueue:
             except Exception:
                 db.rollback()
             logger.exception("Workflow processing failed for %s", entry_id)
+            return False
         finally:
             db.close()
 

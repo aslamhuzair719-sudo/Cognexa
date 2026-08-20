@@ -134,6 +134,8 @@ class ExtractionPipeline:
         self, doc_type: str, ocr_text: str, fields: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Fix fields the LLM commonly mangles using deterministic OCR patterns."""
+        if doc_type == "account_opening_form":
+            return self._compose_applicant_name(fields)
         if doc_type != "cnic":
             return fields
 
@@ -167,4 +169,28 @@ class ExtractionPipeline:
                     )
                     fields["gender"] = digit_gender
 
+        return fields
+
+    @staticmethod
+    def _compose_applicant_name(fields: Dict[str, Any]) -> Dict[str, Any]:
+        existing = str(fields.get("applicant_name") or "").strip()
+        if existing and existing.lower() not in {"null", "none", "n/a"}:
+            return fields
+        parts = [
+            str(fields.get("title") or "").strip(),
+            str(fields.get("forenames") or "").strip(),
+            str(fields.get("surname") or "").strip(),
+        ]
+        composed = " ".join(
+            part for part in parts if part and part.lower() not in {"null", "none"}
+        )
+        if composed:
+            fields["applicant_name"] = composed
+        gender = str(fields.get("gender") or "").strip()
+        if not gender or gender.lower() in {"null", "none", "n/a"}:
+            title = str(fields.get("title") or "").strip().lower().replace(".", "")
+            if title in {"mrs", "miss", "ms"}:
+                fields["gender"] = "F"
+            elif title == "mr":
+                fields["gender"] = "M"
         return fields

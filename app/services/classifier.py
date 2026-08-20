@@ -19,21 +19,31 @@ class BaseClassifier(ABC):
 
 
 class KeywordClassifier(BaseClassifier):
-    """Keyword-based classifier for CNIC, payslip, and bank statement."""
+    """Keyword-based classifier for CNIC, payslip, bank statement, and account opening forms."""
 
     def __init__(self) -> None:
         self.keywords = {
             "cnic": [
                 "national identity card",
+                "identity card",
                 "identity number",
-                "father name",
-                "date of birth",
                 "issue date",
                 "expiry date",
                 "holder's signature",
                 "republic of pakistan",
                 "nadra",
                 "cnic",
+            ],
+            "account_opening_form": [
+                "first applicant",
+                "account opening",
+                "application form",
+                "forenames",
+                "current residential address",
+                "country of residence for tax",
+                "green card",
+                "block capitals",
+                "personal information",
             ],
             "payslip": [
                 "payslip",
@@ -79,7 +89,10 @@ class KeywordClassifier(BaseClassifier):
             logger.warning("Unable to classify document from OCR text")
             return {"document_type": "unknown", "confidence": 0.0}
 
-        best_type = max(scores, key=lambda k: scores[k]["matched_count"])
+        best_type = max(
+            scores,
+            key=lambda k: (scores[k]["matched_count"], scores[k]["confidence"]),
+        )
         result = {
             "document_type": best_type,
             "confidence": scores[best_type]["confidence"],
