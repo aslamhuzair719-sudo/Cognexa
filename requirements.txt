@@ -7,15 +7,19 @@ requests>=2.32.0
 pydantic[email]>=2.0.0
 python-multipart>=0.0.9
 python-dotenv>=1.0.0
+
 numpy>=1.26.0,<2
 opencv-python-headless>=4.8.0,<4.11
-# Pin 2.x on Windows — paddleocr 3.x + paddlepaddle 3.x hits oneDNN/PIR crashes
+
+# PaddleOCR 2.x compatibility
 paddlepaddle==2.6.2
 paddleocr==2.7.3
+
 sqlalchemy>=2.0.0
 psycopg2-binary>=2.9.0
 bcrypt>=4.0.0
 itsdangerous>=2.1.0
 reportlab>=4.0.0
+
 torch>=2.2.0
-dnspython>=3.3.0
+dnspython==2.8.0
