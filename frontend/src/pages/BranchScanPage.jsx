@@ -622,8 +622,9 @@ export default function BranchScanPage() {
                   <option value="account_opening">Account Opening Workflow</option>
                 </select>
                 <p className="hint" style={{ marginTop: '0.5rem' }}>
-                  Per customer: Account Opening Form + Payslip. CNIC front is optional.
-                  CNIC back is not required. Separate customers with a blank page.
+                  Per customer: Account Opening Form, then Payslip, then CNIC.
+                  Separate customers with a blank page (a page labelled "Blank Page" also works).
+                  CNIC back is not required.
                 </p>
               </label>
             )}

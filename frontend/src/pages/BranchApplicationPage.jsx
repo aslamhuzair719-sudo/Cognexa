@@ -4,6 +4,7 @@ import { api, downloadUrl } from '../api'
 import { AiActivityPanel } from '../components/AiActivityPanel.jsx'
 import BrandHeader from '../components/BrandHeader.jsx'
 import ReportView from '../components/ReportView.jsx'
+import QueueEta from '../components/QueueEta.jsx'
 import StatusPill from '../components/StatusPill.jsx'
 import AlertBanner from '../components/ui/AlertBanner.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
@@ -44,11 +45,13 @@ export default function BranchApplicationPage() {
   const [sendingVerification, setSendingVerification] = useState(false)
   const [confirmingVerification, setConfirmingVerification] = useState(false)
   const [activeTab, setActiveTab] = useState('report') // 'report' | 'docs' | 'verification'
+  const [etaSyncedAt, setEtaSyncedAt] = useState(0)
   const toast = useToast()
 
   async function load() {
     const app = await api(`/api/v1/branch/applications/${id}`)
     setDetail(app)
+    setEtaSyncedAt(Date.now())
     setVerificationTarget(app.verification_email_target || '')
     setVerificationNote(app.verification_email_note || '')
     setVerificationDocument(
@@ -234,7 +237,10 @@ export default function BranchApplicationPage() {
           }
         >
           <div className="page-header-pills">
-            <StatusPill status={detail.status} />
+            <div className="queue-status-cell">
+              <StatusPill status={detail.status} />
+              <QueueEta eta={detail.queue_eta} syncedAt={etaSyncedAt} compact />
+            </div>
             {detail.has_report ? <span className="page-header-badge">Report ready</span> : null}
             <span className="page-header-badge">{docCount} documents</span>
           </div>
@@ -243,6 +249,11 @@ export default function BranchApplicationPage() {
         {/* Dynamic AI Status Banner */}
         {['pending', 'analyzing'].includes(detail.status) || detail.ai_progress ? (
           <div className="ai-activity-wrap" style={{ marginBottom: '1.5rem' }}>
+            {detail.queue_eta ? (
+              <p className="queue-eta-banner">
+                <QueueEta eta={detail.queue_eta} syncedAt={etaSyncedAt} />
+              </p>
+            ) : null}
             <AiActivityPanel
               title="Cognexa AI Activity"
               message={detail.ai_progress?.message}

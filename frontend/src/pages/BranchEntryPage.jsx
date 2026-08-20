@@ -4,6 +4,7 @@ import { api } from '../api'
 import { AiActivityPanel } from '../components/AiActivityPanel.jsx'
 import BrandHeader from '../components/BrandHeader.jsx'
 import ReportView from '../components/ReportView.jsx'
+import QueueEta from '../components/QueueEta.jsx'
 import StatusPill, { SourcePill } from '../components/StatusPill.jsx'
 import AlertBanner from '../components/ui/AlertBanner.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
@@ -228,13 +229,19 @@ export default function BranchEntryPage() {
   const [verificationStatusMessage, setVerificationStatusMessage] = useState('')
   const [sendingVerification, setSendingVerification] = useState(false)
   const [confirmingVerification, setConfirmingVerification] = useState(false)
+  const [etaSyncedAt, setEtaSyncedAt] = useState(0)
   const toast = useToast()
+
+  function applyEntry(data) {
+    setEntry(data)
+    setEtaSyncedAt(Date.now())
+  }
 
   useEffect(() => {
     api('/api/v1/auth/me')
       .then(() => api(`/api/v1/branch/branch-entries/${id}`))
       .then((data) => {
-        setEntry(data)
+        applyEntry(data)
         setError('')
         const open = {}
         ;(data.documents || []).forEach((d, i) => { open[d.id] = i === 0 })
@@ -260,7 +267,7 @@ export default function BranchEntryPage() {
     if (!['pending', 'analyzing'].includes(entry.status)) return undefined
     const timer = setInterval(() => {
       api(`/api/v1/branch/branch-entries/${id}`)
-        .then(setEntry)
+        .then(applyEntry)
         .catch(() => {})
     }, 4000)
     return () => clearInterval(timer)
@@ -286,11 +293,11 @@ export default function BranchEntryPage() {
       const message = `Email sent to ${result.verification_email_target}. Status: ${result.verification_email_status}`
       setVerificationStatusMessage(message)
       toast.success('Verification email sent', message, {
-        action: { label: 'Refresh', onClick: () => { api(`/api/v1/branch/branch-entries/${id}`).then((u) => setEntry(u)).catch(() => {}) } },
+        action: { label: 'Refresh', onClick: () => { api(`/api/v1/branch/branch-entries/${id}`).then((u) => applyEntry(u)).catch(() => {}) } },
         duration: 8000,
       })
       const updated = await api(`/api/v1/branch/branch-entries/${id}`)
-      setEntry(updated)
+      applyEntry(updated)
     } catch (err) {
       const msg = err.message || 'Failed to send verification email.'
       setVerificationStatusMessage(msg)
@@ -315,11 +322,11 @@ export default function BranchEntryPage() {
       const message = `Verification confirmed at ${result.verification_email_confirmed_at}`
       setVerificationStatusMessage(message)
       toast.success('Verification confirmed', message, {
-        action: { label: 'Refresh', onClick: () => { api(`/api/v1/branch/branch-entries/${id}`).then((u) => setEntry(u)).catch(() => {}) } },
+        action: { label: 'Refresh', onClick: () => { api(`/api/v1/branch/branch-entries/${id}`).then((u) => applyEntry(u)).catch(() => {}) } },
         duration: 8000,
       })
       const updated = await api(`/api/v1/branch/branch-entries/${id}`)
-      setEntry(updated)
+      applyEntry(updated)
     } catch (err) {
       const msg = err.message || 'Failed to confirm verification.'
       setVerificationStatusMessage(msg)
@@ -386,7 +393,10 @@ export default function BranchEntryPage() {
               >
                 <div className="page-header-pills">
                   <SourcePill source="branch_entry" />
-                  <StatusPill status={entry.status || 'pending'} />
+                  <div className="queue-status-cell">
+                    <StatusPill status={entry.status || 'pending'} />
+                    <QueueEta eta={entry.queue_eta} syncedAt={etaSyncedAt} compact />
+                  </div>
                   {entry.has_report ? <span className="page-header-badge">Report ready</span> : null}
                   <span className="page-header-badge">{docCount} documents</span>
                 </div>
@@ -394,6 +404,11 @@ export default function BranchEntryPage() {
 
               {['pending', 'analyzing'].includes(entry.status) || workflowProgress ? (
                 <div className="ai-activity-wrap" style={{ marginBottom: '1.5rem' }}>
+                  {entry.queue_eta ? (
+                    <p className="queue-eta-banner">
+                      <QueueEta eta={entry.queue_eta} syncedAt={etaSyncedAt} />
+                    </p>
+                  ) : null}
                   <AiActivityPanel
                     title="Cognexa AI Activity"
                     message={workflowProgress?.message || 'OCR, extraction, and cross-document checks are running…'}

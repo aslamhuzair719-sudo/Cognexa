@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import QueueEta from '../components/QueueEta.jsx'
 import StatusPill, { SourcePill } from '../components/StatusPill.jsx'
 import AlertBanner from '../components/ui/AlertBanner.jsx'
 import Button from '../components/ui/Button.jsx'
@@ -19,11 +20,13 @@ export default function BranchQueuePage() {
   const [statusFilter, setStatusFilter] = useState('active')
   const [sourceFilter, setSourceFilter] = useState('all')
   const [sortBy, setSortBy] = useState('newest')
+  const [listSyncedAt, setListSyncedAt] = useState(0)
 
   async function refreshList() {
     try {
       const data = await api('/api/v1/branch/records')
       setRows(data)
+      setListSyncedAt(Date.now())
       setListError('')
       return data
     } catch (err) {
@@ -190,7 +193,12 @@ export default function BranchQueuePage() {
                     <td>{a.mobile_number || '—'}</td>
                     <td>{a.document_count ?? (a.source === 'customer_portal' ? 4 : '—')}</td>
                     <td>{(a.created_at || '').slice(0, 10)}</td>
-                    <td><StatusPill status={a.status} /></td>
+                    <td>
+                      <div className="queue-status-cell">
+                        <StatusPill status={a.status} />
+                        <QueueEta eta={a.queue_eta} syncedAt={listSyncedAt} compact />
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
