@@ -4004,3 +4004,15 @@ imaplib.IMAP4.abort: socket error: EOF
 2026-08-20 16:35:36 | INFO     | app.services.ocr_service | Running OCR on image: 6bf45075-f88c-4e68-bd99-d9626926b23d.png
 2026-08-20 16:35:36 | WARNING  | app.services.classifier | Unable to classify document from OCR text
 2026-08-20 16:35:36 | INFO     | app.services.workflow_queue | Completed workflow processing for e63adeac-12e4-40c6-a1ce-228a6f439878
+2026-08-20 19:12:04 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-20 19:12:04 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-20 19:12:04 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-20 19:12:04 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-20 19:12:04 | INFO     | app.db | Database initialized and seeded
+2026-08-20 19:12:04 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-20 19:12:04 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-20 19:12:04 | INFO     | app.services.workflow_queue | Seeded workflow duration from 10 audit sample(s)
+2026-08-20 19:12:04 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-20 19:18:31 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
+2026-08-20 19:18:56 | INFO     | app.services.email_queue | Queued verification VER-70138ce21f3b4408 for email delivery
+2026-08-20 19:19:00 | INFO     | app.services.email_queue | Verification email delivered for VER-70138ce21f3b4408

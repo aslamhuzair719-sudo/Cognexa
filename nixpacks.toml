@@ -1,2 +1,18 @@
 [phases.setup]
-nixPkgs = ["libGL", "libglib2", "libxkbcommon"]
+nixPkgs = ["libGL", "libglib2", "libxkbcommon", "glib"]
+
+[phases.install]
+cmds = [
+    "pip install --no-cache-dir -r requirements.txt"
+]
+
+[phases.build]
+cmds = [
+    "pip show opencv-python",
+    "pip show opencv-python-headless",
+    "pip show paddleocr",
+    "pip check"
+]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"
