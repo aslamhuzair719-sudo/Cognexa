@@ -37,32 +37,38 @@ export const CNIC_TEXT_FIELDS = [
   { key: 'expiry_date', label: 'Date of Expiry' },
 ]
 
+export const PAYSLIP_FIELD_GROUPS = [
+  { id: 'identity', title: 'Employee & Employer' },
+  { id: 'period', title: 'Pay Period' },
+  { id: 'pay', title: 'Compensation' },
+  { id: 'contact', title: 'Contact' },
+  { id: 'authenticity', title: 'Document Authenticity' },
+]
+
 export const PAYSLIP_TEXT_FIELDS = [
-  { key: 'validity_status', label: 'Validity Status' },
-  { key: 'validity_score', label: 'Validity Score' },
-  { key: 'validity_reason', label: 'Validity Reason', full: true },
-  { key: 'company_name', label: 'Company Name', full: true },
-  { key: 'company_address', label: 'Company Address', full: true },
-  { key: 'company_email', label: 'Company Email' },
-  { key: 'company_phone', label: 'Company Phone' },
-  { key: 'payslip_number', label: 'Payslip No' },
-  { key: 'payslip_date', label: 'Payslip Date' },
-  { key: 'pay_period_start', label: 'Pay Period Start' },
-  { key: 'pay_period_end', label: 'Pay Period End' },
-  { key: 'employee_name', label: 'Employee Name' },
-  { key: 'employee_location', label: 'Employee Location' },
-  { key: 'employee_email', label: 'Employee Email' },
-  { key: 'employee_phone', label: 'Employee Phone' },
-  { key: 'overtime_hours', label: 'Overtime Hours' },
-  { key: 'overtime_rate', label: 'Overtime Rate' },
-  { key: 'overtime_amount_current', label: 'Overtime (Current)' },
-  { key: 'overtime_amount_ytd', label: 'Overtime (YTD)' },
-  { key: 'gross_pay_current', label: 'Gross Pay (Current)' },
-  { key: 'gross_pay_ytd', label: 'Gross Pay (YTD)' },
-  { key: 'total_deduction_current', label: 'Total Deduction (Current)' },
-  { key: 'total_deduction_ytd', label: 'Total Deduction (YTD)' },
-  { key: 'net_pay_current', label: 'Net Pay (Current)' },
-  { key: 'net_pay_ytd', label: 'Net Pay (YTD)' },
+  { key: 'company_name', label: 'Company Name', group: 'identity' },
+  { key: 'employee_name', label: 'Employee Name', group: 'identity' },
+  { key: 'employee_id', label: 'Employee ID', group: 'identity' },
+  { key: 'designation', label: 'Designation', group: 'identity' },
+  { key: 'department', label: 'Department', group: 'identity' },
+  { key: 'employment_status', label: 'Employment Status', group: 'identity' },
+  { key: 'payslip_period', label: 'Payslip Period', group: 'period', full: true },
+  { key: 'period_start', label: 'Period Start', group: 'period' },
+  { key: 'period_end', label: 'Period End', group: 'period' },
+  { key: 'payment_date', label: 'Payment Date', group: 'period' },
+  { key: 'payslip_date', label: 'Payslip Date', group: 'period' },
+  { key: 'payslip_number', label: 'Payslip Number', group: 'period' },
+  { key: 'basic_salary', label: 'Basic Salary', group: 'pay' },
+  { key: 'gross_salary', label: 'Gross Salary', group: 'pay' },
+  { key: 'overtime', label: 'Overtime', group: 'pay' },
+  { key: 'deductions', label: 'Deductions', group: 'pay' },
+  { key: 'net_pay', label: 'Net Pay', group: 'pay' },
+  { key: 'net_salary', label: 'Net Salary', group: 'pay' },
+  { key: 'email', label: 'Email', group: 'contact' },
+  { key: 'phone', label: 'Phone', group: 'contact' },
+  { key: 'validity_status', label: 'Validity Status', group: 'authenticity' },
+  { key: 'validity_score', label: 'Validity Score', group: 'authenticity' },
+  { key: 'validity_reason', label: 'Validity Reason', group: 'authenticity', full: true },
 ]
 
 export const BANK_STATEMENT_TEXT_FIELDS = [
@@ -128,6 +134,38 @@ export function emptyFieldsForDocType(docType) {
   return fields
 }
 
+const PAYSLIP_ALIASES = {
+  employee_email: 'email',
+  employee_phone: 'phone',
+  company_email: 'email',
+  company_phone: 'phone',
+  pay_period_start: 'period_start',
+  pay_period_end: 'period_end',
+  pay_period: 'payslip_period',
+  gross_pay_current: 'gross_salary',
+  gross_pay: 'gross_salary',
+  net_pay_current: 'net_pay',
+  total_deduction_current: 'deductions',
+  overtime_amount_current: 'overtime',
+  overtime_pay: 'overtime',
+}
+
+function applyPayslipAliases(source, fields) {
+  for (const [from, to] of Object.entries(PAYSLIP_ALIASES)) {
+    const raw = source[from]
+    if (!fields[to] && raw != null && String(raw).trim()) {
+      fields[to] = String(raw)
+    }
+  }
+  if (!fields.payslip_period && (fields.period_start || fields.period_end)) {
+    fields.payslip_period = [fields.period_start, fields.period_end].filter(Boolean).join(' - ')
+  }
+  if (!fields.net_salary && fields.net_pay) fields.net_salary = fields.net_pay
+  if (!fields.net_pay && fields.net_salary) fields.net_pay = fields.net_salary
+  if (!fields.designation && source.department) fields.designation = String(source.department)
+  return fields
+}
+
 export function buildFormFromResult(data, selectedDocType) {
   const docType = String(selectedDocType || '').trim()
   const pipeline = String(data?.pipeline || '')
@@ -141,6 +179,7 @@ export function buildFormFromResult(data, selectedDocType) {
       const value = data.fields[key]
       fields[key] = value == null ? '' : String(value)
     }
+    if (docType === 'payslip') applyPayslipAliases(data.fields, fields)
     const checkboxes = {}
     if (config.checkboxes.length) {
       const sourceChecks = data.checkboxes || data.fields || {}
@@ -191,9 +230,9 @@ export function buildDraftKeyFields(formMode, fields, checkboxes) {
   if (formMode === 'payslip') {
     return {
       parties: fields.employee_name || null,
-      amount: fields.net_pay_current || fields.gross_pay_current || null,
-      date: fields.payslip_date || null,
-      reference_number: fields.payslip_number || null,
+      amount: fields.net_pay || fields.gross_salary || null,
+      date: fields.payment_date || fields.payslip_date || fields.payslip_period || null,
+      reference_number: fields.payslip_number || fields.employee_id || null,
       ...fields,
     }
   }
@@ -218,6 +257,11 @@ export function customerNameGuess(fields, formMode) {
     return fields.applicant_name || fields.beneficiary_name || ''
   }
   return fields.applicant_name || fields.beneficiary_name || fields.parties || ''
+}
+
+export function getFieldGroupsForMode(mode) {
+  if (mode === 'payslip') return PAYSLIP_FIELD_GROUPS
+  return []
 }
 
 export function getTextFieldsForMode(mode) {

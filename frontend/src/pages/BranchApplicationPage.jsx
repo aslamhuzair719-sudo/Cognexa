@@ -270,6 +270,8 @@ export default function BranchApplicationPage() {
                   : (detail.ai_progress?.messages || [])
               }
               aiWorking={Boolean(detail.ai_progress?.ai_working)}
+              collapsible={!['pending', 'analyzing'].includes(detail.status)}
+              defaultCollapsed={!['pending', 'analyzing'].includes(detail.status)}
             />
           </div>
         ) : null}

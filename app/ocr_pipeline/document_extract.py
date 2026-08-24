@@ -13,6 +13,7 @@ from app import config
 from app.logging_config import get_logger
 from app.ocr_pipeline.llm_extract import _strip_json_fence
 from app.prompts.manager import PromptManager
+from app.schemas.payslip import PAYSLIP_FORM_KEYS, canonicalize_payslip_fields
 from app.services.llm_factory import (
     call_llm_text,
     call_llm_vision_source,
@@ -35,33 +36,7 @@ CNIC_FIELD_KEYS = (
     "expiry_date",
 )
 
-PAYSLIP_FIELD_KEYS = (
-    "validity_status",
-    "validity_score",
-    "validity_reason",
-    "company_name",
-    "company_address",
-    "company_email",
-    "company_phone",
-    "payslip_number",
-    "payslip_date",
-    "pay_period_start",
-    "pay_period_end",
-    "employee_name",
-    "employee_location",
-    "employee_email",
-    "employee_phone",
-    "overtime_hours",
-    "overtime_rate",
-    "overtime_amount_current",
-    "overtime_amount_ytd",
-    "gross_pay_current",
-    "gross_pay_ytd",
-    "total_deduction_current",
-    "total_deduction_ytd",
-    "net_pay_current",
-    "net_pay_ytd",
-)
+PAYSLIP_FIELD_KEYS = PAYSLIP_FORM_KEYS
 
 BANK_STATEMENT_FIELD_KEYS = (
     "account_title",
@@ -122,10 +97,18 @@ _HEADER_RULES = (
 )
 
 
-def _normalize_fields(data: Dict[str, Any], keys: tuple[str, ...]) -> Dict[str, Any]:
+def _normalize_fields(
+    data: Dict[str, Any],
+    keys: tuple[str, ...],
+    *,
+    document_type: str = "",
+) -> Dict[str, Any]:
+    source = dict(data or {})
+    if document_type == "payslip":
+        source.update(canonicalize_payslip_fields(source))
     out: Dict[str, Any] = {}
     for key in keys:
-        value = data.get(key, "")
+        value = source.get(key, "")
         out[key] = "" if value is None else str(value).strip()
     return out
 
@@ -366,7 +349,7 @@ def extract_document_from_ocr_text(
     engine, used_model = llm_engine_label(vision=False)
 
     parsed = _parse_llm_json(raw, document_type)
-    result = _normalize_fields(parsed, keys)
+    result = _normalize_fields(parsed, keys, document_type=document_type)
     result["meta"] = {
         "engine": engine,
         "model": used_model,
@@ -403,7 +386,7 @@ def _extract_with_vision(
     parsed = _parse_llm_json(raw, document_type)
 
     if document_type == "bank_statement":
-        fields = _normalize_fields(parsed, BANK_STATEMENT_FIELD_KEYS)
+        fields = _normalize_fields(parsed, BANK_STATEMENT_FIELD_KEYS, document_type=document_type)
         tx_raw = parsed.get("transactions")
         transactions: List[Dict[str, str]] = []
         if isinstance(tx_raw, list):
@@ -422,7 +405,7 @@ def _extract_with_vision(
         return result
 
     keys = DOCUMENT_FIELD_KEYS[document_type]
-    result = _normalize_fields(parsed, keys)
+    result = _normalize_fields(parsed, keys, document_type=document_type)
     result["meta"] = {
         "engine": engine,
         "model": used_model,

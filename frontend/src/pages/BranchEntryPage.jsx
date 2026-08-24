@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
 import { AiActivityPanel } from '../components/AiActivityPanel.jsx'
+import ExtractedFieldGrid from '../components/ExtractedFieldGrid.jsx'
 import BrandHeader from '../components/BrandHeader.jsx'
 import ReportView from '../components/ReportView.jsx'
 import QueueEta from '../components/QueueEta.jsx'
@@ -9,6 +10,7 @@ import StatusPill, { SourcePill } from '../components/StatusPill.jsx'
 import AlertBanner from '../components/ui/AlertBanner.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
 import { useToast } from '../components/ui/ToastProvider.jsx'
+import { getTextFieldsForMode } from '../config/scanForms.js'
 
 const DOC_LABELS = {
   cnic_front: 'CNIC front',
@@ -47,12 +49,20 @@ function workflowProgressSteps(progress) {
   const stage = String(progress?.stage || '').toLowerCase()
   const order = ['starting', 'ocr', 'llm', 'validating', 'report', 'complete']
   const index = order.indexOf(stage)
-  return order.map((key, stepIndex) => ({
-    key,
-    label: key.replace(/_/g, ' '),
-    done: progress?.done || (index >= 0 && stepIndex <= index),
-    active: index === stepIndex && !progress?.done,
-  }))
+  return order.map((id, stepIndex) => {
+    let state = 'todo'
+    if (progress?.done || (index >= 0 && stepIndex < index) || id === 'complete' && progress?.done) {
+      state = 'done'
+    } else if (index === stepIndex) {
+      state = 'active'
+    }
+    if (progress?.done) state = 'done'
+    return {
+      id,
+      label: id.replace(/_/g, ' '),
+      state,
+    }
+  })
 }
 
 function VerificationForm({
@@ -179,16 +189,25 @@ function DocumentList({ documents, expanded, setExpanded }) {
 
             {isOpen ? (
               <>
-                <div className="scan-edit-grid" style={{ marginTop: '0.85rem' }}>
-                  {Object.keys(fields).length ? Object.entries(fields).map(([key, value]) => (
-                    <label key={key} className="field">
-                      {humanizeKey(key)}
-                      <input value={value == null ? '' : String(value)} readOnly />
-                    </label>
-                  )) : (
-                    <p className="hint">No text fields stored for this document.</p>
-                  )}
-                </div>
+                {doc.document_type === 'payslip' ? (
+                  <ExtractedFieldGrid
+                    fields={getTextFieldsForMode('payslip')}
+                    values={fields}
+                    readOnly
+                    mode="payslip"
+                  />
+                ) : Object.keys(fields).length ? (
+                  <div className="scan-edit-grid" style={{ marginTop: '0.85rem' }}>
+                    {Object.entries(fields).map(([key, value]) => (
+                      <label key={key} className={`field banking-field${value ? ' is-filled' : ' is-empty'}`}>
+                        <span className="banking-field-label">{humanizeKey(key)}</span>
+                        <input value={value == null ? '' : String(value)} readOnly placeholder="Not found on document" />
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="hint">No text fields stored for this document.</p>
+                )}
                 {Object.keys(checks).length > 0 ? (
                   <div className="scan-checkbox-section">
                     <p className="eyebrow" style={{ marginBottom: '0.65rem' }}>Checkboxes</p>
@@ -424,6 +443,8 @@ export default function BranchEntryPage() {
                         : [workflowProgress?.message].filter(Boolean)
                     }
                     aiWorking={['pending', 'analyzing'].includes(entry.status)}
+                    collapsible={!['pending', 'analyzing'].includes(entry.status)}
+                    defaultCollapsed={!['pending', 'analyzing'].includes(entry.status)}
                   />
                 </div>
               ) : null}

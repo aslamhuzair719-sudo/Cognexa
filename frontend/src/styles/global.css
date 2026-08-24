@@ -2357,6 +2357,10 @@ button.linkish:hover { text-decoration: underline; }
 
 .ai-activity-head {
   margin-bottom: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .ai-activity-live {

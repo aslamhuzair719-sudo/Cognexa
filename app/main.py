@@ -142,8 +142,10 @@ def index():
 @app.get("/branch/audit")
 @app.get("/branch/scan")
 @app.get("/branch/signatures")
+@app.get("/branch/archive")
 @app.get("/branch/applications/{application_id}")
-def spa_routes(application_id: str | None = None):
+@app.get("/branch/entries/{entry_id}")
+def spa_routes(application_id: str | None = None, entry_id: str | None = None):
     return FileResponse(_spa_index())
 
 

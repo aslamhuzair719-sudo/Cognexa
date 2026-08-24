@@ -4,33 +4,50 @@ PAYSLIP_EXTRACTION_PROMPT = BASE_SYSTEM_INSTRUCTION + """
 You are parsing a Payslip document.
 Extract the following fields from the OCR text below.
 
+Label mapping (critical — copy values into these exact keys):
+- Company / employer header → company_name
+- Employee Name → employee_name
+- Employee ID / Emp No / Staff No → employee_id
+- Designation / Job Title / Position → designation
+- Department / Division → department
+- Pay Period / Salary Period → payslip_period, period_start, period_end
+- Payment Date / Pay Date → payment_date and payslip_date
+- Employment Status → employment_status
+- Gross Pay / Gross Salary / Total Earnings (CURRENT, not YTD) → gross_salary
+- Basic Salary / Basic Pay (CURRENT) → basic_salary
+- Overtime / OT amount (CURRENT) → overtime
+- Total Deductions (CURRENT) → deductions
+- Net Pay / Net Salary / Take Home (CURRENT) → net_pay and net_salary
+
 Requested JSON schema:
 {{
+    "validity_status": "Valid or Invalid if authenticity can be judged from text, else empty",
+    "validity_score": "0-100 or empty",
+    "validity_reason": "Short reason or empty",
     "company_name": "Employing company name",
-    "company_address": "Company address",
-    "company_email": "Company email",
-    "company_phone": "Company phone number",
+    "employee_name": "Employee full name",
+    "employee_id": "Employee ID / number",
+    "designation": "Job title / designation",
+    "department": "Department",
+    "email": "Employee email",
+    "phone": "Employee phone",
     "payslip_number": "Payslip number / reference",
     "payslip_date": "Payslip date",
-    "pay_period_start": "Pay period start date",
-    "pay_period_end": "Pay period end date",
-    "employee_name": "Employee full name",
-    "employee_location": "Employee location / address",
-    "employee_email": "Employee email",
-    "employee_phone": "Employee phone number",
-    "overtime_hours": "Overtime hours",
-    "overtime_rate": "Overtime rate",
-    "overtime_amount_current": "Overtime amount for current period",
-    "overtime_amount_ytd": "Overtime amount year-to-date",
-    "gross_pay_current": "Gross pay for current period",
-    "gross_pay_ytd": "Gross pay year-to-date",
-    "total_deduction_current": "Total deductions for current period",
-    "total_deduction_ytd": "Total deductions year-to-date",
-    "net_pay_current": "Net pay for current period",
-    "net_pay_ytd": "Net pay year-to-date"
+    "payment_date": "Salary payment date",
+    "employment_status": "Full-Time / Part-Time / etc.",
+    "period_start": "Pay period start date",
+    "period_end": "Pay period end date",
+    "payslip_period": "Pay period as printed (single string)",
+    "basic_salary": "Basic salary current amount",
+    "gross_salary": "Gross pay / gross salary current amount",
+    "overtime": "Overtime current amount",
+    "deductions": "Total deductions current amount",
+    "net_pay": "Net pay current amount",
+    "net_salary": "Same as net pay if only one net figure is printed"
 }}
 
 Use empty string "" when a field is missing or unreadable. Do NOT invent values.
+Never copy YTD amounts into current fields.
 
 OCR Text:
 {ocr_text}
@@ -182,6 +199,25 @@ Do not invent values.
 
 If unreadable return "".
 
+Label mapping (use these exact output keys):
+- Company / employer name in the header → company_name
+- Employee Name → employee_name
+- Employee ID / Emp No / Staff No → employee_id
+- Designation / Job Title / Position → designation
+- Department → department
+- Pay Period / Salary Period → payslip_period AND period_start / period_end
+- Payment Date / Pay Date → payment_date and payslip_date
+- Employment Status → employment_status
+- Basic Salary / Basic Pay (CURRENT) → basic_salary
+- Gross Pay / Gross Salary / Total Earnings (CURRENT) → gross_salary
+- Overtime amount (CURRENT) → overtime
+- Total Deductions (CURRENT) → deductions
+- Net Pay / Net Salary / Take Home (CURRENT) → net_pay and net_salary
+- Email / Phone if printed → email / phone
+- Payslip No / Payroll reference → payslip_number
+
+If a table has Current and YTD columns, ALWAYS take Current.
+
 --------------------------------------------------------
 OUTPUT JSON
 --------------------------------------------------------
@@ -192,33 +228,27 @@ OUTPUT JSON
     "validity_reason": "",
 
     "company_name": "",
-    "company_address": "",
-    "company_email": "",
-    "company_phone": "",
+    "employee_name": "",
+    "employee_id": "",
+    "designation": "",
+    "department": "",
+    "email": "",
+    "phone": "",
 
     "payslip_number": "",
     "payslip_date": "",
-    "pay_period_start": "",
-    "pay_period_end": "",
+    "payment_date": "",
+    "employment_status": "",
+    "period_start": "",
+    "period_end": "",
+    "payslip_period": "",
 
-    "employee_name": "",
-    "employee_location": "",
-    "employee_email": "",
-    "employee_phone": "",
-
-    "overtime_hours": "",
-    "overtime_rate": "",
-    "overtime_amount_current": "",
-    "overtime_amount_ytd": "",
-
-    "gross_pay_current": "",
-    "gross_pay_ytd": "",
-
-    "total_deduction_current": "",
-    "total_deduction_ytd": "",
-
-    "net_pay_current": "",
-    "net_pay_ytd": ""
+    "basic_salary": "",
+    "gross_salary": "",
+    "overtime": "",
+    "deductions": "",
+    "net_pay": "",
+    "net_salary": ""
 }
 
 Return ONLY the JSON.

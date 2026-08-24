@@ -4016,3 +4016,101 @@ imaplib.IMAP4.abort: socket error: EOF
 2026-08-20 19:18:31 | INFO     | __main__ | Starting verification reply worker, polling every 60 seconds
 2026-08-20 19:18:56 | INFO     | app.services.email_queue | Queued verification VER-70138ce21f3b4408 for email delivery
 2026-08-20 19:19:00 | INFO     | app.services.email_queue | Verification email delivered for VER-70138ce21f3b4408
+2026-08-21 16:21:19 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-21 16:21:19 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-21 16:21:19 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-21 16:21:19 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-21 16:21:19 | INFO     | app.db | Database initialized and seeded
+2026-08-21 16:21:19 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-21 16:21:19 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-21 16:21:19 | INFO     | app.services.workflow_queue | Seeded workflow duration from 10 audit sample(s)
+2026-08-21 16:21:19 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-22 15:29:43 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-22 15:29:43 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-22 15:29:43 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-22 15:29:43 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-22 15:29:43 | INFO     | app.db | Database initialized and seeded
+2026-08-22 15:29:43 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-22 15:29:43 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-22 15:29:43 | INFO     | app.services.workflow_queue | Seeded workflow duration from 10 audit sample(s)
+2026-08-22 15:29:43 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-24 13:42:49 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-24 13:42:49 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-24 13:42:49 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-24 13:42:49 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-24 13:42:49 | INFO     | app.db | Database initialized and seeded
+2026-08-24 13:42:49 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-24 13:42:49 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-24 13:42:50 | INFO     | app.services.workflow_queue | Seeded workflow duration from 10 audit sample(s)
+2026-08-24 13:42:50 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-24 13:43:50 | INFO     | app.services.ocr_service | Running OCR on image: tmpq7gr7kg9.png
+2026-08-24 13:43:50 | INFO     | app.services.ocr_service | Running OCR on image: tmpor45qa4o.png
+2026-08-24 13:43:51 | INFO     | app.services.ocr_service | Running OCR on image: tmpmcfff_cj.png
+2026-08-24 13:44:09 | INFO     | app.services.ocr_service | Running OCR on image: tmpxahhpmyk.png
+2026-08-24 13:44:09 | INFO     | app.services.ocr_service | Running OCR on image: tmpbv54t7qq.png
+2026-08-24 13:44:10 | INFO     | app.services.ocr_service | Running OCR on image: tmp7kn91g1z.png
+2026-08-24 13:44:10 | INFO     | app.services.ocr_service | Running OCR on image: tmp7q3mq3zn.png
+2026-08-24 13:44:11 | INFO     | app.services.ocr_service | Running OCR on image: tmpz69v27f_.png
+2026-08-24 13:44:11 | INFO     | app.services.ocr_service | Running OCR on image: tmp1hhp9gkr.png
+2026-08-24 13:44:11 | INFO     | app.services.workflow_queue | Queued branch entry 612bf569-a961-49a6-96ef-dc6a45e55e44 for workflow extraction
+2026-08-24 13:44:12 | INFO     | app.services.ocr_service | Running OCR on image: 3ad77a4b-8a9d-4938-a0d6-6b07d21d106b.png
+2026-08-24 13:44:12 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for account_opening_form
+2026-08-24 13:44:46 | INFO     | app.services.ocr_service | Running OCR on image: 00af22d8-d986-4af0-b1c1-c2f3166bf124.png
+2026-08-24 13:44:47 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for cnic
+2026-08-24 13:45:04 | INFO     | app.services.ocr_service | Running OCR on image: 5f02d467-3270-4a47-8d12-1b016a591f69.png
+2026-08-24 13:45:04 | INFO     | app.services.gemini_service | Gemini vision extraction attempt 1/3 for payslip
+2026-08-24 13:45:58 | INFO     | app.services.workflow_queue | Completed workflow processing for 612bf569-a961-49a6-96ef-dc6a45e55e44
+2026-08-24 14:02:52 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-24 14:02:52 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-24 14:02:52 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-24 14:02:52 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-24 14:02:52 | INFO     | app.db | Database initialized and seeded
+2026-08-24 14:02:52 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-24 14:02:52 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-24 14:02:52 | INFO     | app.services.workflow_queue | Seeded workflow duration from 11 audit sample(s)
+2026-08-24 14:02:52 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-24 14:08:41 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-24 14:08:41 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-24 14:08:41 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-24 14:08:41 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-24 14:08:42 | INFO     | app.db | Database initialized and seeded
+2026-08-24 14:08:42 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-24 14:08:42 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-24 14:08:42 | INFO     | app.services.workflow_queue | Seeded workflow duration from 11 audit sample(s)
+2026-08-24 14:08:42 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-24 14:08:46 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-24 14:08:46 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-24 14:08:46 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-24 14:08:46 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-24 14:08:46 | INFO     | app.db | Database initialized and seeded
+2026-08-24 14:08:46 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-24 14:08:46 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-24 14:08:46 | INFO     | app.services.workflow_queue | Seeded workflow duration from 11 audit sample(s)
+2026-08-24 14:08:46 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-24 14:10:01 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-24 14:10:01 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-24 14:10:01 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-24 14:10:01 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-24 14:10:02 | INFO     | app.db | Database initialized and seeded
+2026-08-24 14:10:02 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-24 14:10:02 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-24 14:10:02 | INFO     | app.services.workflow_queue | Seeded workflow duration from 11 audit sample(s)
+2026-08-24 14:10:02 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-24 14:11:23 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-24 14:11:23 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-24 14:11:23 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-24 14:11:23 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-24 14:11:23 | INFO     | app.db | Database initialized and seeded
+2026-08-24 14:11:23 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-24 14:11:23 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-24 14:11:23 | INFO     | app.services.workflow_queue | Seeded workflow duration from 11 audit sample(s)
+2026-08-24 14:11:23 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-24 14:14:36 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-24 14:14:36 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-24 14:14:36 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-24 14:14:36 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-24 14:14:36 | INFO     | app.db | Database initialized and seeded
+2026-08-24 14:14:36 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-24 14:14:36 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-24 14:14:36 | INFO     | app.services.workflow_queue | Seeded workflow duration from 11 audit sample(s)
+2026-08-24 14:14:36 | INFO     | app.services.workflow_queue | Workflow queue worker started

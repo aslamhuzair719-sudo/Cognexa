@@ -1422,6 +1422,11 @@ def _get_branch_entry(db: Session, user: User, entry_id: UUID) -> BranchEntry:
 def _branch_entry_doc_meta(entry_id: UUID, doc: BranchEntryDocument) -> dict:
     path = Path(doc.file_path)
     suffix = path.suffix.lower()
+    fields = doc.fields_json or {}
+    if doc.document_type == "payslip":
+        from app.utils.payslip_ocr import enrich_payslip_from_ocr
+
+        fields = enrich_payslip_from_ocr(doc.extracted_text or "", fields)
     return {
         "id": str(doc.id),
         "document_type": doc.document_type,
@@ -1432,7 +1437,7 @@ def _branch_entry_doc_meta(entry_id: UUID, doc: BranchEntryDocument) -> dict:
         "url": f"/api/v1/branch/branch-entries/{entry_id}/documents/{doc.id}",
         "is_image": suffix in IMAGE_EXTENSIONS,
         "is_pdf": suffix == ".pdf",
-        "fields": doc.fields_json or {},
+        "fields": fields,
         "checkboxes": doc.checkboxes_json or {},
         "summary": doc.summary_json or {},
         "extracted_text": doc.extracted_text or "",

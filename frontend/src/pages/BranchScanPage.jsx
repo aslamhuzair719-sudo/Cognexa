@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api'
 import { AiActivityPanel, buildScanSteps } from '../components/AiActivityPanel.jsx'
+import ExtractedFieldGrid from '../components/ExtractedFieldGrid.jsx'
 import AlertBanner from '../components/ui/AlertBanner.jsx'
 import PageHeader from '../components/ui/PageHeader.jsx'
 import {
@@ -55,27 +56,14 @@ function buildDraftItem({ file, docType, result, fields, checkboxes, formMode, t
   }
 }
 
-function StructuredFieldGrid({ fields, editFields, onChange }) {
+function StructuredFieldGrid({ fields, editFields, onChange, mode }) {
   return (
-    <div className="scan-edit-grid">
-      {fields.map(({ key, label, full }) => (
-        <label key={key} className={`field${full ? ' full' : ''}`}>
-          {label}
-          {full ? (
-            <textarea
-              rows={2}
-              value={editFields[key] || ''}
-              onChange={(e) => onChange(key, e.target.value)}
-            />
-          ) : (
-            <input
-              value={editFields[key] || ''}
-              onChange={(e) => onChange(key, e.target.value)}
-            />
-          )}
-        </label>
-      ))}
-    </div>
+    <ExtractedFieldGrid
+      fields={fields}
+      values={editFields}
+      onChange={onChange}
+      mode={mode}
+    />
   )
 }
 
@@ -977,6 +965,8 @@ export default function BranchScanPage() {
                 steps={liveSteps}
                 messages={completionMessages}
                 aiWorking={false}
+                collapsible
+                defaultCollapsed
               />
             </div>
 
@@ -1122,6 +1112,7 @@ export default function BranchScanPage() {
                       fields={getTextFieldsForMode(formMode)}
                       editFields={editFields}
                       onChange={updateField}
+                      mode={formMode}
                     />
                     {getCheckboxesForMode(formMode).length > 0 && (
                       <div className="scan-checkbox-section">

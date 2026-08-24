@@ -17,6 +17,7 @@ from app.utils.normalize import (
     gender_from_cnic_number,
     is_valid_cnic,
 )
+from app.utils.payslip_ocr import enrich_payslip_from_ocr
 
 logger = get_logger(__name__)
 
@@ -136,6 +137,8 @@ class ExtractionPipeline:
         """Fix fields the LLM commonly mangles using deterministic OCR patterns."""
         if doc_type == "account_opening_form":
             return self._compose_applicant_name(fields)
+        if doc_type == "payslip":
+            return enrich_payslip_from_ocr(ocr_text, fields)
         if doc_type != "cnic":
             return fields
 
