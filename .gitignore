@@ -17,7 +17,7 @@ pip-wheel-metadata/
 venv/
 env/
 ENV/
-frontend/
+
 
 # Type checkers / linters
 .mypy_cache/
