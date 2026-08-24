@@ -6,6 +6,7 @@ import { ToastProvider } from './components/ui/ToastProvider.jsx'
 import './styles/global.css'
 import './styles/ui-enhancements.css'
 import './styles/design-system.css'
+import './styles/corporate-ui.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

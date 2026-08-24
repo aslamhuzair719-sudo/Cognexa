@@ -4114,3 +4114,12 @@ imaplib.IMAP4.abort: socket error: EOF
 2026-08-24 14:14:36 | INFO     | app.services.email_queue | Verification email queue started
 2026-08-24 14:14:36 | INFO     | app.services.workflow_queue | Seeded workflow duration from 11 audit sample(s)
 2026-08-24 14:14:36 | INFO     | app.services.workflow_queue | Workflow queue worker started
+2026-08-24 17:24:43 | INFO     | app.db_migrate | Ensured branch_entries schema
+2026-08-24 17:24:43 | INFO     | app.db_migrate | Ensured document_archives schema
+2026-08-24 17:24:43 | INFO     | app.db_migrate | Ensured signature_records schema
+2026-08-24 17:24:43 | INFO     | app.db_migrate | Ensured verifications schema
+2026-08-24 17:24:43 | INFO     | app.db | Database initialized and seeded
+2026-08-24 17:24:43 | INFO     | app.services.analysis_queue | Analysis queue worker started
+2026-08-24 17:24:43 | INFO     | app.services.email_queue | Verification email queue started
+2026-08-24 17:24:43 | INFO     | app.services.workflow_queue | Seeded workflow duration from 11 audit sample(s)
+2026-08-24 17:24:43 | INFO     | app.services.workflow_queue | Workflow queue worker started
